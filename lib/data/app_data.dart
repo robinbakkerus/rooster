@@ -19,6 +19,17 @@ class AppData {
   double screenWidth = 600.0; //assume
   double screenHeight = 600.0; //assume
   late String trainerId = "";
+  SpreadSheet _spreadSheet = SpreadSheet();
+  SpreadSheet getSpreadsheet() {
+    return _spreadSheet;
+  }
+
+  void setSpreadsheet(SpreadSheet spreadSheet) {
+    _spreadSheet = spreadSheet;
+    rebuildSpreadsheet = false;
+  }
+
+  bool rebuildSpreadsheet = true;
 
   TrainerData _trainerData = TrainerData.empty();
   List<TrainerData> _allTrainerData = [];
@@ -67,8 +78,6 @@ class AppData {
     return _trainerData.newSchemas;
   }
 
-  // List<Trainer> allTrainers = [];
-  // List<List<DaySchema>> allSchemas = [];
   List<DateTime> _activeDates = [];
 
   // ---
@@ -114,8 +123,6 @@ class AppData {
     } else {
       log('!!! dit kan niet (updateAvailability)');
     }
-
-    // log('updated $ds.id => $newValue');
   }
 
   ///--- update the avavailability in the oldSchemas list

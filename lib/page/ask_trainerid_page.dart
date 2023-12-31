@@ -1,10 +1,5 @@
-import 'dart:developer';
-
 import 'package:firestore/controller/app_controler.dart';
-import 'package:firestore/data/populate_data.dart' as populate;
 import 'package:firestore/data/trainer_data.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/util/data_parser.dart';
 import 'package:flutter/material.dart';
 
 class AskTrainerIdPage extends StatefulWidget {
@@ -22,14 +17,11 @@ class _AskTrainerIdPageState extends State<AskTrainerIdPage> {
   @override
   void initState() {
     super.initState();
-
-    // Start listening to changes.
-    _textCtrl.addListener(_printLatestValue);
+    _textCtrl.addListener(_onTextFieldChanged);
   }
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     _textCtrl.dispose();
     super.dispose();
   }
@@ -75,13 +67,6 @@ class _AskTrainerIdPageState extends State<AskTrainerIdPage> {
                   ),
                 ],
               ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.brown,
-                ),
-                onPressed: _onTest,
-                child: const Text("test"),
-              ),
             ],
           ),
         ),
@@ -89,7 +74,7 @@ class _AskTrainerIdPageState extends State<AskTrainerIdPage> {
     );
   }
 
-  void _printLatestValue() {
+  void _onTextFieldChanged() {
     final text = _textCtrl.text;
     if (text.length > 6) {
       setState(() {
@@ -100,17 +85,7 @@ class _AskTrainerIdPageState extends State<AskTrainerIdPage> {
   }
 
   void _onSubmit() {
-    TrainerData.instance.trainerId = _textCtrl.text;
+    AppData.instance.trainerId = _textCtrl.text;
     AppController.instance.getTrainerData(_textCtrl.text);
-  }
-
-  //--------------- dummy test
-  void _onTest() {
-    TrainerData.instance.trainer = populate.trainerRobin;
-    List<DaySchema> dsList =
-        DateParser.buildFromTrainerSchemas(populate.trainerSchemas1);
-    for (DaySchema ds in dsList) {
-      log(ds.toJson());
-    }
   }
 }

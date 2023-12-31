@@ -1,12 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:firestore/util/data_parser.dart';
+import 'package:flutter/foundation.dart';
+
+import 'package:firestore/util/data_helper.dart';
 
 class Trainer {
-  final String id;
+  final String accessCode;
+  final String pk; // this is also the firestore dbs ID
   final String fullname;
-  final String shortname;
   final String email;
   final int dinsdag;
   final int donderdag;
@@ -15,12 +17,13 @@ class Trainer {
   final int r1;
   final int r2;
   final int r3;
+  final int zamo;
   final String roles;
 
   Trainer({
-    required this.id,
+    required this.accessCode,
+    required this.pk,
     required this.fullname,
-    required this.shortname,
     required this.email,
     required this.dinsdag,
     required this.donderdag,
@@ -29,13 +32,14 @@ class Trainer {
     required this.r1,
     required this.r2,
     required this.r3,
+    required this.zamo,
     required this.roles,
   });
 
   Trainer copyWith({
-    String? id,
+    String? accessCode,
+    String? pk,
     String? fullname,
-    String? shortname,
     String? email,
     int? dinsdag,
     int? donderdag,
@@ -44,12 +48,13 @@ class Trainer {
     int? r1,
     int? r2,
     int? r3,
+    int? zamo,
     String? roles,
   }) {
     return Trainer(
-      id: id ?? this.id,
+      accessCode: accessCode ?? this.accessCode,
+      pk: pk ?? this.pk,
       fullname: fullname ?? this.fullname,
-      shortname: shortname ?? this.shortname,
       email: email ?? this.email,
       dinsdag: dinsdag ?? this.dinsdag,
       donderdag: donderdag ?? this.donderdag,
@@ -58,15 +63,16 @@ class Trainer {
       r1: r1 ?? this.r1,
       r2: r2 ?? this.r2,
       r3: r3 ?? this.r3,
+      zamo: zamo ?? this.zamo,
       roles: roles ?? this.roles,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'accessCode': accessCode,
+      'pk': pk,
       'fullname': fullname,
-      'shortname': shortname,
       'email': email,
       'dinsdag': dinsdag,
       'donderdag': donderdag,
@@ -75,15 +81,16 @@ class Trainer {
       'r1': r1,
       'r2': r2,
       'r3': r3,
+      'zamo': zamo,
       'roles': roles,
     };
   }
 
   factory Trainer.fromMap(Map<String, dynamic> map) {
     return Trainer(
-      id: map['id'],
+      accessCode: map['accessCode'],
+      pk: map['pk'],
       fullname: map['fullname'],
-      shortname: map['shortname'],
       email: map['email'],
       dinsdag: map['dinsdag'],
       donderdag: map['donderdag'],
@@ -92,15 +99,33 @@ class Trainer {
       r1: map['r1'],
       r2: map['r2'],
       r3: map['r3'],
+      zamo: map['zamo'],
       roles: map['roles'],
     );
   }
 
-  factory Trainer.unknown() {
+  @override
+  String toString() {
+    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, dinsdag: $dinsdag, donderdag: $donderdag, zaterdag: $zaterdag, pr: $pr, r1: $r1, r2: $r2, r3: $r3, zamo: $zamo, roles: $roles)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Trainer && other.accessCode == accessCode;
+  }
+
+  @override
+  int get hashCode {
+    return accessCode.hashCode;
+  }
+
+  factory Trainer.empty() {
     return Trainer(
-        id: '???',
+        accessCode: '',
+        pk: '',
         fullname: '',
-        shortname: '',
         dinsdag: 0,
         donderdag: 0,
         zaterdag: 0,
@@ -109,51 +134,35 @@ class Trainer {
         r1: 0,
         r2: 0,
         r3: 0,
+        zamo: 0,
         roles: '');
+  }
+
+  //--- not generated
+  bool isEmpty() {
+    return pk.isEmpty;
+  }
+
+  String firstName() {
+    List<String> tokens = fullname.split(' ');
+    if (tokens.isNotEmpty) {
+      return tokens[0];
+    } else {
+      return fullname;
+    }
+  }
+
+  bool isSupervisor() {
+    return roles.contains(RegExp('S'));
+  }
+
+  bool isAdmin() {
+    return roles.contains(RegExp('A'));
   }
 
   String toJson() => json.encode(toMap());
   factory Trainer.fromJson(String source) =>
       Trainer.fromMap(json.decode(source));
-  @override
-  String toString() {
-    return 'Trainer(id: $id, fullname: $fullname, shortname: $shortname, email: $email, dinsdag: $dinsdag, donderdag: $donderdag, zaterdag: $zaterdag, pr: $pr, r1: $r1, r2: $r2, r3: $r3, roles: $roles)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Trainer &&
-        other.id == id &&
-        other.fullname == fullname &&
-        other.shortname == shortname &&
-        other.email == email &&
-        other.dinsdag == dinsdag &&
-        other.donderdag == donderdag &&
-        other.zaterdag == zaterdag &&
-        other.pr == pr &&
-        other.r1 == r1 &&
-        other.r2 == r2 &&
-        other.r3 == r3 &&
-        other.roles == roles;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        fullname.hashCode ^
-        shortname.hashCode ^
-        email.hashCode ^
-        dinsdag.hashCode ^
-        donderdag.hashCode ^
-        zaterdag.hashCode ^
-        pr.hashCode ^
-        r1.hashCode ^
-        r2.hashCode ^
-        r3.hashCode ^
-        roles.hashCode;
-  }
 }
 
 //----------- DaySchema -------------
@@ -163,14 +172,12 @@ class DaySchema {
   final int month;
   final int day;
   int available = 1;
-  final DateTime modified;
 
   DaySchema({
     required this.year,
     required this.month,
     required this.day,
     required this.available,
-    required this.modified,
   });
 
   DaySchema copyWith({
@@ -178,14 +185,12 @@ class DaySchema {
     int? month,
     int? day,
     int? available,
-    DateTime? modified,
   }) {
     return DaySchema(
       year: year ?? this.year,
       month: month ?? this.month,
       day: day ?? this.day,
       available: available ?? this.available,
-      modified: modified ?? this.modified,
     );
   }
 
@@ -195,7 +200,6 @@ class DaySchema {
       'month': month,
       'day': day,
       'available': available,
-      'modified': modified.millisecondsSinceEpoch,
     };
   }
 
@@ -205,7 +209,6 @@ class DaySchema {
       month: map['month'],
       day: map['day'],
       available: map['available'],
-      modified: DateTime.fromMillisecondsSinceEpoch(map['modified']),
     );
   }
 
@@ -214,7 +217,7 @@ class DaySchema {
       DaySchema.fromMap(json.decode(source));
   @override
   String toString() {
-    return 'DaySchema(year: $year, month: $month, day: $day, available: $available, modified: $modified)';
+    return 'DS(y: $year, m: $month, d: $day, avail: $available)';
   }
 
   @override
@@ -225,17 +228,12 @@ class DaySchema {
         other.year == year &&
         other.month == month &&
         other.day == day &&
-        other.available == available &&
-        other.modified == modified;
+        other.available == available;
   }
 
   @override
   int get hashCode {
-    return year.hashCode ^
-        month.hashCode ^
-        day.hashCode ^
-        available.hashCode ^
-        modified.hashCode;
+    return year.hashCode ^ month.hashCode ^ day.hashCode ^ available.hashCode;
   }
 }
 
@@ -286,8 +284,11 @@ class TrainerAccess {
 /// ----- TrainerSchemas ------------------------------
 ///
 
-class TrainerSchemas {
+class TrainerSchema {
   final String id;
+  final String trainerPk;
+  final int year;
+  final int month;
   final int din1;
   final int din2;
   final int din3;
@@ -297,14 +298,24 @@ class TrainerSchemas {
   final int don2;
   final int don3;
   final int don4;
+  final int don5;
   final int zat1;
   final int zat2;
   final int zat3;
   final int zat4;
-  final DateTime modified;
+  final int zat5;
+  DateTime? created;
+  DateTime? modified;
 
-  TrainerSchemas({
+  bool isEmpty() {
+    return id.isEmpty;
+  }
+
+  TrainerSchema({
     required this.id,
+    required this.trainerPk,
+    required this.year,
+    required this.month,
     required this.din1,
     required this.din2,
     required this.din3,
@@ -314,14 +325,20 @@ class TrainerSchemas {
     required this.don2,
     required this.don3,
     required this.don4,
+    required this.don5,
     required this.zat1,
     required this.zat2,
     required this.zat3,
     required this.zat4,
-    required this.modified,
+    required this.zat5,
+    this.created,
+    this.modified,
   });
-  TrainerSchemas copyWith({
+  TrainerSchema copyWith({
     String? id,
+    String? trainerPk,
+    int? year,
+    int? month,
     int? din1,
     int? din2,
     int? din3,
@@ -331,14 +348,20 @@ class TrainerSchemas {
     int? don2,
     int? don3,
     int? don4,
+    int? don5,
     int? zat1,
     int? zat2,
     int? zat3,
     int? zat4,
+    int? zat5,
+    DateTime? created,
     DateTime? modified,
   }) {
-    return TrainerSchemas(
+    return TrainerSchema(
       id: id ?? this.id,
+      trainerPk: trainerPk ?? this.trainerPk,
+      year: year ?? this.year,
+      month: month ?? this.month,
       din1: din1 ?? this.din1,
       din2: din2 ?? this.din2,
       din3: din3 ?? this.din3,
@@ -348,10 +371,13 @@ class TrainerSchemas {
       don2: don2 ?? this.don2,
       don3: don3 ?? this.don3,
       don4: don4 ?? this.don4,
+      don5: don5 ?? this.don5,
       zat1: zat1 ?? this.zat1,
       zat2: zat2 ?? this.zat2,
       zat3: zat3 ?? this.zat3,
       zat4: zat4 ?? this.zat4,
+      zat5: zat5 ?? this.zat5,
+      created: created ?? this.created,
       modified: modified ?? this.modified,
     );
   }
@@ -359,6 +385,9 @@ class TrainerSchemas {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'trainerPk': trainerPk,
+      'year': year,
+      'month': month,
       'din1': din1,
       'din2': din2,
       'din3': din3,
@@ -368,17 +397,23 @@ class TrainerSchemas {
       'don2': don2,
       'don3': don3,
       'don4': don4,
+      'don5': don5,
       'zat1': zat1,
       'zat2': zat2,
       'zat3': zat3,
       'zat4': zat4,
-      'modified': modified.millisecondsSinceEpoch,
+      'zat5': zat5,
+      'created': created,
+      'modified': modified,
     };
   }
 
-  factory TrainerSchemas.fromMap(Map<String, dynamic> map) {
-    return TrainerSchemas(
+  factory TrainerSchema.fromMap(Map<String, dynamic> map) {
+    return TrainerSchema(
         id: map['id'],
+        trainerPk: map['trainerPk'],
+        year: map['year'],
+        month: map['month'],
         din1: map['din1'],
         din2: map['din2'],
         din3: map['din3'],
@@ -388,26 +423,33 @@ class TrainerSchemas {
         don2: map['don2'],
         don3: map['don3'],
         don4: map['don4'],
+        don5: map['don5'],
         zat1: map['zat1'],
         zat2: map['zat2'],
         zat3: map['zat3'],
         zat4: map['zat4'],
-        modified: DateParser.parseDateTime(map['modified']));
+        zat5: map['zat5'],
+        created: DataHelper.instance.parseDateTime(map['created']),
+        modified: DataHelper.instance.parseDateTime(map['modified']));
   }
+
   String toJson() => json.encode(toMap());
-  factory TrainerSchemas.fromJson(String source) =>
-      TrainerSchemas.fromMap(json.decode(source));
+  factory TrainerSchema.fromJson(String source) =>
+      TrainerSchema.fromMap(json.decode(source));
   @override
   String toString() {
-    return 'TrainerSchemas(id: $id, din1: $din1, din2: $din2, din3: $din3, din4: $din4, din5: $din5, don1: $don1, don2: $don2, don3: $don3, don4: $don4, zat1: $zat1, zat2: $zat2, zat3: $zat3, zat4: $zat4, modified: $modified)';
+    return 'TrainerSchemas(id: $id, trainerPk: $trainerPk, year: $year, month: $month, din1: $din1, din2: $din2, din3: $din3, din4: $din4, din5: $din5, don1: $don1, don2: $don2, don3: $don3, don4: $don4, don5: $don5, zat1: $zat1, zat2: $zat2, zat3: $zat3, zat4: $zat4, zat5: $zat5, created: $created, modified: $modified)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TrainerSchemas &&
+    return other is TrainerSchema &&
         other.id == id &&
+        other.trainerPk == trainerPk &&
+        other.year == year &&
+        other.month == month &&
         other.din1 == din1 &&
         other.din2 == din2 &&
         other.din3 == din3 &&
@@ -417,16 +459,22 @@ class TrainerSchemas {
         other.don2 == don2 &&
         other.don3 == don3 &&
         other.don4 == don4 &&
+        other.don5 == don5 &&
         other.zat1 == zat1 &&
         other.zat2 == zat2 &&
         other.zat3 == zat3 &&
         other.zat4 == zat4 &&
+        other.zat5 == zat5 &&
+        other.created == created &&
         other.modified == modified;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
+        trainerPk.hashCode ^
+        year.hashCode ^
+        month.hashCode ^
         din1.hashCode ^
         din2.hashCode ^
         din3.hashCode ^
@@ -436,16 +484,22 @@ class TrainerSchemas {
         don2.hashCode ^
         don3.hashCode ^
         don4.hashCode ^
+        don5.hashCode ^
         zat1.hashCode ^
         zat2.hashCode ^
         zat3.hashCode ^
         zat4.hashCode ^
+        zat5.hashCode ^
+        created.hashCode ^
         modified.hashCode;
   }
 
-  factory TrainerSchemas.empty() {
-    return TrainerSchemas(
+  factory TrainerSchema.empty() {
+    return TrainerSchema(
         id: '',
+        trainerPk: '',
+        year: 2024,
+        month: 1,
         din1: 0,
         din2: 0,
         din3: 0,
@@ -455,10 +509,240 @@ class TrainerSchemas {
         don2: 0,
         don3: 0,
         don4: 0,
+        don5: 0,
         zat1: 0,
         zat2: 0,
         zat3: 0,
         zat4: 0,
-        modified: DateTime.now());
+        zat5: 0,
+        modified: null);
+  }
+}
+
+///----------
+
+class TrainerData {
+  Trainer trainer = Trainer.empty();
+  TrainerSchema trainerSchemas = TrainerSchema.empty();
+  List<DaySchema> oldSchemas = [];
+  List<DaySchema> newSchemas = [];
+
+  bool isEmpty() {
+    return trainer.accessCode.isEmpty;
+  }
+
+  factory TrainerData.empty() {
+    return TrainerData();
+  }
+
+  TrainerData();
+}
+
+//------------------
+enum Groep {
+  pr,
+  r1,
+  r2,
+  r3,
+  zamo;
+}
+
+///---------------------------
+
+class AvailableCounts {
+  List<Trainer> confirmed = [];
+  List<Trainer> ifNeeded = [];
+  List<Trainer> notEnteredYet = [];
+
+  @override
+  String toString() =>
+      'AvailableCounts(confirmed: $confirmed, ifNeeded: $ifNeeded, notEnteredYet: $notEnteredYet)';
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is AvailableCounts &&
+        listEquals(other.confirmed, confirmed) &&
+        listEquals(other.ifNeeded, ifNeeded) &&
+        listEquals(other.notEnteredYet, notEnteredYet);
+  }
+
+  @override
+  int get hashCode =>
+      confirmed.hashCode ^ ifNeeded.hashCode ^ notEnteredYet.hashCode;
+
+  List<Trainer> getAllTrainers() {
+    List<Trainer> result = [];
+    result.addAll(confirmed);
+    result.addAll(ifNeeded);
+    result.addAll(notEnteredYet);
+    return result;
+  }
+}
+
+///---------------------------------------------------------------------------
+///
+class Available {
+  DateTime date;
+  List<AvailableCounts> counts = [];
+
+  Available({required this.date}) {
+    for (int i = 0; i < Groep.values.length; i++) {
+      List<AvailableCounts> counts = [];
+      counts.add(AvailableCounts());
+    }
+  }
+
+  @override
+  String toString() {
+    return 'Available(date: $date ';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Available && other.date == date;
+  }
+
+  @override
+  int get hashCode {
+    return date.hashCode;
+  }
+}
+
+///------- Spreadsheet
+
+class SpreadSheet {
+  List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
+  List<SheetRow> rows = [];
+
+  void addRow(SheetRow row) {
+    rows.add(row);
+  }
+
+  // SpreadSheet() {
+  //   rows = [];
+  // }
+}
+
+//----------------------
+class SheetRow {
+  final int rowIndex;
+  final DateTime date;
+  String training = '';
+  List<RowCell> rowCells = [];
+
+  SheetRow({
+    required this.rowIndex,
+    required this.date,
+  });
+
+  Trainer getTrainerByGroup(Groep group) {
+    if (rowCells.isNotEmpty) {
+      return rowCells[group.index].getTrainer();
+    } else {
+      return Trainer.empty();
+    }
+  }
+
+  String dateStr() {
+    return DataHelper.instance.getDateStringForSpreadsheet(date);
+  }
+
+  @override
+  String toString() {
+    return '$rowIndex, \t $date}';
+  }
+}
+
+///------------ RowCell -------
+
+class RowCell {
+  final int rowIndex;
+  final int colIndex;
+  AvailableCounts availableCounts = AvailableCounts();
+  List<TrainerWeight> trainerWeights = [];
+  Trainer _trainer = Trainer.empty();
+  String availableText = '';
+  String spreadSheetText = '';
+
+  RowCell({required this.rowIndex, required this.colIndex});
+
+  void setTrainer(Trainer trainer) {
+    _trainer = trainer;
+    spreadSheetText = trainer.firstName();
+  }
+
+  Trainer getTrainer() => _trainer;
+}
+
+///----------- LastRosterFinal -----
+
+class LastRosterFinal {
+  final DateTime at;
+  final String by;
+  final int year;
+  final int month;
+  LastRosterFinal({
+    required this.at,
+    required this.by,
+    required this.year,
+    required this.month,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'at': at.millisecondsSinceEpoch,
+      'by': by,
+      'year': year,
+      'month': month,
+    };
+  }
+
+  factory LastRosterFinal.fromMap(Map<String, dynamic> map) {
+    return LastRosterFinal(
+      at: DateTime.fromMillisecondsSinceEpoch(map['at']),
+      by: map['by'],
+      year: map['year'],
+      month: map['month'],
+    );
+  }
+
+  @override
+  String toString() {
+    return 'LastRosterFinal(at: $at, by: $by, year: $year, month: $month)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is LastRosterFinal &&
+        other.at == at &&
+        other.by == by &&
+        other.year == year &&
+        other.month == month;
+  }
+
+  @override
+  int get hashCode {
+    return at.hashCode ^ by.hashCode ^ year.hashCode ^ month.hashCode;
+  }
+}
+
+//--------------
+
+class TrainerWeight {
+  final Trainer trainer;
+  int weight = 50;
+  TrainerWeight({
+    required this.trainer,
+    required this.weight,
+  });
+
+  @override
+  String toString() {
+    return 'TW( ${trainer.firstName()}=$weight';
   }
 }

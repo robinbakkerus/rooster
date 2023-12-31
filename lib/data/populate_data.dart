@@ -1,9 +1,9 @@
 import 'package:firestore/model/app_models.dart';
 
 Trainer trainerRobin = Trainer(
-    id: 'Robin1234',
+    accessCode: 'ROMA',
+    pk: 'RB',
     fullname: 'Robin Bakkerus',
-    shortname: 'RB',
     email: 'robin.bakkerus@gmail.com',
     dinsdag: 1,
     donderdag: 1,
@@ -12,60 +12,73 @@ Trainer trainerRobin = Trainer(
     r1: 1,
     r2: 2,
     r3: 2,
+    zamo: 0,
     roles: 'A,S,T');
 
-DaySchema ds1 = DaySchema(
-    year: 2024, month: 1, day: 2, available: 1, modified: DateTime(2024, 1, 1));
-DaySchema ds2 = DaySchema(
-    year: 2024, month: 1, day: 4, available: 1, modified: DateTime(2024, 1, 1));
-DaySchema ds3 = DaySchema(
-    year: 2024, month: 1, day: 9, available: 1, modified: DateTime(2024, 1, 1));
-DaySchema ds4 = DaySchema(
-    year: 2024,
-    month: 1,
-    day: 11,
-    available: 1,
-    modified: DateTime(2024, 1, 1));
-DaySchema ds5 = DaySchema(
-    year: 2024,
-    month: 1,
-    day: 16,
-    available: 1,
-    modified: DateTime(2024, 1, 1));
-DaySchema ds6 = DaySchema(
-    year: 2024,
-    month: 1,
-    day: 18,
-    available: 1,
-    modified: DateTime(2024, 1, 1));
-DaySchema ds7 = DaySchema(
-    year: 2024,
-    month: 1,
-    day: 23,
-    available: 1,
-    modified: DateTime(2024, 1, 1));
+Trainer trainerPaula = _buildTrainer('PvA', 'Paula van Agt', 0, 0, 1, 1, 0);
+Trainer trainerOlav = _buildTrainer('OB', 'Olav Boiten', 1, 0, 0, 0, 0);
+Trainer trainerFried = _buildTrainer('FvH', 'Fried van Hoek', 0, 2, 1, 1, 0);
+Trainer trainerMaria = _buildTrainer('MvH', 'Maria van Hout', 0, 1, 1, 2, 0);
+Trainer trainerJeroen =
+    _buildTrainer('MvH', 'Jeroen Lathouwers', 2, 1, 0, 0, 0);
+Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 1, 1, 0, 0, 0);
+Trainer trainerPauline = _buildTrainer('PG', 'Pauline Geenen', 0, 0, 1, 1, 1);
+Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 0, 0, 1, 1, 1);
+Trainer trainerRonald = _buildTrainer('RV', 'Ronald Vissers', 2, 1, 2, 0, 2);
 
-int nextValue = 0;
+// _buildTRainer
+Trainer _buildTrainer(
+    String pk, String fullname, int pr, int r1, int r2, int r3, int zaterdag) {
+  String accesscode = '${pk}01'.toUpperCase().substring(0, 4);
+  int zamo = (zaterdag > 0) ? 1 : 0;
+  return Trainer(
+      accessCode: accesscode,
+      pk: pk,
+      fullname: fullname,
+      email: '',
+      dinsdag: 1,
+      donderdag: 1,
+      zaterdag: zaterdag,
+      pr: pr,
+      r1: r1,
+      r2: r2,
+      r3: r3,
+      zamo: zamo,
+      roles: 'T');
+}
 
-// String _nextId() {
-//   nextValue++;
-//   final now = DateTime.now();
-//   return now.microsecondsSinceEpoch.toString() + nextValue.toString();
-// }
+List<TrainerSchema> allSchemas = [
+  trainerSchemasRobin,
+  trainerSchemasPaula,
+  trainerSchemasOlav,
+  trainerSchemasFried,
+];
 
-TrainerSchemas trainerSchemas1 = TrainerSchemas(
-    id: 'Robin_2024_1',
-    din1: 1,
-    din2: 1,
-    din3: 1,
-    din4: 1,
-    din5: 1,
-    don1: 1,
-    don2: 1,
-    don3: 1,
-    don4: 1,
-    zat1: 0,
-    zat2: 0,
-    zat3: 0,
-    zat4: 0,
-    modified: DateTime.now());
+TrainerSchema trainerSchemasRobin = _buildTrainerSchema(trainerRobin);
+TrainerSchema trainerSchemasPaula = _buildTrainerSchema(trainerPaula);
+TrainerSchema trainerSchemasOlav = _buildTrainerSchema(trainerOlav);
+TrainerSchema trainerSchemasFried = _buildTrainerSchema(trainerFried);
+TrainerSchema trainerSchemasRonald = _buildTrainerSchema(trainerRonald);
+
+TrainerSchema _buildTrainerSchema(Trainer trainer) {
+  TrainerSchema result = TrainerSchema.empty();
+  Map<String, dynamic> map = result.toMap();
+  map['id'] = '${trainer.pk}_2024_1';
+
+  map['trainerPk'] = trainer.pk;
+  for (int i = 1; i < 6; i++) {
+    String elem = 'din$i';
+    map[elem] = trainer.dinsdag;
+  }
+  for (int i = 1; i < 6; i++) {
+    String elem = 'don$i';
+    map[elem] = trainer.donderdag;
+  }
+  for (int i = 1; i < 6; i++) {
+    String elem = 'zat$i';
+    map[elem] = trainer.zaterdag;
+  }
+
+  result = TrainerSchema.fromMap(map);
+  return result;
+}

@@ -1,29 +1,21 @@
-import 'dart:developer';
-
-import 'package:firestore/data/trainer_data.dart';
+import 'package:firestore/data/app_data.dart';
 import 'package:firestore/event/app_events.dart';
 import 'package:firestore/model/app_models.dart';
-import 'package:firestore/util/data_parser.dart';
+import 'package:firestore/util/data_helper.dart';
+import 'package:firestore/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:firestore/controller/app_controler.dart';
 
 class SchemaEditPage extends StatefulWidget {
-  SchemaEditPage({super.key}) {
-    if (TrainerData.instance.trainerId.isNotEmpty) {
-      // AppController.instance.getTrainerData(TrainerData.instance.trainerId);
-    }
-  }
+  const SchemaEditPage({super.key});
 
   @override
   State<SchemaEditPage> createState() => _SchemaEditPageState();
 }
 
 class _SchemaEditPageState extends State<SchemaEditPage> {
-  Trainer trainer = Trainer.unknown();
-  String topTitle = '...';
-  bool firstTime = true;
-  Icon fabIcon = const Icon(Icons.done);
-  List<DaySchema> listsData = [];
+  final Icon _fabIcon = const Icon(Icons.save);
+  List<DaySchema> _daySchemaList = [];
 
   _SchemaEditPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
@@ -33,12 +25,11 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
-        trainer = TrainerData.instance.trainer;
-        topTitle = '${trainer.fullname} : Januari 2024';
-        listsData = TrainerData.instance.newSchemas;
-        log(listsData.length.toString());
+        _daySchemaList = AppData.instance.getNewSchemas();
       });
     }
+
+    _showSnackbar();
   }
 
   void _onSchemaUpdated(SchemaUpdatedEvent event) {
@@ -49,70 +40,126 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> columnWidgets = [];
+    columnWidgets.add(_buildTopRow()!);
+    for (DaySchema daySchema in _daySchemaList) {
+      columnWidgets
+          .add(ScheduleItemWidget(key: UniqueKey(), daySchema: daySchema));
+    }
+
     return Scaffold(
-      body: ListView.builder(
-        itemCount: listsData.length,
-        itemBuilder: (context, index) {
-          return ScheduleItem(daySchema: listsData[index]);
-        },
+      body: SizedBox(
+        height: AppData.instance.screenHeight - 150,
+        // width: AppData.instance.screenWidth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: columnWidgets,
+        ),
       ),
       floatingActionButton: _getFab(),
     );
   }
 
+  Widget? _buildTopRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _topRowBox(w15, 'Dag', Colors.blue),
+        _topRowBox(w15, 'Ja', Colors.green),
+        _topRowBox(w15, 'Nee', Colors.red),
+        _topRowBox(w2, 'Als nodig', Colors.lightBlueAccent),
+      ],
+    );
+  }
+
+  Widget _topRowBox(double width, String title, Color color) {
+    return Container(
+      width: width,
+      color: color,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
+        child: Text(title),
+      ),
+    );
+  }
+
   Widget? _getFab() {
-    if (TrainerData.instance.isDirty() || firstTime) {
+    if (AppData.instance.isSchemaDirty()) {
       return FloatingActionButton(
-        onPressed: _onSave,
+        onPressed: _onSaveSchema,
         hoverColor: Colors.greenAccent,
-        child: fabIcon,
+        child: _fabIcon,
       );
     } else {
       return null;
     }
   }
 
-  void _onSave() {
+  void _onSaveSchema() {
     setState(() {
-      firstTime = false;
-      fabIcon = const Icon(Icons.save);
-
-      AppController.instance.updateSchemas();
+      AppController.instance.updateTrainerSchemas();
     });
+  }
+
+  void _showSnackbar() {
+    TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
+    String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
+    Color color = Colors.lightBlue;
+
+    if (ts.modified == null) {
+      msg +=
+          'Met succes nieuw schema aangemaakt, deze wordt nu als ingevuld beschouwd';
+    } else if (DataHelper.instance.isJustModified(ts)) {
+      color = Colors.lightGreen;
+      msg += 'Met succes schema aangepast';
+    } else {
+      msg += 'Met succes schema geopend';
+    }
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(WidgetHelper().buildSnackbar(text: msg, color: color));
   }
 }
 
 ///----------------------------------------------------------------
 ///
 
-class ScheduleItem extends StatefulWidget {
+class ScheduleItemWidget extends StatefulWidget {
   final DaySchema daySchema;
 
-  const ScheduleItem({
-    Key? key,
+  const ScheduleItemWidget({
+    required Key key,
     required this.daySchema,
   }) : super(key: key);
 
   @override
-  State<ScheduleItem> createState() => _ScheduleItemState();
+  State<ScheduleItemWidget> createState() => _ScheduleItemWidgetState();
 }
 
 ///------------------------------------------------
 
-class _ScheduleItemState extends State<ScheduleItem> {
+class _ScheduleItemWidgetState extends State<ScheduleItemWidget> {
   int? selectedOption = 1;
 
   int _getAvailable() => widget.daySchema.available;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(0)),
+          shape: BoxShape.rectangle,
+          border: Border.all(
+            color: Colors.grey,
+            width: 0.2,
+          )),
       child: Row(
         children: [
           _dayLabel(),
-          _radioButton('Ja', 1, Colors.green),
-          _radioButton('Nee', 0, Colors.red),
-          _radioButton('Alleen als nodig', 2, Colors.brown),
+          _radioButton(1, Colors.green),
+          _radioButton(0, Colors.red),
+          _radioButton(2, Colors.brown),
         ],
       ),
     );
@@ -121,11 +168,11 @@ class _ScheduleItemState extends State<ScheduleItem> {
   Widget _dayLabel() {
     DateTime dt = DateTime(
         widget.daySchema.year, widget.daySchema.month, widget.daySchema.day);
-    String label = '${DateParser.parse(dt)}}';
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
-      child: SizedBox(
-        width: 180,
+    String label = DataHelper.instance.getSimpleDayString(dt);
+    return SizedBox(
+      width: w15,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 1, 1, 1),
         child: Text(label,
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold)),
@@ -133,29 +180,29 @@ class _ScheduleItemState extends State<ScheduleItem> {
     );
   }
 
-  Widget _radioButton(String label, int currentValue, Color color) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(children: [
-        Text(label,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold)),
-        Radio<int>(
+  Widget _radioButton(int currentValue, Color color) {
+    return SizedBox(
+      width: w15,
+      child: Center(
+        child: Radio<int>(
           activeColor: color,
           value: currentValue,
           groupValue: _getAvailable(),
-          onChanged: (val) => _onChangeValue(val),
+          onChanged: (val) => onChangeValue(val),
         ),
-      ]),
+      ),
     );
   }
 
-  void _onChangeValue(int? value) {
+  void onChangeValue(int? value) {
     setState(() {
       selectedOption = value;
       widget.daySchema.available = value!;
-      TrainerData.instance.update(widget.daySchema, value);
+      AppData.instance.updateAvailability(widget.daySchema, value);
       AppEvents.fireSchemaUpdated();
     });
   }
 }
+
+final double w15 = 0.15 * AppData.instance.screenWidth;
+final double w2 = 0.25 * AppData.instance.screenWidth;
