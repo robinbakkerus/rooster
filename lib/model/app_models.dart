@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:firestore/util/data_helper.dart';
+import 'package:rooster/util/data_helper.dart';
 
 class Trainer {
   final String accessCode;

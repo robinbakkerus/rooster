@@ -1,8 +1,8 @@
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/event/app_events.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/util/data_helper.dart';
-import 'package:firestore/widget/widget_helper.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/event/app_events.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 
 class AvailabilityPage extends StatefulWidget {

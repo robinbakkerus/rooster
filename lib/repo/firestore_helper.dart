@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/repo/simulator.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/simulator.dart';
 
 class FirestoreHelper {
   FirestoreHelper._();

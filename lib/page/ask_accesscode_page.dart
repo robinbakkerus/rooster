@@ -1,6 +1,6 @@
-import 'package:firestore/controller/app_controler.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/widget/widget_helper.dart';
+import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 
 class AskAccessCodePage extends StatefulWidget {

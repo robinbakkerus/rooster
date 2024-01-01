@@ -1,6 +1,6 @@
-import 'package:firestore/page/availability_page.dart';
-import 'package:firestore/page/spreadsheet_page.dart';
-import 'package:firestore/page/trainer_progress_page.dart';
+import 'package:rooster/page/availability_page.dart';
+import 'package:rooster/page/spreadsheet_page.dart';
+import 'package:rooster/page/trainer_progress_page.dart';
 import 'package:flutter/material.dart';
 
 class ViewAllSchemasPage extends StatefulWidget {

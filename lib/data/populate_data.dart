@@ -1,4 +1,4 @@
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/model/app_models.dart';
 
 Trainer trainerRobin = Trainer(
     accessCode: 'ROMA',
@@ -15,21 +15,27 @@ Trainer trainerRobin = Trainer(
     zamo: 0,
     roles: 'A,S,T');
 
-Trainer trainerPaula = _buildTrainer('PvA', 'Paula van Agt', 0, 0, 1, 1, 0);
-Trainer trainerOlav = _buildTrainer('OB', 'Olav Boiten', 1, 0, 0, 0, 0);
-Trainer trainerFried = _buildTrainer('FvH', 'Fried van Hoek', 0, 2, 1, 1, 0);
-Trainer trainerMaria = _buildTrainer('MvH', 'Maria van Hout', 0, 1, 1, 2, 0);
+Trainer trainerPaula =
+    _buildTrainer('PvA', 'Paula van Agt', 'PACO', 0, 0, 1, 1, 0);
+Trainer trainerOlav = _buildTrainer('OB', 'Olav Boiten', 'OSLO', 1, 0, 0, 0, 0);
+Trainer trainerFried =
+    _buildTrainer('FvH', 'Fried van Hoek', 'FARO', 0, 2, 1, 1, 0);
+Trainer trainerMaria =
+    _buildTrainer('MvH', 'Maria van Hout', 'METS', 0, 1, 1, 2, 0);
 Trainer trainerJeroen =
-    _buildTrainer('MvH', 'Jeroen Lathouwers', 2, 1, 0, 0, 0);
-Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 1, 1, 0, 0, 0);
-Trainer trainerPauline = _buildTrainer('PG', 'Pauline Geenen', 0, 0, 1, 1, 1);
-Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 0, 0, 1, 1, 1);
-Trainer trainerRonald = _buildTrainer('RV', 'Ronald Vissers', 2, 1, 2, 0, 2);
+    _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA', 2, 1, 0, 0, 0);
+Trainer trainerJanneke =
+    _buildTrainer('JK', 'Janneke Kemkers', 'JAVA', 1, 1, 0, 0, 0);
+Trainer trainerPauline =
+    _buildTrainer('PG', 'Pauline Geenen', 'PILA', 0, 0, 1, 1, 1);
+Trainer trainerHuib =
+    _buildTrainer('HC', 'Huib van Chapelle', 'HACO', 0, 0, 1, 1, 1);
+Trainer trainerRonald =
+    _buildTrainer('RV', 'Ronald Vissers', 'ROME', 2, 1, 2, 0, 2);
 
 // _buildTRainer
-Trainer _buildTrainer(
-    String pk, String fullname, int pr, int r1, int r2, int r3, int zaterdag) {
-  String accesscode = '${pk}01'.toUpperCase().substring(0, 4);
+Trainer _buildTrainer(String pk, String fullname, String accesscode, int pr,
+    int r1, int r2, int r3, int zaterdag) {
   int zamo = (zaterdag > 0) ? 1 : 0;
   return Trainer(
       accessCode: accesscode,

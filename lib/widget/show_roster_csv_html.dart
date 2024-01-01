@@ -1,4 +1,4 @@
-import 'package:firestore/widget/widget_helper.dart';
+import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 

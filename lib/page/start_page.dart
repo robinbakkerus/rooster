@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:firestore/controller/app_controler.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/event/app_events.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/page/admin_page.dart';
-import 'package:firestore/page/ask_accesscode_page.dart';
-import 'package:firestore/page/help_page.dart';
-import 'package:firestore/page/schema_edit_page.dart';
-import 'package:firestore/page/splash_page.dart';
-import 'package:firestore/page/trainer_settings_page.dart';
-import 'package:firestore/page/view_all_schemas_page.dart';
+import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/event/app_events.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/page/admin_page.dart';
+import 'package:rooster/page/ask_accesscode_page.dart';
+import 'package:rooster/page/help_page.dart';
+import 'package:rooster/page/schema_edit_page.dart';
+import 'package:rooster/page/splash_page.dart';
+import 'package:rooster/page/trainer_settings_page.dart';
+import 'package:rooster/page/view_all_schemas_page.dart';
 import 'package:flutter/material.dart';
 
 class StartPage extends StatefulWidget {

@@ -1,5 +1,5 @@
-import 'package:firestore/controller/app_controler.dart';
-import 'package:firestore/page/start_page.dart';
+import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/page/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';

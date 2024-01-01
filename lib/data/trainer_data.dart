@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/model/app_models.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import 'package:firestore/util/data_helper.dart';
+import 'package:rooster/util/data_helper.dart';
 
 class AppData {
   AppData._() {

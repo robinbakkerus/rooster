@@ -3,8 +3,8 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
 
 class DataHelper {
   DataHelper._();

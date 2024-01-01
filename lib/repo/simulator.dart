@@ -1,5 +1,5 @@
-import 'package:firestore/data/populate_data.dart' as populate;
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/data/populate_data.dart' as populate;
+import 'package:rooster/model/app_models.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 

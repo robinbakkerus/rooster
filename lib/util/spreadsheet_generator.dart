@@ -4,9 +4,9 @@ import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/util/data_helper.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/data_helper.dart';
 
 class SpreadsheetGenerator {
   SpreadSheet _spreadSheet = SpreadSheet();
@@ -59,8 +59,7 @@ class SpreadsheetGenerator {
     // first fill the spreadsheet with available trainer data
     _fillAvailabilityInSpreadsheet(availableList);
 
-    // next the best trainer
-    dev.log('todo ${_spreadSheet.rows.length}');
+    // next find the best trainer
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
       for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
         _findSuitableTrainer(rowNr: rowNr, groepNr: groepNr);
@@ -68,7 +67,6 @@ class SpreadsheetGenerator {
     }
 
     _postProcessSpreadsheet();
-    dev.log('return spreadsheet');
     return _spreadSheet;
   }
 
@@ -179,9 +177,11 @@ class SpreadsheetGenerator {
     List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
-    if (groepNr == 0) dev.log('todo $possibleTrainerWeights');
-
-    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights);
+    if (groepNr == 1) {
+      dev.log('todo1 : $rowNr $possibleTrainerWeights');
+    }
+    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
+        rowNr: rowNr, groepNr: groepNr);
     _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
   }
 
@@ -190,19 +190,22 @@ class SpreadsheetGenerator {
     List<TrainerWeight> result = [];
 
     for (Trainer trainer in cnts.confirmed) {
-      result.add(TrainerWeight(trainer: trainer, weight: 50));
+      result.add(TrainerWeight(trainer: trainer, weight: 100));
     }
     for (Trainer trainer in cnts.ifNeeded) {
-      result.add(TrainerWeight(trainer: trainer, weight: 50));
+      result.add(TrainerWeight(trainer: trainer, weight: 85));
     }
     for (Trainer trainer in cnts.notEnteredYet) {
-      result.add(TrainerWeight(trainer: trainer, weight: 50));
+      result.add(TrainerWeight(trainer: trainer, weight: 100));
     }
 
     return result;
   }
 
-  Trainer _getTrainerFromPossibleList(List<TrainerWeight> possibleTrainers) {
+  Trainer _getTrainerFromPossibleList(List<TrainerWeight> possibleTrainers,
+      {required int rowNr, required int groepNr}) {
+    possibleTrainers = _removeAlreadyScheduled(possibleTrainers,
+        rowNr: rowNr, groepNr: groepNr);
     if (possibleTrainers.length == 1) {
       return possibleTrainers.last.trainer;
     } else if (possibleTrainers.length > 1) {
@@ -221,27 +224,36 @@ class SpreadsheetGenerator {
     }
   }
 
+  List<TrainerWeight> _removeAlreadyScheduled(
+      List<TrainerWeight> possibleTrainers,
+      {required int rowNr,
+      required int groepNr}) {
+    SheetRow sheetRow = _spreadSheet.rows[rowNr];
+    List<TrainerWeight> result = [];
+
+    for (TrainerWeight tw in possibleTrainers) {
+      if (!_alreadyScheduledThisDay(tw.trainer, sheetRow)) {
+        result.add(tw);
+      }
+    }
+    return result;
+  }
+
+  bool _alreadyScheduledThisDay(Trainer trainer, SheetRow sheetRow) {
+    for (RowCell rowCell in sheetRow.rowCells) {
+      if (rowCell.getTrainer() == trainer) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // here we make weight higher or lower in order to make choice
   void _applyWeights(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
-    _applyOnlyIfNeeded(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
-    _applyDaysNotAvailable(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
-    _applyAlreadyScheduled(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
-    _applyAlreadyScheduledOtherGroup(trainerWeightList,
-        rowNr: rowNr, groepNr: groepNr);
-  }
-
-  void _applyAlreadyScheduledSameDay(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {}
-
-  void _applyOnlyIfNeeded(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
-      Trainer trainer = tw.trainer;
-      String groupName = Groep.values[groepNr].name;
-      if (trainer.toMap()[groupName] == 2) {
-        tw.weight -= 15;
-      }
+    if (!_isSaturday(rowNr)) {
+      _applyDaysNotAvailable(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
+      _applyAlreadyScheduled(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
     }
   }
 
@@ -270,17 +282,9 @@ class SpreadsheetGenerator {
     }
   }
 
-  void _applyAlreadyScheduledOtherGroup(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
-      Trainer trainer = tw.trainer;
-      int scheduledCnt = _countDaysAlreadyScheduledOtherGroup(trainer,
-          rowNr: rowNr, groepNr: groepNr);
-
-      if (scheduledCnt > 0) {
-        tw.weight = -1; // so trainer can not be selected anymore this day
-      }
-    }
+  bool _isSaturday(int rowNr) {
+    SheetRow sheetRow = _spreadSheet.rows[rowNr];
+    return sheetRow.date.weekday == DateTime.saturday;
   }
 
   // hoe vaak afwezig vanaf dateTime
@@ -323,23 +327,6 @@ class SpreadsheetGenerator {
     return result;
   }
 
-  // hoe vaak afwezig vanaf dateTime
-  int _countDaysAlreadyScheduledOtherGroup(Trainer trainer,
-      {required int rowNr, required int groepNr}) {
-    int result = 0;
-
-    SheetRow sheetRow = _spreadSheet.rows.last;
-
-    for (Groep groep in Groep.values) {
-      Trainer schedTrainer = sheetRow.getTrainerByGroup(groep);
-      if (schedTrainer.pk == trainer.pk) {
-        result++;
-      }
-    }
-
-    return result;
-  }
-
   void _postProcessSpreadsheet() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
@@ -348,6 +335,8 @@ class SpreadsheetGenerator {
           sheetRow.rowCells[i].spreadSheetText = '';
         }
         sheetRow.rowCells[Groep.zamo.index].spreadSheetText = 'Hu/Pa/Ro';
+      } else {
+        sheetRow.rowCells[Groep.zamo.index].setTrainer(Trainer.empty());
       }
     }
   }

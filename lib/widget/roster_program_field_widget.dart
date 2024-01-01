@@ -1,5 +1,5 @@
-import 'package:firestore/event/app_events.dart';
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/event/app_events.dart';
+import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
 
 class SpreadsheetTrainingColumn extends StatefulWidget {

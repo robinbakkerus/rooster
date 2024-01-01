@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'dart:html';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/event/app_events.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/repo/firestore_helper.dart';
-import 'package:firestore/util/data_helper.dart';
-import 'package:firestore/util/spreadsheet_generator.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/event/app_events.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 // import 'package:collection/collection.dart';
@@ -147,28 +147,24 @@ class AppController {
         ? await FirestoreHelper.instance.getTrainerById(trainerPk)
         : trainer;
 
-    if (useTrainer != null) {
-      result.trainer = useTrainer;
-      String schemaId = DataHelper.instance.buildTrainerSchemaId(useTrainer);
+    result.trainer = useTrainer!;
+    String schemaId = DataHelper.instance.buildTrainerSchemaId(useTrainer);
 
-      TrainerSchema trainerSchemas =
-          await FirestoreHelper.instance.getTrainerSchema(schemaId);
+    TrainerSchema trainerSchemas =
+        await FirestoreHelper.instance.getTrainerSchema(schemaId);
 
-      if (!trainerSchemas.isEmpty()) {
-        result.trainerSchemas = trainerSchemas;
-      } else if (!forAllTrainers) {
-        TrainerSchema newTrainerSchemas =
-            DataHelper.instance.buildNewSchemaForTrainer(useTrainer);
+    if (!trainerSchemas.isEmpty()) {
+      result.trainerSchemas = trainerSchemas;
+    } else if (!forAllTrainers) {
+      TrainerSchema newTrainerSchemas =
+          DataHelper.instance.buildNewSchemaForTrainer(useTrainer);
 
-        bool updateSchema = false;
-        bool updateOkay = await FirestoreHelper.instance
-            .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema);
-        if (updateOkay) {
-          result.trainerSchemas = newTrainerSchemas;
-        }
+      bool updateSchema = false;
+      bool updateOkay = await FirestoreHelper.instance
+          .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema);
+      if (updateOkay) {
+        result.trainerSchemas = newTrainerSchemas;
       }
-    } else {
-      log('Error getting trainer ');
     }
     return result;
   }

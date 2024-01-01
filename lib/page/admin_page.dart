@@ -1,13 +1,13 @@
 import 'dart:developer';
 import 'dart:html';
 
-import 'package:firestore/controller/app_controler.dart';
-import 'package:firestore/data/app_data.dart';
-import 'package:firestore/model/app_models.dart';
-import 'package:firestore/repo/firestore_helper.dart';
-import 'package:firestore/util/spreadsheet_generator.dart';
+import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:firestore/data/populate_data.dart' as p;
+import 'package:rooster/data/populate_data.dart' as p;
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -35,7 +35,8 @@ class _AdminPageState extends State<AdminPage> {
 
   void _addTrainers() {
     List<Trainer> trainers = [
-      p.trainerRobin,
+      p.trainerPaula,
+      // p.trainerRobin,
       p.trainerFried,
       p.trainerHuib,
       p.trainerJanneke,

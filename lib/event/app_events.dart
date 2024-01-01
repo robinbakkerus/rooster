@@ -2,7 +2,7 @@
 
 import 'package:event_bus/event_bus.dart';
 
-import 'package:firestore/model/app_models.dart';
+import 'package:rooster/model/app_models.dart';
 
 enum ShowPage { editSchema, createSchema, admin }
 
