@@ -41,7 +41,7 @@ class AppController {
   }
 
   /// get trainer data
-  void getTrainerData({String? trainerPk, Trainer? trainer}) async {
+  Future<void> getTrainerData({String? trainerPk, Trainer? trainer}) async {
     TrainerData trainerData = await _getTheTrainerData(
         trainerPk: trainerPk, trainer: trainer, forAllTrainers: false);
     AppData.instance.setTrainerData(trainerData);
@@ -49,7 +49,7 @@ class AppController {
   }
 
   /// get TrainerData for all trainers
-  Future<List<TrainerData>> getAllTrainerData() async {
+  Future<List<TrainerData>> _getAllTrainerData() async {
     List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();
 
     List<TrainerData> allTrainerData = [];
@@ -89,7 +89,7 @@ class AppController {
   }
 
   Future<SpreadSheet> generateSpreadsheet() async {
-    List<TrainerData> trainerData = await getAllTrainerData();
+    List<TrainerData> trainerData = await _getAllTrainerData();
 
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();

@@ -114,8 +114,6 @@ class AppData {
     } else {
       log('!!! dit kan niet (updateAvailability)');
     }
-
-    // log('updated $ds.id => $newValue');
   }
 
   ///--- update the avavailability in the oldSchemas list

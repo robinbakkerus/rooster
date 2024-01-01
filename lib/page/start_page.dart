@@ -78,7 +78,10 @@ class _StartPageState extends State<StartPage> {
   void _onTrainerDataReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
-        _stackIndex = 2;
+        if (_stackIndex != Action.spreadSheet.code) {
+          _stackIndex = 2;
+        }
+
         _barTitle = _buildBarTitle();
 
         _prevMonthEnabled =
@@ -150,7 +153,7 @@ class _StartPageState extends State<StartPage> {
         } else if (value == '3') {
           _gotoTrainerSettings();
         } else if (value == '4') {
-          _gotoViewAllSchemas();
+          _gotoSpreadsheet();
         } else if (value == '5') {
           _gotoHelpPage();
         } else if (value == '6') {
@@ -173,7 +176,7 @@ class _StartPageState extends State<StartPage> {
           ),
           const PopupMenuItem(
             value: '4',
-            child: Text("Bekijk voortgang en alle schemas"),
+            child: Text("Spreadsheet & voortgang"),
           ),
           const PopupMenuItem(
             value: '5',
@@ -231,6 +234,10 @@ class _StartPageState extends State<StartPage> {
 
     AppController.instance
         .getTrainerData(trainer: AppData.instance.getTrainer());
+
+    if (_stackIndex == Action.spreadSheet.code) {
+      AppController.instance.generateSpreadsheet();
+    }
   }
 
   void _gotoNextMonth() {
@@ -246,6 +253,10 @@ class _StartPageState extends State<StartPage> {
 
     AppController.instance
         .getTrainerData(trainer: AppData.instance.getTrainer());
+
+    if (_stackIndex == Action.spreadSheet.code) {
+      AppController.instance.generateSpreadsheet();
+    }
   }
 
   void _gotoEditSchemas() {
@@ -256,7 +267,7 @@ class _StartPageState extends State<StartPage> {
     });
   }
 
-  void _gotoViewAllSchemas() {
+  void _gotoSpreadsheet() {
     AppController.instance.generateSpreadsheet();
     setState(() {
       _stackIndex = 4;
@@ -317,7 +328,7 @@ class _StartPageState extends State<StartPage> {
 enum Action {
   editSchema(2),
   trainerSettings(3),
-  viewAllSchemas(4),
+  spreadSheet(4),
   helpPage(5),
   adminPage(6);
 

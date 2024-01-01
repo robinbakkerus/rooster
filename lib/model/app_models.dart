@@ -304,6 +304,7 @@ class TrainerSchema {
   final int zat3;
   final int zat4;
   final int zat5;
+  bool? isNew = true;
   DateTime? created;
   DateTime? modified;
 
@@ -331,6 +332,7 @@ class TrainerSchema {
     required this.zat3,
     required this.zat4,
     required this.zat5,
+    this.isNew,
     this.created,
     this.modified,
   });
@@ -354,6 +356,7 @@ class TrainerSchema {
     int? zat3,
     int? zat4,
     int? zat5,
+    bool? isNew,
     DateTime? created,
     DateTime? modified,
   }) {
@@ -377,6 +380,7 @@ class TrainerSchema {
       zat3: zat3 ?? this.zat3,
       zat4: zat4 ?? this.zat4,
       zat5: zat5 ?? this.zat5,
+      isNew: isNew ?? this.isNew,
       created: created ?? this.created,
       modified: modified ?? this.modified,
     );
@@ -403,6 +407,7 @@ class TrainerSchema {
       'zat3': zat3,
       'zat4': zat4,
       'zat5': zat5,
+      'isNew': isNew,
       'created': created,
       'modified': modified,
     };
@@ -429,6 +434,7 @@ class TrainerSchema {
         zat3: map['zat3'],
         zat4: map['zat4'],
         zat5: map['zat5'],
+        isNew: map['isNew'],
         created: DataHelper.instance.parseDateTime(map['created']),
         modified: DataHelper.instance.parseDateTime(map['modified']));
   }
@@ -438,60 +444,19 @@ class TrainerSchema {
       TrainerSchema.fromMap(json.decode(source));
   @override
   String toString() {
-    return 'TrainerSchemas(id: $id, trainerPk: $trainerPk, year: $year, month: $month, din1: $din1, din2: $din2, din3: $din3, din4: $din4, din5: $din5, don1: $don1, don2: $don2, don3: $don3, don4: $don4, don5: $don5, zat1: $zat1, zat2: $zat2, zat3: $zat3, zat4: $zat4, zat5: $zat5, created: $created, modified: $modified)';
+    return 'TrainerSchemas(id: $id, trainerPk: $trainerPk, year: $year, month: $month, din1: $din1, din2: $din2, din3: $din3, din4: $din4, din5: $din5, don1: $don1, don2: $don2, don3: $don3, don4: $don4, don5: $don5, zat1: $zat1, zat2: $zat2, zat3: $zat3, zat4: $zat4, zat5: $zat5, created: $created, modified: $modified, isNew: $isNew)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TrainerSchema &&
-        other.id == id &&
-        other.trainerPk == trainerPk &&
-        other.year == year &&
-        other.month == month &&
-        other.din1 == din1 &&
-        other.din2 == din2 &&
-        other.din3 == din3 &&
-        other.din4 == din4 &&
-        other.din5 == din5 &&
-        other.don1 == don1 &&
-        other.don2 == don2 &&
-        other.don3 == don3 &&
-        other.don4 == don4 &&
-        other.don5 == don5 &&
-        other.zat1 == zat1 &&
-        other.zat2 == zat2 &&
-        other.zat3 == zat3 &&
-        other.zat4 == zat4 &&
-        other.zat5 == zat5 &&
-        other.created == created &&
-        other.modified == modified;
+    return other is TrainerSchema && other.id == id;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^
-        trainerPk.hashCode ^
-        year.hashCode ^
-        month.hashCode ^
-        din1.hashCode ^
-        din2.hashCode ^
-        din3.hashCode ^
-        din4.hashCode ^
-        din5.hashCode ^
-        don1.hashCode ^
-        don2.hashCode ^
-        don3.hashCode ^
-        don4.hashCode ^
-        don5.hashCode ^
-        zat1.hashCode ^
-        zat2.hashCode ^
-        zat3.hashCode ^
-        zat4.hashCode ^
-        zat5.hashCode ^
-        created.hashCode ^
-        modified.hashCode;
+    return id.hashCode;
   }
 
   factory TrainerSchema.empty() {
@@ -515,6 +480,7 @@ class TrainerSchema {
         zat3: 0,
         zat4: 0,
         zat5: 0,
+        isNew: true,
         modified: null);
   }
 }
@@ -632,6 +598,7 @@ class SheetRow {
   final DateTime date;
   String training = '';
   List<RowCell> rowCells = [];
+  List<RowCell> extraRowCells = [];
 
   SheetRow({
     required this.rowIndex,

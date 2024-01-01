@@ -54,7 +54,7 @@ class FirestoreHelper {
     if (AppData.instance.simulate) {
       return Simulator.instance.getTrainerSchema(trainerSchemaId);
     } else {
-      TrainerSchema schemas = await _getSchemas(trainerSchemaId);
+      TrainerSchema schemas = await _getTheTrainerSchema(trainerSchemaId);
       return schemas;
     }
   }
@@ -67,7 +67,12 @@ class FirestoreHelper {
     if (!AppData.instance.simulate) {
       CollectionReference schemaRef = firestore.collection('schemas');
 
-      if (updateSchema) trainerSchemas.modified = DateTime.now();
+      if (updateSchema) {
+        trainerSchemas.modified = DateTime.now();
+        trainerSchemas.isNew = false;
+      } else {
+        trainerSchemas.isNew = true;
+      }
 
       await schemaRef.doc(trainerSchemas.id).set(trainerSchemas.toMap()).then(
           (value) {
@@ -196,7 +201,7 @@ class FirestoreHelper {
   ///============ private methods --------
 
   ///-- get schema's for trainer
-  Future<TrainerSchema> _getSchemas(String schemaId) async {
+  Future<TrainerSchema> _getTheTrainerSchema(String schemaId) async {
     CollectionReference schemaRef = firestore.collection('schemas');
 
     TrainerSchema trainerSchema = TrainerSchema.empty();
@@ -207,6 +212,7 @@ class FirestoreHelper {
             Map<String, dynamic>.from(snapshot.data() as Map<dynamic, dynamic>);
         map['id'] = schemaId;
         trainerSchema = TrainerSchema.fromMap(map);
+        trainerSchema.isNew = false;
       } else {
         return [];
       }

@@ -59,7 +59,7 @@ class _AdminPageState extends State<AdminPage> {
 
   void _generateRoster() async {
     await FirestoreHelper.instance.findTrainerByAccessCode('ROME');
-    await AppController.instance.getAllTrainerData();
+    await AppController.instance.generateSpreadsheet();
 
     List<Available> availableList = [];
     SpreadSheet spreadSheet = SpreadSheet();
