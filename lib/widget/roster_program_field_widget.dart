@@ -32,10 +32,16 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color col = const Color(0xffF4E9CA);
     return InkWell(
       onTap: () => _dialogBuilder(context),
-      child: Container(width: widget.width, color: col, child: Text(_training)),
+      child: Container(
+          width: widget.width,
+          decoration:
+              BoxDecoration(border: Border.all(width: 0.1), color: col4),
+          child: Text(
+            _training,
+            overflow: TextOverflow.ellipsis,
+          )),
     );
   }
 
@@ -123,3 +129,5 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
         .pop(); // dismisses only the dialog and returns nothing
   }
 }
+
+const Color col4 = Color(0xffADD3E4);

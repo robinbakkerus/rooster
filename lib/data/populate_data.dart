@@ -32,6 +32,8 @@ Trainer trainerHuib =
     _buildTrainer('HC', 'Huib van Chapelle', 'HACO', 0, 0, 1, 1, 1);
 Trainer trainerRonald =
     _buildTrainer('RV', 'Ronald Vissers', 'ROME', 2, 1, 2, 0, 2);
+Trainer trainerAnne =
+    _buildTrainer('AJ', 'Anne Joustra', 'AKEN', 0, 0, 1, 1, 0);
 
 // _buildTRainer
 Trainer _buildTrainer(String pk, String fullname, String accesscode, int pr,

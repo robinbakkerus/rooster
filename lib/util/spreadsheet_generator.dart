@@ -177,9 +177,6 @@ class SpreadsheetGenerator {
     List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
-    if (groepNr == 1) {
-      dev.log('todo1 : $rowNr $possibleTrainerWeights');
-    }
     Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
         rowNr: rowNr, groepNr: groepNr);
     _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
