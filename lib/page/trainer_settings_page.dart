@@ -71,7 +71,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   List<Widget> _buildColumnWidgets() {
     List<Widget> list = _readOnlyValues();
     list.addAll(_voorkeurDagen());
-    list.add(WidgetHelper().verSpace(10));
+    list.add(WidgetHelper.verSpace(10));
     list.addAll(_voorkeurGroep());
     return list;
   }
@@ -97,7 +97,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         ],
       ),
     ));
-    list.add(WidgetHelper().verSpace(10));
+    list.add(WidgetHelper.verSpace(10));
     return list;
   }
 
@@ -108,10 +108,12 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: w15,
+            width: WidgetHelper.w25,
             child: Text(label),
           ),
-          SizedBox(width: w2, child: Text(_getStringValue(mapElem))),
+          SizedBox(
+              width: WidgetHelper.w25 * 2,
+              child: Text(_getStringValue(mapElem))),
         ],
       ),
     );
@@ -190,7 +192,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
     String msg = okay
         ? 'Met succes voorkeuren aangepast'
         : 'Fout tijdens aanpassen voorkeuren';
-    _showSnackbar(msg);
+    WidgetHelper.showSnackbar(msg, color: Colors.lightGreen);
     setState(() {
       _trainer = _updateTrainer;
     });
@@ -199,10 +201,10 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   Widget? _voorkeurTopRow(String label) {
     return Row(
       children: [
-        _topRowBox(w2, 'Dag', Colors.blue),
-        _topRowBox(w15, 'Ja', Colors.green),
-        _topRowBox(w15, 'Nee', Colors.red),
-        _topRowBox(w2, 'Als nodig', Colors.lightBlueAccent),
+        _topRowBox(WidgetHelper.w25, 'Dag', Colors.blue),
+        _topRowBox(WidgetHelper.w15, 'Ja', Colors.green),
+        _topRowBox(WidgetHelper.w15, 'Nee', Colors.red),
+        _topRowBox(WidgetHelper.w25, 'Als nodig', Colors.lightBlueAccent),
       ],
     );
   }
@@ -219,11 +221,6 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         ),
       ),
     );
-  }
-
-  void _showSnackbar(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        WidgetHelper().buildSnackbar(text: msg, color: Colors.lightGreen));
   }
 }
 
@@ -266,10 +263,11 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
       child: SizedBox(
-        width: w15,
-        child: Text(widget.mapName,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold)),
+        width: WidgetHelper.w15,
+        child: Text(
+          widget.mapName,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
@@ -278,7 +276,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.all(1.0),
       child: SizedBox(
-        width: w2,
+        width: WidgetHelper.w1,
         child: Radio<int>(
           activeColor: color,
           value: currentValue,
@@ -307,5 +305,4 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
 
 ///----------------
 
-final double w15 = 0.15 * AppData.instance.screenWidth;
-final double w2 = 0.2 * AppData.instance.screenWidth;
+

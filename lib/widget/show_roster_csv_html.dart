@@ -23,14 +23,14 @@ class _ShowRosterCsvHtmlViewState extends State<ShowRosterCsvHtmlView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            WidgetHelper().verSpace(10),
+            WidgetHelper.verSpace(10),
             _radioButtons(),
             Container(
               height: 1,
               color: Colors.grey,
             ),
             _showText == 1 ? _showHtml() : _showCsv(),
-            WidgetHelper().verSpace(10),
+            WidgetHelper.verSpace(10),
             ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -54,7 +54,7 @@ class _ShowRosterCsvHtmlViewState extends State<ShowRosterCsvHtmlView> {
           });
         },
       ),
-      WidgetHelper().horSpace(20),
+      WidgetHelper.horSpace(20),
       const Text('Show CSV'),
       Radio(
         value: 2,

@@ -1,36 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:rooster/data/app_data.dart';
 
 class WidgetHelper {
-  final Color color1 = const Color(0xffF4E9CA);
-  final Color color2 = const Color(0xffA6CD7A);
-  final Color color3 = const Color(0xffF6AB94);
+  static final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
-  SnackBar buildSnackbar({required String text, Color? color}) {
-    Color useColor = color ?? Colors.lightBlue;
+  static const Color color1 = Color(0xffF4E9CA);
+  static const Color color2 = Color(0xffA6CD7A);
+  static const Color color3 = Color(0xffF6AB94);
 
-    return SnackBar(
-      backgroundColor: useColor,
-      content: Text(text),
-      duration: const Duration(seconds: 2),
-    );
-  }
+  static final double w1 = 0.1 * AppData.instance.screenWidth;
+  static final double w2 = 0.2 * AppData.instance.screenWidth;
+  static final double w12 = 0.12 * AppData.instance.screenWidth;
+  static final double w15 = 0.15 * AppData.instance.screenWidth;
+  static final double w25 = 0.25 * AppData.instance.screenWidth;
 
-  Widget horSpace(double h) {
+  static Widget horSpace(double h) {
     return Container(
       width: h,
     );
   }
 
-  Widget verSpace(double w) {
+  static Widget verSpace(double w) {
     return Container(
       height: w,
     );
   }
 
-  void showSnackbar(BuildContext context, String msg, {Color? inputColor}) {
-    Color color = inputColor ?? Colors.lightBlue;
+  static void showSnackbar(String msg,
+      {Color color = Colors.lightBlue, int seconds = 3}) {
+    SnackBar snackBar = SnackBar(
+        backgroundColor: color,
+        content: Text(msg),
+        duration: Duration(seconds: seconds));
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(WidgetHelper().buildSnackbar(text: msg, color: color));
+    scaffoldKey.currentState?.showSnackBar(snackBar);
   }
 }

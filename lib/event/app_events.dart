@@ -37,6 +37,13 @@ class TrainingUpdatedEvent {
   TrainingUpdatedEvent(this.rowIndex, this.training);
 }
 
+class ExtraDayUpdatedEvent {
+  final int dag;
+  final String text;
+
+  ExtraDayUpdatedEvent(this.dag, this.text);
+}
+
 /*
 	Static class that contains all onXxx and fireXxx methods.
 */
@@ -67,6 +74,9 @@ class AppEvents {
   static void fireTrainingUpdatedEvent(int rowIndex, String training) =>
       _sEventBus.fire(TrainingUpdatedEvent(rowIndex, training));
 
+  static void fireExtraDayUpdatedEvent(int dag, String text) =>
+      _sEventBus.fire(ExtraDayUpdatedEvent(dag, text));
+
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
@@ -89,6 +99,9 @@ class AppEvents {
 
   static void onTrainingUpdatedEvent(OnTrainingUpdatedEventFunc func) =>
       _sEventBus.on<TrainingUpdatedEvent>().listen((event) => func(event));
+
+  static void onExtraDayUpdatedEvent(OnExtraDayUpdatedEventFunc func) =>
+      _sEventBus.on<ExtraDayUpdatedEvent>().listen((event) => func(event));
 }
 
 /// ----- typedef's -----------
@@ -107,3 +120,5 @@ typedef OnAllTrainerDataReadyEventFunc = void Function(
 typedef OnDatesReadyEventFunc = void Function(DatesReadyEvent event);
 
 typedef OnTrainingUpdatedEventFunc = void Function(TrainingUpdatedEvent event);
+
+typedef OnExtraDayUpdatedEventFunc = void Function(ExtraDayUpdatedEvent event);

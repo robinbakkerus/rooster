@@ -582,27 +582,25 @@ class Available {
 class SpreadSheet {
   List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
   List<SheetRow> rows = [];
+  List<SheetRow> extraRows = [];
 
   void addRow(SheetRow row) {
     rows.add(row);
   }
-
-  // SpreadSheet() {
-  //   rows = [];
-  // }
 }
 
 //----------------------
 class SheetRow {
   final int rowIndex;
   final DateTime date;
-  String training = '';
+  String text = '';
+  bool isExtraRow = false;
   List<RowCell> rowCells = [];
-  List<RowCell> extraRowCells = [];
 
   SheetRow({
     required this.rowIndex,
     required this.date,
+    this.isExtraRow = false,
   });
 
   Trainer getTrainerByGroup(Groep group) {

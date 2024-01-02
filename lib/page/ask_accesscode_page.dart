@@ -92,8 +92,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> {
     _findTriggered = false;
     if (!flag) {
       final String msg = 'Kan geen trainer met accesscode $accesscode vinden!';
-      ScaffoldMessenger.of(context).showSnackBar(
-          WidgetHelper().buildSnackbar(text: msg, color: Colors.red));
+      WidgetHelper.showSnackbar(msg, color: Colors.orange);
     }
   }
 }

@@ -1,12 +1,15 @@
+import 'dart:developer';
+
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/widget/widget_helper.dart';
 
 class SpreadsheetTrainingColumn extends StatefulWidget {
   final SheetRow sheetRow;
   final double width;
   const SpreadsheetTrainingColumn(
-      {super.key, required this.sheetRow, required this.width});
+      {required super.key, required this.sheetRow, required this.width});
 
   @override
   State<SpreadsheetTrainingColumn> createState() =>
@@ -20,9 +23,22 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   void initState() {
-    _training = widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
+    log('todo '
+        ' '
+        '${widget.sheetRow.dateStr()} ${widget.sheetRow.isExtraRow}');
+    _training = _getText();
     super.initState();
   }
+
+  String _getText() {
+    if (_isExtraRow()) {
+      return widget.sheetRow.text;
+    } else {
+      return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
+    }
+  }
+
+  bool _isExtraRow() => widget.sheetRow.isExtraRow;
 
   @override
   void dispose() {
@@ -32,12 +48,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
+    Color col = _isExtraRow() ? Colors.white : WidgetHelper.color1;
     return InkWell(
       onTap: () => _dialogBuilder(context),
       child: Container(
           width: widget.width,
-          decoration:
-              BoxDecoration(border: Border.all(width: 0.1), color: col4),
+          decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
           child: Text(
             _training,
             overflow: TextOverflow.ellipsis,
@@ -70,7 +86,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
                     controller: _textCtrl,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Programma',
+                      labelText: 'Training',
                       isDense: true, // Added this
                     ),
                   ),
@@ -129,5 +145,3 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
         .pop(); // dismisses only the dialog and returns nothing
   }
 }
-
-const Color col4 = Color(0xffADD3E4);

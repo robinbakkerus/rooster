@@ -2,7 +2,6 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/data_helper.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:rooster/widget/widget_helper.dart';
@@ -19,93 +18,97 @@ class RosterPage extends StatefulWidget {
 class _RosterPageState extends State<RosterPage> {
   SpreadSheet _spreadSheet = SpreadSheet();
   bool _isSupervisor = false;
+  List<Widget> _columnRowWidgets = [];
 
   _RosterPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
     AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
+    AppEvents.onExtraDayUpdatedEvent(_onExtraDayUpdated);
   }
 
   @override
   void initState() {
     _spreadSheet = AppData.instance.getSpreadsheet();
     _isSupervisor = AppData.instance.getTrainer().isSupervisor();
+    _columnRowWidgets = _buildRows();
+
     super.initState();
-  }
-
-  void _onReady(AllTrainersDataReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        _spreadSheet = AppData.instance.getSpreadsheet();
-      });
-    }
-  }
-
-  void _onTrainingUpdated(TrainingUpdatedEvent event) {
-    if (mounted) {
-      _spreadSheet.rows[event.rowIndex].training = event.training;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> colWidgets = _getColumnChildren();
-    colWidgets.add(WidgetHelper().verSpace(20));
-    if (_isSupervisor) {
-      colWidgets.add(_buildSupervisorButtons());
-    }
-
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: Column(
-        children: colWidgets,
+        children: _columnRowWidgets,
       ),
     );
   }
 
-  List<Widget> _getColumnChildren() {
-    List<Widget> list = [];
+  List<Widget> _buildRows() {
+    List<Widget> widgetList = [];
 
-    list.add(_buildHeaderRow());
-    list.add(WidgetHelper().verSpace(2));
+    widgetList.add(_buildHeaderRow());
+    widgetList.add(WidgetHelper.verSpace(2));
 
-    for (SheetRow sheetRow in _spreadSheet.rows) {
+    List<SheetRow> sheetList = [];
+    sheetList.addAll(_spreadSheet.rows);
+    sheetList.addAll(_spreadSheet.extraRows);
+    sheetList.sort((a, b) => a.date.compareTo(b.date));
+
+    for (SheetRow sheetRow in sheetList) {
       Widget w = Row(
         children: _buildRosterRowFields(sheetRow),
       );
-      list.add(w);
-      list.add(
-        WidgetHelper().verSpace(1),
-      );
+      widgetList.add(w);
+      widgetList.add(WidgetHelper.verSpace(1));
     }
 
-    return list;
+    widgetList.add(WidgetHelper.verSpace(20));
+    if (_isSupervisor) {
+      widgetList.add(_buildSupervisorButtons());
+    }
+    return widgetList;
   }
 
   List<Widget> _buildRosterRowFields(SheetRow sheetRow) {
     List<Widget> widgets = [];
 
-    widgets.add(SpreadsheetExtraDayColumn(sheetRow: sheetRow, width: w1));
+    widgets.add(SpreadsheeDayColumn(
+        key: UniqueKey(), sheetRow: sheetRow, width: WidgetHelper.w1));
 
-    widgets.add(SpreadsheetTrainingColumn(sheetRow: sheetRow, width: w2));
+    widgets.add(SpreadsheetTrainingColumn(
+        key: UniqueKey(), sheetRow: sheetRow, width: WidgetHelper.w2));
 
-    for (Groep groep in Groep.values) {
-      widgets.add(_buildRosterFieldWidget(sheetRow, colIndex: groep.index));
-      widgets.add(WidgetHelper().horSpace(1));
+    if (sheetRow.rowCells.length == Groep.values.length) {
+      for (Groep groep in Groep.values) {
+        widgets.add(_buildRosterFieldWidget(sheetRow, colIndex: groep.index));
+        widgets.add(WidgetHelper.horSpace(1));
+      }
     }
 
     return widgets;
   }
 
   Widget _buildHeaderRow() {
-    var widths = [w1, w2, w3, w3, w3, w3, w3];
+    var widths = [
+      WidgetHelper.w1,
+      WidgetHelper.w2,
+      WidgetHelper.w12,
+      WidgetHelper.w12,
+      WidgetHelper.w12,
+      WidgetHelper.w12,
+      WidgetHelper.w12
+    ];
     List<Widget> widgets = [];
     for (int i = 0; i < _spreadSheet.header.length; i++) {
       widgets.add(Container(
         width: widths[i],
-        decoration: BoxDecoration(border: Border.all(width: 0.1), color: col2),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.1), color: WidgetHelper.color2),
         child: Text(_spreadSheet.header[i]),
       ));
-      widgets.add(WidgetHelper().horSpace(1));
+      widgets.add(WidgetHelper.horSpace(1));
     }
 
     return Row(
@@ -116,9 +119,13 @@ class _RosterPageState extends State<RosterPage> {
   Widget _buildRosterFieldWidget(SheetRow sheetRow, {required int colIndex}) {
     RowCell rowCell = sheetRow.rowCells[colIndex];
     return Container(
-      width: w3,
-      decoration: BoxDecoration(border: Border.all(width: 0.1), color: col1),
-      child: Text(rowCell.spreadSheetText),
+      width: WidgetHelper.w12,
+      decoration: BoxDecoration(
+          border: Border.all(width: 0.1), color: WidgetHelper.color1),
+      child: Text(
+        rowCell.spreadSheetText,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
@@ -149,7 +156,7 @@ class _RosterPageState extends State<RosterPage> {
 
   void _doFinalizeRoster(BuildContext context) async {
     AppController.instance.finalizeRoster(_spreadSheet);
-    WidgetHelper().showSnackbar(context, 'Training schema is nu definitief!');
+    WidgetHelper.showSnackbar('Training schema is nu definitief!');
   }
 
   // Future<void> _buildDialogShowCsvHtml(BuildContext context,
@@ -207,14 +214,39 @@ class _RosterPageState extends State<RosterPage> {
 
   bool _areProgramFieldSet() {
     List<SheetRow> emptyPrograms = _spreadSheet.rows
-        .where((e) => e.date.weekday != DateTime.saturday && e.training.isEmpty)
+        .where((e) => e.date.weekday != DateTime.saturday && e.text.isEmpty)
         .toList();
     return emptyPrograms.isEmpty;
   }
-}
 
-final double w1 = 0.1 * AppData.instance.screenWidth;
-final double w2 = 0.2 * AppData.instance.screenWidth;
-final double w3 = 0.12 * AppData.instance.screenWidth;
-const Color col1 = Color(0xffF4E9CA);
-const Color col2 = Colors.lightGreenAccent;
+  void _onReady(AllTrainersDataReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _spreadSheet = AppData.instance.getSpreadsheet();
+      });
+    }
+  }
+
+  void _onTrainingUpdated(TrainingUpdatedEvent event) {
+    if (mounted) {
+      _spreadSheet.rows[event.rowIndex].text = event.training;
+      _columnRowWidgets = _buildRows();
+    }
+  }
+
+  void _onExtraDayUpdated(ExtraDayUpdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        int index = _spreadSheet.extraRows.length;
+        DateTime date = DateTime(AppData.instance.getActiveYear(),
+            AppData.instance.getActiveMonth(), event.dag);
+        SheetRow extraRow =
+            SheetRow(rowIndex: index, date: date, isExtraRow: true);
+        extraRow.text = event.text;
+        _spreadSheet.extraRows.add(extraRow);
+
+        _columnRowWidgets = _buildRows();
+      });
+    }
+  }
+}

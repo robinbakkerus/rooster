@@ -327,7 +327,7 @@ class SpreadsheetGenerator {
   void _postProcessSpreadsheet() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
-        sheetRow.training = '';
+        sheetRow.text = '';
         for (int i = 0; i < Groep.values.length; i++) {
           sheetRow.rowCells[i].spreadSheetText = '';
         }

@@ -1,42 +1,47 @@
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/widget/widget_helper.dart';
 
-class SpreadsheetExtraDayColumn extends StatefulWidget {
+class SpreadsheeDayColumn extends StatefulWidget {
   final SheetRow sheetRow;
   final double width;
-  const SpreadsheetExtraDayColumn(
-      {super.key, required this.sheetRow, required this.width});
+  const SpreadsheeDayColumn(
+      {required super.key, required this.sheetRow, required this.width});
 
   @override
-  State<SpreadsheetExtraDayColumn> createState() =>
-      _SpreadsheetExtraDayColumnState();
+  State<SpreadsheeDayColumn> createState() => _SpreadsheeDayColumnState();
 }
 
 //--------------------------------
-class _SpreadsheetExtraDayColumnState extends State<SpreadsheetExtraDayColumn> {
-  final _textCtrl = TextEditingController();
+class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
+  final _textTextCtrl = TextEditingController();
+  final _textDayCtrl = TextEditingController();
 
   @override
   void initState() {
+    _textDayCtrl.text = widget.sheetRow.date.day.toString();
     super.initState();
   }
 
   @override
   void dispose() {
-    _textCtrl.dispose();
+    _textTextCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Color col = widget.sheetRow.isExtraRow ? Colors.white : WidgetHelper.color1;
     return InkWell(
       onTap: () => _dialogBuilder(context),
       child: Container(
           width: widget.width,
-          decoration:
-              BoxDecoration(border: Border.all(width: 0.1), color: col1),
+          decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
           child: Text(
             DataHelper.instance.getSimpleDayString(widget.sheetRow.date),
             overflow: TextOverflow.ellipsis,
@@ -59,28 +64,9 @@ class _SpreadsheetExtraDayColumnState extends State<SpreadsheetExtraDayColumn> {
                 Container(
                   height: 20,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: TextField(
-                    controller: _textCtrl,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Extra',
-                      isDense: true, // Added this
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                    onPressed: () {
-                      // setState(() {
-                      //   _training = _textCtrl.text;
-                      //   AppEvents.fireTrainingUpdatedEvent(
-                      //       widget.sheetRow.rowIndex, _training);
-                      // });
-                      Navigator.of(context, rootNavigator: true)
-                          .pop(); // dismisses only the dialog and returns nothing
-                    },
-                    child: const Text("Close"))
+                _buildDayField(),
+                _buildExtraTextField(),
+                _buildButton(context)
               ],
             ),
           ),
@@ -88,7 +74,62 @@ class _SpreadsheetExtraDayColumnState extends State<SpreadsheetExtraDayColumn> {
       },
     );
   }
-}
 
-const Color col4 = Color(0xffADD3E4);
-const Color col1 = Color(0xffF4E9CA);
+  Widget _buildDayField() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: SizedBox(
+            width: WidgetHelper.w1,
+            child: TextField(
+                controller: _textDayCtrl,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                decoration: const InputDecoration(
+                  labelText: "Dag",
+                  hintText: "Dag",
+                )),
+          ),
+        ),
+        WidgetHelper.horSpace(10),
+        Text(_monthAsString()),
+      ],
+    );
+  }
+
+  String _monthAsString() {
+    var formatter = DateFormat('MMM');
+    return formatter.format(AppData.instance.getActiveDate());
+  }
+
+  Widget _buildExtraTextField() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: TextField(
+        controller: _textTextCtrl,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Extra',
+          isDense: true, // Added this
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            int dag = int.parse(_textDayCtrl.text);
+            AppEvents.fireExtraDayUpdatedEvent(dag, _textTextCtrl.text);
+          });
+          Navigator.of(context, rootNavigator: true)
+              .pop(); // dismisses only the dialog and returns nothing
+        },
+        child: const Text("Close"));
+  }
+}

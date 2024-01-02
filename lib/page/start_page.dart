@@ -164,11 +164,11 @@ class _StartPageState extends State<StartPage> {
         return [
           const PopupMenuItem(
             value: '2',
-            child: Text("Wijzig trainer schema"),
+            child: Text("Trainer verhinderingen"),
           ),
           const PopupMenuItem(
             value: '3',
-            child: Text("Wijzig trainer settings"),
+            child: Text("Trainer settings"),
           ),
           const PopupMenuItem(
             value: '0',
@@ -189,9 +189,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   PopupMenuItem _adminPopup() {
-    // bool isAdmin = AppData.instance.getTrainer().isAdmin();
-    if (1 == 1) {
-      //if (isAdmin) {
+    if (AppData.instance.getTrainer().isAdmin()) {
       return const PopupMenuItem(
         value: '6',
         child: Text("Admin pagina"),

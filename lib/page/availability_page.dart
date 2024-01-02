@@ -53,7 +53,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
         ],
       );
       list.add(w);
-      list.add(WidgetHelper().verSpace(1));
+      list.add(WidgetHelper.verSpace(1));
     }
 
     return list;
@@ -64,13 +64,13 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       children: [
         Container(
             width: w15, color: Colors.lightBlue, child: const Text('Dag')),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('PR')),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R1')),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R2')),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R3')),
       ],
     );
@@ -81,11 +81,11 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
     return Row(
       children: [
         _buildAvailableField(Groep.pr, dateTime),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         _buildAvailableField(Groep.r1, dateTime),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         _buildAvailableField(Groep.r2, dateTime),
-        WidgetHelper().horSpace(1),
+        WidgetHelper.horSpace(1),
         _buildAvailableField(Groep.r3, dateTime),
       ],
     );
@@ -97,17 +97,17 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
 
     String fieldText =
         '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
-    Color color = _buildAvailFieldColor(cnts, WidgetHelper().color1);
+    Color color = _buildAvailFieldColor(cnts, WidgetHelper.color1);
     return _buildAvailableFieldWidget(group, dateTime, color, fieldText);
   }
 
   Color _buildAvailFieldColor(AvailableCounts cnts, Color color) {
     if (cnts.confirmed.isNotEmpty) {
-      color = WidgetHelper().color2;
+      color = WidgetHelper.color2;
     } else if (cnts.confirmed.isEmpty &&
         cnts.ifNeeded.isEmpty &&
         cnts.notEnteredYet.isEmpty) {
-      color = WidgetHelper().color3;
+      color = WidgetHelper.color3;
     }
     return color;
   }
@@ -174,7 +174,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(WidgetHelper().verSpace(20));
+    colWidgets.add(WidgetHelper.verSpace(20));
 
     colWidgets.add(const Text(
       'Alleen als nodig',
@@ -186,7 +186,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(WidgetHelper().verSpace(20));
+    colWidgets.add(WidgetHelper.verSpace(20));
 
     colWidgets.add(const Text('Nog niet ingevuld',
         style: TextStyle(

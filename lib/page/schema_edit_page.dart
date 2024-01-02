@@ -105,7 +105,6 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
   void _showSnackbar() {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
-    Color color = Colors.lightBlue;
 
     if (ts.isNew != null && ts.isNew!) {
       msg +=
@@ -114,8 +113,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
       msg += 'Met succes schema geopend';
     }
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(WidgetHelper().buildSnackbar(text: msg, color: color));
+    WidgetHelper.showSnackbar(msg);
   }
 }
 
@@ -201,5 +199,6 @@ class _ScheduleItemWidgetState extends State<ScheduleItemWidget> {
   }
 }
 
+final double w1 = 0.1 * AppData.instance.screenWidth;
 final double w15 = 0.15 * AppData.instance.screenWidth;
 final double w2 = 0.25 * AppData.instance.screenWidth;
