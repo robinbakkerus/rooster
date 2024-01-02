@@ -28,12 +28,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   String _getText() {
     if (_isExtraRow()) {
-      return widget.sheetRow.text;
+      return widget.sheetRow.trainingText;
     } else {
-      if (widget.sheetRow.text.isEmpty) {
+      if (widget.sheetRow.trainingText.isEmpty) {
         return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
       } else {
-        return widget.sheetRow.text;
+        return widget.sheetRow.trainingText;
       }
     }
   }

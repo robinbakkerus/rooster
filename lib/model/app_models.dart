@@ -617,7 +617,7 @@ class SpreadSheet {
 class SheetRow {
   final int rowIndex;
   final DateTime date;
-  String text = '';
+  String trainingText = '';
   bool isExtraRow = false;
   List<RowCell> rowCells = [];
 
@@ -653,14 +653,13 @@ class RowCell {
   AvailableCounts availableCounts = AvailableCounts();
   List<TrainerWeight> trainerWeights = [];
   Trainer _trainer = Trainer.empty();
-  String availableText = '';
-  String spreadSheetText = '';
+  String text = '';
 
   RowCell({required this.rowIndex, required this.colIndex});
 
   void setTrainer(Trainer trainer) {
     _trainer = trainer;
-    spreadSheetText = trainer.firstName();
+    text = trainer.firstName();
   }
 
   Trainer getTrainer() => _trainer;
@@ -734,4 +733,106 @@ class TrainerWeight {
   String toString() {
     return 'TW( ${trainer.firstName()}=$weight';
   }
+}
+
+///-------------------------------
+
+class FsSpreadsheet {
+  int year = 2024;
+  int month = 1;
+  List<FsSpreadsheetRow> rows = [];
+  FsSpreadsheet({
+    required this.year,
+    required this.month,
+    required this.rows,
+  });
+
+  String getID() {
+    return '${year}_$month';
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'year': year,
+      'month': month,
+      'rows': rows.map((x) => x.toMap()).toList(),
+    };
+  }
+
+  factory FsSpreadsheet.fromMap(Map<String, dynamic> map) {
+    return FsSpreadsheet(
+      year: map['year'] as int,
+      month: map['month'] as int,
+      rows: List<FsSpreadsheetRow>.from(
+        (map['rows'] as List<int>).map<FsSpreadsheetRow>(
+          (x) => FsSpreadsheetRow.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+    );
+  }
+
+  @override
+  String toString() => 'FsSpreadsheet(year: $year, month: $month, rows: $rows)';
+
+  @override
+  bool operator ==(covariant FsSpreadsheet other) {
+    if (identical(this, other)) return true;
+
+    return other.year == year &&
+        other.month == month &&
+        listEquals(other.rows, rows);
+  }
+
+  @override
+  int get hashCode => year.hashCode ^ month.hashCode ^ rows.hashCode;
+}
+
+//------------------------------------------------
+class FsSpreadsheetRow {
+  DateTime date = DateTime.now();
+  String trainingText = '';
+  bool isExtraRow = false;
+  List<String> rowCells = [];
+  FsSpreadsheetRow({
+    required this.date,
+    required this.trainingText,
+    required this.isExtraRow,
+    required this.rowCells,
+  });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'date': date.millisecondsSinceEpoch,
+      'trainingText': trainingText,
+      'isExtraRow': isExtraRow,
+      'rowCells': rowCells,
+    };
+  }
+
+  factory FsSpreadsheetRow.fromMap(Map<String, dynamic> map) {
+    return FsSpreadsheetRow(
+        date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+        trainingText: map['trainingText'] as String,
+        isExtraRow: map['isExtraRow'] as bool,
+        rowCells: List<String>.from(
+          (map['rowCells'] as List<String>),
+        ));
+  }
+
+  @override
+  String toString() =>
+      'FsSpreadsheetRow(trainingText: $trainingText, isExtraRow: $isExtraRow, rowCells: $rowCells)';
+
+  @override
+  bool operator ==(covariant FsSpreadsheetRow other) {
+    if (identical(this, other)) return true;
+
+    return other.trainingText == trainingText &&
+        other.isExtraRow == isExtraRow &&
+        listEquals(other.rowCells, rowCells);
+  }
+
+  @override
+  int get hashCode =>
+      trainingText.hashCode ^ isExtraRow.hashCode ^ rowCells.hashCode;
 }

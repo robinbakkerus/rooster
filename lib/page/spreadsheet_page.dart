@@ -117,7 +117,7 @@ class _RosterPageState extends State<RosterPage> {
       decoration:
           BoxDecoration(border: Border.all(width: 0.1), color: WH.color1),
       child: Text(
-        rowCell.spreadSheetText,
+        rowCell.text,
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -208,7 +208,8 @@ class _RosterPageState extends State<RosterPage> {
 
   bool _areProgramFieldSet() {
     List<SheetRow> emptyPrograms = _spreadSheet.rows
-        .where((e) => e.date.weekday != DateTime.saturday && e.text.isEmpty)
+        .where((e) =>
+            e.date.weekday != DateTime.saturday && e.trainingText.isEmpty)
         .toList();
     return emptyPrograms.isEmpty;
   }
@@ -224,7 +225,7 @@ class _RosterPageState extends State<RosterPage> {
 
   void _onTrainingUpdated(TrainingUpdatedEvent event) {
     if (mounted) {
-      _spreadSheet.rows[event.rowIndex].text = event.training;
+      _spreadSheet.rows[event.rowIndex].trainingText = event.training;
       _columnRowWidgets = _buildRows();
     }
   }
@@ -247,7 +248,7 @@ class _RosterPageState extends State<RosterPage> {
     DateTime date = DateTime(AppData.instance.getActiveYear(),
         AppData.instance.getActiveMonth(), event.dag);
     SheetRow extraRow = SheetRow(rowIndex: index, date: date, isExtraRow: true);
-    extraRow.text = event.text;
+    extraRow.trainingText = event.text;
     _spreadSheet.extraRows.add(extraRow);
   }
 
@@ -259,7 +260,7 @@ class _RosterPageState extends State<RosterPage> {
         .extraRows
         .firstWhereOrNull((e) => e.date == date);
     if (sheetRow != null) {
-      sheetRow.text = event.text;
+      sheetRow.trainingText = event.text;
     }
   }
 

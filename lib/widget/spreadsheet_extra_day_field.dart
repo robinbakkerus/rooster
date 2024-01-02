@@ -26,8 +26,8 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
   @override
   void initState() {
     _textDayCtrl.text = widget.sheetRow.date.day.toString();
-    _textTextCtrl.text = widget.sheetRow.text;
-    _showRemoveButton = widget.sheetRow.text.isNotEmpty;
+    _textTextCtrl.text = widget.sheetRow.trainingText;
+    _showRemoveButton = widget.sheetRow.trainingText.isNotEmpty;
     super.initState();
   }
 

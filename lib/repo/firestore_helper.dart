@@ -164,6 +164,19 @@ class FirestoreHelper {
     return result;
   }
 
+  ///--------------------------
+  Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet) async {
+    CollectionReference trainerRef = firestore.collection('spreadsheet');
+    await trainerRef
+        .doc(fsSpreadsheet.getID())
+        .set(fsSpreadsheet.toMap())
+        .then((val) {})
+        .catchError((e) {
+      log('Error in saveFsSpreadsheet $e');
+      throw e;
+    });
+  }
+
   ///-------- sendEmail
   Future<bool> sendEmail(
       {required List<Trainer> toTrainers,

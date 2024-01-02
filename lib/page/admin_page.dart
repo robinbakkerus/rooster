@@ -29,7 +29,8 @@ class _AdminPageState extends State<AdminPage> {
           OutlinedButton(
               onPressed: _generateRoster, child: const Text('Maak rooster')),
           OutlinedButton(
-              onPressed: _generateRoster, child: const Text('Whatsapp'))
+              onPressed: saveFsSpreadsheet,
+              child: const Text('Firestore spreadsheet'))
         ],
       ),
     );
@@ -63,20 +64,21 @@ class _AdminPageState extends State<AdminPage> {
     await FirestoreHelper.instance.findTrainerByAccessCode('ROME');
     await AppController.instance.generateSpreadsheet();
 
-    List<Available> availableList = [];
-    SpreadSheet spreadSheet = SpreadSheet();
-    availableList =
+    List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
-    spreadSheet = SpreadsheetGenerator.instance
+    SpreadSheet spreadSheet = SpreadsheetGenerator.instance
         .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+    log('todo1 $spreadSheet');
+  }
 
-    List<String> csvList =
-        SpreadsheetGenerator.instance.generateCsv(spreadSheet);
-    for (String s in csvList) {
-      log(s);
-    }
-
-    String html = SpreadsheetGenerator.instance.generateHtml(spreadSheet);
-    log(html);
+  void saveFsSpreadsheet() async {
+    List<Available> availableList =
+        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
+    SpreadSheet spreadSheet = SpreadsheetGenerator.instance
+        .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+    FsSpreadsheet fsSpreadsheet =
+        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
+    log('todo2 $fsSpreadsheet');
   }
 }

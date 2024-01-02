@@ -70,20 +70,30 @@ class SpreadsheetGenerator {
     return _spreadSheet;
   }
 
-  //------------- first fill the spreadsheet with available trainer data
-  void _fillAvailabilityInSpreadsheet(List<Available> availableList) {
-    int rowIdx = 0;
-    for (Available avail in availableList) {
-      SheetRow sheetRow = SheetRow(date: avail.date, rowIndex: rowIdx);
-      for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
-        RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groepNr);
-        rowCell.availableCounts = avail.counts[groepNr];
-        sheetRow.rowCells.add(rowCell);
-      }
-      _spreadSheet.addRow(sheetRow);
-
-      rowIdx++;
+  //----------------
+  FsSpreadsheet fsSpreadsheetFrom(SpreadSheet spreadSheet) {
+    List<FsSpreadsheetRow> fsRows = [];
+    for (SheetRow sheetRow in spreadSheet.rows) {
+      fsRows.add(_mapFromRow(sheetRow));
     }
+    for (SheetRow sheetRow in spreadSheet.extraRows) {
+      fsRows.add(_mapFromRow(sheetRow));
+    }
+
+    FsSpreadsheet result = FsSpreadsheet(year: 2024, month: 1, rows: fsRows);
+    return result;
+  }
+
+  FsSpreadsheetRow _mapFromRow(SheetRow sheetRow) {
+    List<String> fsCells = [];
+    for (RowCell cell in sheetRow.rowCells) {
+      fsCells.add(cell.text);
+    }
+    return FsSpreadsheetRow(
+        date: sheetRow.date,
+        isExtraRow: false,
+        trainingText: sheetRow.trainingText,
+        rowCells: fsCells);
   }
 
   ///---------------
@@ -143,6 +153,22 @@ class SpreadsheetGenerator {
   }
 
   //---- private --
+
+  //------------- first fill the spreadsheet with available trainer data
+  void _fillAvailabilityInSpreadsheet(List<Available> availableList) {
+    int rowIdx = 0;
+    for (Available avail in availableList) {
+      SheetRow sheetRow = SheetRow(date: avail.date, rowIndex: rowIdx);
+      for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
+        RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groepNr);
+        rowCell.availableCounts = avail.counts[groepNr];
+        sheetRow.rowCells.add(rowCell);
+      }
+      _spreadSheet.addRow(sheetRow);
+
+      rowIdx++;
+    }
+  }
 
   Available _genCountProcessDate(DateTime date) {
     Available available = Available(date: date);
@@ -327,11 +353,11 @@ class SpreadsheetGenerator {
   void _postProcessSpreadsheet() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
-        sheetRow.text = '';
+        sheetRow.trainingText = '';
         for (int i = 0; i < Groep.values.length; i++) {
-          sheetRow.rowCells[i].spreadSheetText = '';
+          sheetRow.rowCells[i].text = '';
         }
-        sheetRow.rowCells[Groep.zamo.index].spreadSheetText = 'Hu/Pa/Ro';
+        sheetRow.rowCells[Groep.zamo.index].text = 'Hu/Pa/Ro';
       } else {
         sheetRow.rowCells[Groep.zamo.index].setTrainer(Trainer.empty());
       }
