@@ -21,13 +21,13 @@ class SpreadsheeDayColumn extends StatefulWidget {
 class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
   final _textTextCtrl = TextEditingController();
   final _textDayCtrl = TextEditingController();
+  bool _showRemoveButton = false;
 
   @override
   void initState() {
     _textDayCtrl.text = widget.sheetRow.date.day.toString();
     _textTextCtrl.text = widget.sheetRow.text;
-
-    AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
+    _showRemoveButton = widget.sheetRow.text.isNotEmpty;
     super.initState();
   }
 
@@ -69,7 +69,11 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
                 ),
                 _buildDayField(),
                 _buildExtraTextField(),
-                _buildButton(context)
+                _showRemoveButton
+                    ? _buildRemoveExtraRowButton(context)
+                    : Container(),
+                WH.verSpace(10),
+                _buildCloseButton(context),
               ],
             ),
           ),
@@ -116,14 +120,14 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
         controller: _textTextCtrl,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
-          labelText: 'Extra',
+          labelText: 'Extra regel',
           isDense: true, // Added this
         ),
       ),
     );
   }
 
-  Widget _buildButton(BuildContext context) {
+  Widget _buildCloseButton(BuildContext context) {
     return ElevatedButton(
         onPressed: () {
           setState(() {
@@ -136,9 +140,17 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
         child: const Text("Close"));
   }
 
-  void _onTrainingUpdated(TrainingUpdatedEvent event) {
-    if (mounted) {
-      setState(() {});
-    }
+  Widget _buildRemoveExtraRowButton(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {
+          setState(() {
+            int dag = widget.sheetRow.date.day;
+            AppEvents.fireExtraDayUpdatedEvent(
+                dag, WH.removeExtraSpreadsheetRow);
+          });
+          Navigator.of(context, rootNavigator: true)
+              .pop(); // dismisses only the dialog and returns nothing
+        },
+        child: const Text("Verwijder deze regel"));
   }
 }

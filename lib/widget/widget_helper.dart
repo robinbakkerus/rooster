@@ -14,6 +14,8 @@ class WH {
   static final double w15 = 0.15 * AppData.instance.screenWidth;
   static final double w25 = 0.25 * AppData.instance.screenWidth;
 
+  static const String removeExtraSpreadsheetRow = 'REMOVE EXTRA ROW';
+
   static Widget horSpace(double h) {
     return Container(
       width: h,

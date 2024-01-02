@@ -23,7 +23,6 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   void initState() {
     _training = _getText();
     _textCtrl.text = _training;
-    AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     super.initState();
   }
 
@@ -138,20 +137,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   void _onDropdownSelected(Object? value) {
     setState(() {
       _training = value.toString();
+      _textCtrl.text = _training;
     });
 
     AppEvents.fireTrainingUpdatedEvent(widget.sheetRow.rowIndex, _training);
 
     Navigator.of(context, rootNavigator: true)
         .pop(); // dismisses only the dialog and returns nothing
-  }
-
-  void _onTrainingUpdated(TrainingUpdatedEvent event) {
-    if (mounted) {
-      setState(() {
-        _training = _getText();
-        _textCtrl.text = _training;
-      });
-    }
   }
 }

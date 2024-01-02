@@ -232,7 +232,11 @@ class _RosterPageState extends State<RosterPage> {
   void _onExtraDayUpdated(ExtraDayUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
+        if (event.text == WH.removeExtraSpreadsheetRow) {
+          _removeExtraRow(event);
+        } else {
+          _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
+        }
         _columnRowWidgets = _buildRows();
       });
     }
@@ -256,6 +260,16 @@ class _RosterPageState extends State<RosterPage> {
         .firstWhereOrNull((e) => e.date == date);
     if (sheetRow != null) {
       sheetRow.text = event.text;
+    }
+  }
+
+  void _removeExtraRow(ExtraDayUpdatedEvent event) {
+    DateTime actDate = AppData.instance.getActiveDate();
+    DateTime date = DateTime(actDate.year, actDate.month, event.dag);
+    SheetRow? sheetRow =
+        _spreadSheet.extraRows.firstWhereOrNull((e) => e.date == date);
+    if (sheetRow != null) {
+      _spreadSheet.extraRows.remove(sheetRow);
     }
   }
 

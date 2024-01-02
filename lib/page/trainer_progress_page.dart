@@ -16,8 +16,6 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
   // varbs
   List<Trainer> _allTrainers = [];
 
-  final double _screenWidth = AppData.instance.screenWidth;
-
   _TrainerProgressPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
   }
