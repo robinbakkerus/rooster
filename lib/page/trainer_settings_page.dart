@@ -16,30 +16,12 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
   List<Widget> _columnWidgets = [];
+  final _textCtrl = TextEditingController();
+  Widget? _fab;
 
   _TrainerSettingsPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
     AppEvents.onTrainerUpdatedEvent(_onTrainerUpdated);
-  }
-
-  void _onReady(TrainerDataReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        _trainer = AppData.instance.getTrainer();
-        _updateTrainer = _trainer.copyWith();
-        _columnWidgets = _buildColumnWidgets();
-      });
-    }
-  }
-
-  void _onTrainerUpdated(TrainerUdatedEvent event) {
-    if (mounted) {
-      setState(() {
-        _trainer = AppData.instance.getTrainer();
-        _updateTrainer = event.trainer;
-        _columnWidgets = _buildColumnWidgets();
-      });
-    }
   }
 
   @override
@@ -47,6 +29,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
     _trainer = AppData.instance.getTrainer();
     _updateTrainer = _trainer.copyWith();
     _columnWidgets = _buildColumnWidgets();
+    _fab = _getFab();
     super.initState();
   }
 
@@ -64,7 +47,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
           ),
         ],
       ),
-      floatingActionButton: _getFab(),
+      floatingActionButton: _fab,
     );
   }
 
@@ -81,6 +64,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
     list.add(_readOnlyRow('PK', 'pk'));
     list.add(_readOnlyRow('Naam', 'fullname'));
     list.add(_readOnlyRow('Rollen', 'roles'));
+    list.add(_emailRow());
     list.add(Padding(
       padding: const EdgeInsets.fromLTRB(20, 1, 20, 1),
       child: Container(
@@ -114,6 +98,42 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
           SizedBox(
               width: WidgetHelper.w25 * 2,
               child: Text(_getStringValue(mapElem))),
+        ],
+      ),
+    );
+  }
+
+  Widget _emailRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: WidgetHelper.w25,
+            child: const Text('email'),
+          ),
+          SizedBox(
+            width: WidgetHelper.w25 * 2,
+            child: TextField(
+              controller: _textCtrl,
+              textCapitalization: TextCapitalization.characters,
+              onChanged: (value) {
+                if (_textCtrl.text != value.toLowerCase()) {
+                  _textCtrl.value =
+                      _textCtrl.value.copyWith(text: value.toLowerCase());
+                }
+                _updateTrainer.email = _textCtrl.text;
+                setState(() {
+                  _fab = _getFab();
+                });
+              },
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'email',
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -221,6 +241,29 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         ),
       ),
     );
+  }
+
+  void _onReady(TrainerDataReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _trainer = AppData.instance.getTrainer();
+        _updateTrainer = _trainer.copyWith();
+        _columnWidgets = _buildColumnWidgets();
+        _textCtrl.text = _trainer.email;
+        _fab = _getFab();
+      });
+    }
+  }
+
+  void _onTrainerUpdated(TrainerUdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        _trainer = AppData.instance.getTrainer();
+        _updateTrainer = event.trainer;
+        _columnWidgets = _buildColumnWidgets();
+        _fab = _getFab();
+      });
+    }
   }
 }
 

@@ -9,7 +9,7 @@ class Trainer {
   final String accessCode;
   final String pk; // this is also the firestore dbs ID
   final String fullname;
-  final String email;
+  String email;
   final int dinsdag;
   final int donderdag;
   final int zaterdag;
@@ -110,15 +110,39 @@ class Trainer {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(covariant Trainer other) {
     if (identical(this, other)) return true;
 
-    return other is Trainer && other.accessCode == accessCode;
+    return other.accessCode == accessCode &&
+        other.pk == pk &&
+        other.fullname == fullname &&
+        other.email == email &&
+        other.dinsdag == dinsdag &&
+        other.donderdag == donderdag &&
+        other.zaterdag == zaterdag &&
+        other.pr == pr &&
+        other.r1 == r1 &&
+        other.r2 == r2 &&
+        other.r3 == r3 &&
+        other.zamo == zamo &&
+        other.roles == roles;
   }
 
   @override
   int get hashCode {
-    return accessCode.hashCode;
+    return accessCode.hashCode ^
+        pk.hashCode ^
+        fullname.hashCode ^
+        email.hashCode ^
+        dinsdag.hashCode ^
+        donderdag.hashCode ^
+        zaterdag.hashCode ^
+        pr.hashCode ^
+        r1.hashCode ^
+        r2.hashCode ^
+        r3.hashCode ^
+        zamo.hashCode ^
+        roles.hashCode;
   }
 
   factory Trainer.empty() {
