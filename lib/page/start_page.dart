@@ -86,7 +86,7 @@ class _StartPageState extends State<StartPage> {
 
         _prevMonthEnabled =
             AppData.instance.getActiveDate().millisecondsSinceEpoch >
-                AppData.instance.firstMonth.millisecondsSinceEpoch;
+                AppData.instance.lastActiveDate.millisecondsSinceEpoch;
 
         _nextMonthEnabled =
             AppData.instance.getActiveDate().millisecondsSinceEpoch <

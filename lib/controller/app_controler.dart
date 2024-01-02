@@ -177,6 +177,7 @@ class AppController {
         : lastActiveDate.add(const Duration(days: 31));
 
     setActiveDate(DateTime(nextMonth.year, nextMonth.month, 1));
+    AppData.instance.lastActiveDate = lastActiveDate;
 
     const int nMonths = 2;
     DateTime lastMonth = lastActiveDate.day > 15

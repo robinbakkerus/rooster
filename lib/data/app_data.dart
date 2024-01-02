@@ -59,7 +59,7 @@ class AppData {
   }
 
   DateTime _activeDate = DateTime(2024, 1, 1);
-  final DateTime firstMonth = DateTime(2024, 1, 1);
+  DateTime lastActiveDate = DateTime(2024, 1, 1);
   DateTime lastMonth = DateTime(2024, 1, 1);
 
   Trainer getTrainer() {

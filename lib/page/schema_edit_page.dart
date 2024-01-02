@@ -105,15 +105,26 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
   void _showSnackbar() {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
+    Color col = Colors.lightBlue;
 
     if (ts.isNew != null && ts.isNew!) {
       msg +=
           'Met succes nieuw schema aangemaakt, deze wordt nu als ingevuld beschouwd';
     } else {
       msg += 'Met succes schema geopend';
+      if (_isReadonly()) {
+        msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
+        col = Colors.orange;
+      }
     }
 
-    WidgetHelper.showSnackbar(msg);
+    WidgetHelper.showSnackbar(msg, color: col);
+  }
+
+  bool _isReadonly() {
+    DateTime activeDate = AppData.instance.getActiveDate();
+    DateTime lastActiveDate = AppData.instance.lastActiveDate;
+    return !activeDate.isAfter(lastActiveDate);
   }
 }
 
