@@ -39,7 +39,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color col = widget.sheetRow.isExtraRow ? Colors.white : WidgetHelper.color1;
+    Color col = widget.sheetRow.isExtraRow ? Colors.white : WH.color1;
     return InkWell(
       onTap: () => _dialogBuilder(context),
       child: Container(
@@ -85,7 +85,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: SizedBox(
-            width: WidgetHelper.w1,
+            width: WH.w1,
             child: TextField(
                 controller: _textDayCtrl,
                 keyboardType: TextInputType.number,
@@ -98,7 +98,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
                 )),
           ),
         ),
-        WidgetHelper.horSpace(10),
+        WH.horSpace(10),
         Text(_monthAsString()),
       ],
     );

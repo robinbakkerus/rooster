@@ -54,7 +54,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   List<Widget> _buildColumnWidgets() {
     List<Widget> list = _readOnlyValues();
     list.addAll(_voorkeurDagen());
-    list.add(WidgetHelper.verSpace(10));
+    list.add(WH.verSpace(10));
     list.addAll(_voorkeurGroep());
     return list;
   }
@@ -81,7 +81,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         ],
       ),
     ));
-    list.add(WidgetHelper.verSpace(10));
+    list.add(WH.verSpace(10));
     return list;
   }
 
@@ -92,12 +92,10 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: WidgetHelper.w25,
+            width: WH.w1,
             child: Text(label),
           ),
-          SizedBox(
-              width: WidgetHelper.w25 * 2,
-              child: Text(_getStringValue(mapElem))),
+          SizedBox(width: WH.w25 * 2, child: Text(_getStringValue(mapElem))),
         ],
       ),
     );
@@ -110,11 +108,11 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: WidgetHelper.w25,
+            width: WH.w1,
             child: const Text('email'),
           ),
           SizedBox(
-            width: WidgetHelper.w25 * 2,
+            width: WH.w25 * 3,
             child: TextField(
               controller: _textCtrl,
               textCapitalization: TextCapitalization.characters,
@@ -212,7 +210,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
     String msg = okay
         ? 'Met succes voorkeuren aangepast'
         : 'Fout tijdens aanpassen voorkeuren';
-    WidgetHelper.showSnackbar(msg, color: Colors.lightGreen);
+    WH.showSnackbar(msg, color: Colors.lightGreen);
     setState(() {
       _trainer = _updateTrainer;
     });
@@ -221,10 +219,10 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   Widget? _voorkeurTopRow(String label) {
     return Row(
       children: [
-        _topRowBox(WidgetHelper.w25, 'Dag', Colors.blue),
-        _topRowBox(WidgetHelper.w15, 'Ja', Colors.green),
-        _topRowBox(WidgetHelper.w15, 'Nee', Colors.red),
-        _topRowBox(WidgetHelper.w25, 'Als nodig', Colors.lightBlueAccent),
+        _topRowBox(WH.w1, 'Dag', Colors.blue),
+        _topRowBox(WH.w15, 'Ja', Colors.green),
+        _topRowBox(WH.w15, 'Nee', Colors.red),
+        _topRowBox(WH.w25, 'Als nodig', Colors.lightBlueAccent),
       ],
     );
   }
@@ -306,7 +304,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
       child: SizedBox(
-        width: WidgetHelper.w15,
+        width: WH.w1,
         child: Text(
           widget.mapName,
           overflow: TextOverflow.ellipsis,
@@ -319,7 +317,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.all(1.0),
       child: SizedBox(
-        width: WidgetHelper.w1,
+        width: WH.w15,
         child: Radio<int>(
           activeColor: color,
           value: currentValue,

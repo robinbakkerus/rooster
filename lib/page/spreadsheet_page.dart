@@ -51,7 +51,7 @@ class _RosterPageState extends State<RosterPage> {
     List<Widget> widgetList = [];
 
     widgetList.add(_buildHeaderRow());
-    widgetList.add(WidgetHelper.verSpace(2));
+    widgetList.add(WH.verSpace(2));
 
     List<SheetRow> sheetList = [];
     sheetList.addAll(_spreadSheet.rows);
@@ -63,10 +63,10 @@ class _RosterPageState extends State<RosterPage> {
         children: _buildRosterRowFields(sheetRow),
       );
       widgetList.add(w);
-      widgetList.add(WidgetHelper.verSpace(1));
+      widgetList.add(WH.verSpace(1));
     }
 
-    widgetList.add(WidgetHelper.verSpace(20));
+    widgetList.add(WH.verSpace(20));
     if (_isSupervisor) {
       widgetList.add(_buildSupervisorButtons());
     }
@@ -77,15 +77,15 @@ class _RosterPageState extends State<RosterPage> {
     List<Widget> widgets = [];
 
     widgets.add(SpreadsheeDayColumn(
-        key: UniqueKey(), sheetRow: sheetRow, width: WidgetHelper.w1));
+        key: UniqueKey(), sheetRow: sheetRow, width: WH.w1));
 
     widgets.add(SpreadsheetTrainingColumn(
-        key: UniqueKey(), sheetRow: sheetRow, width: WidgetHelper.w2));
+        key: UniqueKey(), sheetRow: sheetRow, width: WH.w2));
 
     if (sheetRow.rowCells.length == Groep.values.length) {
       for (Groep groep in Groep.values) {
         widgets.add(_buildRosterFieldWidget(sheetRow, colIndex: groep.index));
-        widgets.add(WidgetHelper.horSpace(1));
+        widgets.add(WH.horSpace(1));
       }
     }
 
@@ -93,24 +93,16 @@ class _RosterPageState extends State<RosterPage> {
   }
 
   Widget _buildHeaderRow() {
-    var widths = [
-      WidgetHelper.w1,
-      WidgetHelper.w2,
-      WidgetHelper.w12,
-      WidgetHelper.w12,
-      WidgetHelper.w12,
-      WidgetHelper.w12,
-      WidgetHelper.w12
-    ];
+    var widths = [WH.w1, WH.w2, WH.w12, WH.w12, WH.w12, WH.w12, WH.w12];
     List<Widget> widgets = [];
     for (int i = 0; i < _spreadSheet.header.length; i++) {
       widgets.add(Container(
         width: widths[i],
-        decoration: BoxDecoration(
-            border: Border.all(width: 0.1), color: WidgetHelper.color2),
+        decoration:
+            BoxDecoration(border: Border.all(width: 0.1), color: WH.color2),
         child: Text(_spreadSheet.header[i]),
       ));
-      widgets.add(WidgetHelper.horSpace(1));
+      widgets.add(WH.horSpace(1));
     }
 
     return Row(
@@ -121,9 +113,9 @@ class _RosterPageState extends State<RosterPage> {
   Widget _buildRosterFieldWidget(SheetRow sheetRow, {required int colIndex}) {
     RowCell rowCell = sheetRow.rowCells[colIndex];
     return Container(
-      width: WidgetHelper.w12,
-      decoration: BoxDecoration(
-          border: Border.all(width: 0.1), color: WidgetHelper.color1),
+      width: WH.w12,
+      decoration:
+          BoxDecoration(border: Border.all(width: 0.1), color: WH.color1),
       child: Text(
         rowCell.spreadSheetText,
         overflow: TextOverflow.ellipsis,
@@ -158,7 +150,7 @@ class _RosterPageState extends State<RosterPage> {
 
   void _doFinalizeRoster(BuildContext context) async {
     AppController.instance.finalizeRoster(_spreadSheet);
-    WidgetHelper.showSnackbar('Training schema is nu definitief!');
+    WH.showSnackbar('Training schema is nu definitief!');
   }
 
   // Future<void> _buildDialogShowCsvHtml(BuildContext context,

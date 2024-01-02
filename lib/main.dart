@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     AppController.instance.initializeAppData(context);
 
     return MaterialApp(
-      scaffoldMessengerKey: WidgetHelper.scaffoldKey,
+      scaffoldMessengerKey: WH.scaffoldKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primarySwatch: Colors.blue,

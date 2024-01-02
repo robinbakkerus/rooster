@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 
-class WidgetHelper {
+class WH {
   static final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
   static const Color color1 = Color(0xffF4E9CA);

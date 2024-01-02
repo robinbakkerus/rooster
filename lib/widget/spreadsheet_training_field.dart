@@ -49,7 +49,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color col = _isExtraRow() ? Colors.white : WidgetHelper.color1;
+    Color col = _isExtraRow() ? Colors.white : WH.color1;
     return InkWell(
       onTap: () => _dialogBuilder(context),
       child: Container(

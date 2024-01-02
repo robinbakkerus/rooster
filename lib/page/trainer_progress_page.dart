@@ -3,6 +3,7 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/widget/widget_helper.dart';
 
 class TrainerProgressPage extends StatefulWidget {
   const TrainerProgressPage({super.key});
@@ -54,7 +55,12 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
     for (Trainer trainer in _allTrainers) {
       Widget w = Row(
         children: [
-          SizedBox(width: 0.3 * _screenWidth, child: Text(trainer.fullname)),
+          SizedBox(
+              width: WH.w25,
+              child: Text(
+                trainer.firstName(),
+                overflow: TextOverflow.ellipsis,
+              )),
           _buildEntered(trainer),
         ],
       );
@@ -68,11 +74,9 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
     Widget topRow = Row(
       children: [
         Container(
-            width: 0.3 * _screenWidth,
-            color: Colors.lightBlue,
-            child: const Text('naam')),
+            width: WH.w25, color: Colors.lightBlue, child: const Text('naam')),
         Container(
-            width: 0.3 * _screenWidth,
+            width: WH.w2,
             color: Colors.lightGreen,
             child: const Center(child: Text('Ingevuld?'))),
       ],
@@ -95,6 +99,6 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
             color: Colors.red,
           );
 
-    return SizedBox(width: 0.3 * _screenWidth, child: icon);
+    return SizedBox(width: WH.w2, child: icon);
   }
 }

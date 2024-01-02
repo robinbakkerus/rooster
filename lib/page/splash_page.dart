@@ -38,7 +38,7 @@ class _SplashPageState extends State<SplashPage> {
                         color: Colors.lightBlue)),
               ],
             ),
-            WidgetHelper.verSpace(20),
+            WH.verSpace(20),
             const Text('Traininschema v1.0'),
           ]),
     ));

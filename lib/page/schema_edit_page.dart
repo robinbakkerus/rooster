@@ -118,7 +118,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
       }
     }
 
-    WidgetHelper.showSnackbar(msg, color: col);
+    WH.showSnackbar(msg, color: col);
   }
 
   bool _isReadonly() {
