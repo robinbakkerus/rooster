@@ -27,7 +27,9 @@ class _AdminPageState extends State<AdminPage> {
           OutlinedButton(
               onPressed: _removeCookie, child: const Text('Remove cookie')),
           OutlinedButton(
-              onPressed: _generateRoster, child: const Text('Maak rooster'))
+              onPressed: _generateRoster, child: const Text('Maak rooster')),
+          OutlinedButton(
+              onPressed: _generateRoster, child: const Text('Whatsapp'))
         ],
       ),
     );

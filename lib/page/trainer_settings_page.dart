@@ -52,7 +52,9 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   }
 
   List<Widget> _buildColumnWidgets() {
-    List<Widget> list = _readOnlyValues();
+    List<Widget> list = [];
+
+    list.addAll(_readOnlyValues());
     list.addAll(_voorkeurDagen());
     list.add(WH.verSpace(10));
     list.addAll(_voorkeurGroep());
@@ -92,10 +94,15 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: WH.w1,
+            width: WH.w15,
             child: Text(label),
           ),
-          SizedBox(width: WH.w25 * 2, child: Text(_getStringValue(mapElem))),
+          SizedBox(
+              width: WH.w25 * 2,
+              child: Text(
+                _getStringValue(mapElem),
+                overflow: TextOverflow.ellipsis,
+              )),
         ],
       ),
     );
@@ -219,7 +226,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   Widget? _voorkeurTopRow(String label) {
     return Row(
       children: [
-        _topRowBox(WH.w1, 'Dag', Colors.blue),
+        _topRowBox(WH.w2, 'Dag', Colors.blue),
         _topRowBox(WH.w15, 'Ja', Colors.green),
         _topRowBox(WH.w15, 'Nee', Colors.red),
         _topRowBox(WH.w25, 'Als nodig', Colors.lightBlueAccent),
@@ -291,6 +298,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         _dayLabel(),
         _radioButton(1, Colors.green),
@@ -302,9 +310,9 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
 
   Widget _dayLabel() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
+      padding: const EdgeInsets.fromLTRB(10, 1, 4, 1),
       child: SizedBox(
-        width: WH.w1,
+        width: WH.w2,
         child: Text(
           widget.mapName,
           overflow: TextOverflow.ellipsis,

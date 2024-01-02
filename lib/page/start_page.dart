@@ -132,13 +132,15 @@ class _StartPageState extends State<StartPage> {
   String _buildBarTitle() {
     String result = '${AppData.instance.getTrainer().firstName()}: ';
 
-    if (_stackIndex == 2 || _stackIndex == 4) {
+    if (_stackIndex == Action.editSchema.code) {
       result += AppData.instance.getActiveMonthAsString();
-    } else if (_stackIndex == 3) {
-      result += '${AppData.instance.getTrainer().firstName()} : Instellingen';
-    } else if (_stackIndex == 5) {
+    } else if (_stackIndex == Action.trainerSettings.code) {
+      result += ' Instellingen';
+    } else if (_stackIndex == Action.spreadSheet.code) {
+      result = ' Schema ${AppData.instance.getActiveMonthAsString()}';
+    } else if (_stackIndex == Action.helpPage.code) {
       return 'Help pagina';
-    } else if (_stackIndex == 6) {
+    } else if (_stackIndex == Action.adminPage.code) {
       return 'Admin pagina';
     }
 
