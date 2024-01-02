@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +21,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   void initState() {
-    log('todo '
-        ' '
-        '${widget.sheetRow.dateStr()} ${widget.sheetRow.isExtraRow}');
     _training = _getText();
+    _textCtrl.text = _training;
+    AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     super.initState();
   }
 
@@ -34,7 +31,11 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     if (_isExtraRow()) {
       return widget.sheetRow.text;
     } else {
-      return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
+      if (widget.sheetRow.text.isEmpty) {
+        return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
+      } else {
+        return widget.sheetRow.text;
+      }
     }
   }
 
@@ -143,5 +144,14 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
     Navigator.of(context, rootNavigator: true)
         .pop(); // dismisses only the dialog and returns nothing
+  }
+
+  void _onTrainingUpdated(TrainingUpdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        _training = _getText();
+        _textCtrl.text = _training;
+      });
+    }
   }
 }

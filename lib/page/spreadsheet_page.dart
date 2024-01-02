@@ -6,6 +6,8 @@ import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 
 class RosterPage extends StatefulWidget {
   const RosterPage({super.key});
@@ -223,6 +225,7 @@ class _RosterPageState extends State<RosterPage> {
     if (mounted) {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
+        _columnRowWidgets = _buildRows();
       });
     }
   }
@@ -237,16 +240,40 @@ class _RosterPageState extends State<RosterPage> {
   void _onExtraDayUpdated(ExtraDayUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        int index = _spreadSheet.extraRows.length;
-        DateTime date = DateTime(AppData.instance.getActiveYear(),
-            AppData.instance.getActiveMonth(), event.dag);
-        SheetRow extraRow =
-            SheetRow(rowIndex: index, date: date, isExtraRow: true);
-        extraRow.text = event.text;
-        _spreadSheet.extraRows.add(extraRow);
-
+        _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
         _columnRowWidgets = _buildRows();
       });
     }
+  }
+
+  void _addExtraRow(ExtraDayUpdatedEvent event) {
+    int index = _spreadSheet.extraRows.length;
+    DateTime date = DateTime(AppData.instance.getActiveYear(),
+        AppData.instance.getActiveMonth(), event.dag);
+    SheetRow extraRow = SheetRow(rowIndex: index, date: date, isExtraRow: true);
+    extraRow.text = event.text;
+    _spreadSheet.extraRows.add(extraRow);
+  }
+
+  void _updateExtraRow(ExtraDayUpdatedEvent event) {
+    DateTime actDate = AppData.instance.getActiveDate();
+    DateTime date = DateTime(actDate.year, actDate.month, event.dag);
+    SheetRow? sheetRow = AppData.instance
+        .getSpreadsheet()
+        .extraRows
+        .firstWhereOrNull((e) => e.date == date);
+    if (sheetRow != null) {
+      sheetRow.text = event.text;
+    }
+  }
+
+  bool _extraRowExists(ExtraDayUpdatedEvent event) {
+    DateTime actDate = AppData.instance.getActiveDate();
+    DateTime date = DateTime(actDate.year, actDate.month, event.dag);
+    return AppData.instance
+            .getSpreadsheet()
+            .extraRows
+            .firstWhereOrNull((e) => e.date == date) !=
+        null;
   }
 }

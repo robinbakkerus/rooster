@@ -25,6 +25,9 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
   @override
   void initState() {
     _textDayCtrl.text = widget.sheetRow.date.day.toString();
+    _textTextCtrl.text = widget.sheetRow.text;
+
+    AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     super.initState();
   }
 
@@ -131,5 +134,11 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
               .pop(); // dismisses only the dialog and returns nothing
         },
         child: const Text("Close"));
+  }
+
+  void _onTrainingUpdated(TrainingUpdatedEvent event) {
+    if (mounted) {
+      setState(() {});
+    }
   }
 }
