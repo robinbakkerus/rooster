@@ -135,7 +135,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   bool _isExtraRow() => widget.sheetRow.isExtraRow;
   bool _isSupervisor() {
-    AppData.instance.getTrainer().isSupervisor();
+    return AppData.instance.getTrainer().isSupervisor();
   }
 
   void _onDropdownSelected(Object? value) {
