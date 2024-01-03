@@ -41,7 +41,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
   Widget build(BuildContext context) {
     Color col = widget.sheetRow.isExtraRow ? Colors.white : WH.color1;
     return InkWell(
-      onTap: () => _dialogBuilder(context),
+      onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
       child: Container(
           width: widget.width,
           decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
@@ -111,6 +111,10 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
   String _monthAsString() {
     var formatter = DateFormat('MMM');
     return formatter.format(AppData.instance.getActiveDate());
+  }
+
+  bool _isSupervisor() {
+    return AppData.instance.getTrainer().isSupervisor();
   }
 
   Widget _buildExtraTextField() {

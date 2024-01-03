@@ -1,3 +1,4 @@
+import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +39,6 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     }
   }
 
-  bool _isExtraRow() => widget.sheetRow.isExtraRow;
-
   @override
   void dispose() {
     _textCtrl.dispose();
@@ -50,7 +49,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   Widget build(BuildContext context) {
     Color col = _isExtraRow() ? Colors.white : WH.color1;
     return InkWell(
-      onTap: () => _dialogBuilder(context),
+      onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
       child: Container(
           width: widget.width,
           decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
@@ -132,6 +131,11 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
           );
         }).toList(),
         onChanged: _onDropdownSelected);
+  }
+
+  bool _isExtraRow() => widget.sheetRow.isExtraRow;
+  bool _isSupervisor() {
+    AppData.instance.getTrainer().isSupervisor();
   }
 
   void _onDropdownSelected(Object? value) {
