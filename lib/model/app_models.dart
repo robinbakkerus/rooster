@@ -604,6 +604,8 @@ class Available {
 ///------- Spreadsheet
 
 class SpreadSheet {
+  int year = 2024;
+  int month = 1;
   List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
   List<SheetRow> rows = [];
   List<SheetRow> extraRows = [];
@@ -611,6 +613,11 @@ class SpreadSheet {
   void addRow(SheetRow row) {
     rows.add(row);
   }
+
+  SpreadSheet({
+    required this.year,
+    required this.month,
+  });
 }
 
 //----------------------

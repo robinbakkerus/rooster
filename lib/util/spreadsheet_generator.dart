@@ -9,7 +9,9 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/data_helper.dart';
 
 class SpreadsheetGenerator {
-  SpreadSheet _spreadSheet = SpreadSheet();
+  SpreadSheet _spreadSheet = SpreadSheet(
+      year: AppData.instance.getActiveYear(),
+      month: AppData.instance.getActiveMonth());
 
   SpreadsheetGenerator._();
 
@@ -54,8 +56,9 @@ class SpreadsheetGenerator {
   //------------------------------------------
   SpreadSheet generateSpreadsheet(
       List<Available> availableList, DateTime date) {
-    _spreadSheet = SpreadSheet();
-
+    _spreadSheet = SpreadSheet(
+        year: AppData.instance.getActiveYear(),
+        month: AppData.instance.getActiveMonth());
     // first fill the spreadsheet with available trainer data
     _fillAvailabilityInSpreadsheet(availableList);
 
@@ -80,7 +83,8 @@ class SpreadsheetGenerator {
       fsRows.add(_mapFromRow(sheetRow));
     }
 
-    FsSpreadsheet result = FsSpreadsheet(year: 2024, month: 1, rows: fsRows);
+    FsSpreadsheet result = FsSpreadsheet(
+        year: spreadSheet.year, month: spreadSheet.month, rows: fsRows);
     return result;
   }
 
@@ -89,67 +93,12 @@ class SpreadsheetGenerator {
     for (RowCell cell in sheetRow.rowCells) {
       fsCells.add(cell.text);
     }
+
     return FsSpreadsheetRow(
         date: sheetRow.date,
-        isExtraRow: false,
+        isExtraRow: sheetRow.isExtraRow,
         trainingText: sheetRow.trainingText,
         rowCells: fsCells);
-  }
-
-  ///---------------
-  String generateHtml(SpreadSheet spreadSheet) {
-    // String maand = AppData.instance.getActiveMonthAsString();
-    return 'html todo';
-//     String html = '''
-// <h2>Trainingschema $maand</h2><br>
-// <table border="0.5" >
-// <tbody>
-//     ''';
-
-//     int row = 0;
-//     for (SheetRow sheetRow in _spreadSheet.rows) {
-//       row++;
-//       String style = row == 1 ? '''class="toprow";''' : '';
-//       html += '<tr $style>\n';
-//       html += '<td>${sheetRow.date}</td>\n';
-//       html += '<td>${sheetRow.availableText}</td>\n';
-//       html += '<td>${_getHtmlValue(sheetRow, Groep.pr, row)}</td>\n';
-//       html += '<td>${_getHtmlValue(sheetRow, Groep.r1, row)}</td>\n';
-//       html += '<td>${_getHtmlValue(sheetRow, Groep.r2, row)}</td>\n';
-//       html += '<td>${_getHtmlValue(sheetRow, Groep.r3, row)}</td>\n';
-//       html += '</tr>\n';
-//     }
-
-//     html += '''
-// </table>
-// </tbody>
-// ''';
-
-//     return html;
-  }
-
-  // String _getHtmlValue(SheetRow csv, Groep groep, int row) {
-  //   Map<String, dynamic> csvMap = csv.toMap();
-  //   if (row == 1) {
-  //     return groep.name.toUpperCase();
-  //   } else {
-  //     return Trainer.fromMap(csvMap[groep.name]).firstName();
-  //   }
-  // }
-
-  ///---------------
-  List<String> generateCsv(SpreadSheet spreadSheet) {
-    List<String> result = [];
-
-    // int row = 0;
-    // for (SheetRow r in _spreadSheet.rows) {
-    //   row++;
-    //   String line = (row == 1)
-    //       ? '${r.date};${r.availableText};PR;R1;R2;R3'
-    //       : '${r.date};${r.availableText};${r.pr.firstName()};${r.r1.firstName()};${r.r2.firstName()};${r.r3.firstName()}';
-    //   result.add(line);
-    // }
-    return result;
   }
 
   //---- private --

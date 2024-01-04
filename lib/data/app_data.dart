@@ -19,7 +19,7 @@ class AppData {
   double screenWidth = 600.0; //assume
   double screenHeight = 600.0; //assume
   late String trainerId = "";
-  SpreadSheet _spreadSheet = SpreadSheet();
+  SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
   }

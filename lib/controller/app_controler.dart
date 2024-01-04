@@ -105,28 +105,31 @@ class AppController {
 
   ///--------------------
   void finalizeRoster(SpreadSheet spreadSheet) async {
-    await _sendEmailToTrainers(spreadSheet);
+    // await _sendEmailToTrainers(spreadSheet);
+    FsSpreadsheet fsSpreadsheet =
+        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
     await FirestoreHelper.instance.saveLastRosterFinal();
   }
 
   Future<void> _sendEmailToTrainers(SpreadSheet spreadSheet) async {
-    String html = SpreadsheetGenerator.instance.generateHtml(spreadSheet);
-    List<String> csvList =
-        SpreadsheetGenerator.instance.generateCsv(spreadSheet);
-    String content = '$html<br><br>';
-    for (String line in csvList) {
-      content += '$line<br>';
-    }
-    bool okay = await FirestoreHelper.instance.sendEmail(
-        toTrainers: AppData.instance.getAllTrainers(),
-        subject: 'Trainingschema',
-        html: content);
+    // String html = SpreadsheetGenerator.instance.generateHtml(spreadSheet);
+    // List<String> csvList =
+    //     SpreadsheetGenerator.instance.generateCsv(spreadSheet);
+    // String content = '$html<br><br>';
+    // for (String line in csvList) {
+    //   content += '$line<br>';
+    // }
+    // bool okay = await FirestoreHelper.instance.sendEmail(
+    //     toTrainers: AppData.instance.getAllTrainers(),
+    //     subject: 'Trainingschema',
+    //     html: content);
 
-    if (okay) {
-      log("email okay");
-    } else {
-      log("!email NOT  okay");
-    }
+    // if (okay) {
+    //   log("email okay");
+    // } else {
+    //   log("!email NOT  okay");
+    // }
   }
 
   ///--------------------

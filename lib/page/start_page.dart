@@ -53,48 +53,6 @@ class _StartPageState extends State<StartPage> {
     super.initState();
   }
 
-  void _findTrainer(String accessCode) async {
-    bool okay = await AppController.instance.findTrainer(accessCode);
-    if (!okay) {
-      setState(() {
-        _stackIndex = 1;
-      });
-    }
-  }
-
-  void _getTrainerDataIfNeeded() {
-    Trainer activeTrainer = AppData.instance.getTrainer();
-    if (!activeTrainer.isEmpty() &&
-        AppData.instance.getTrainerData().isEmpty()) {
-      AppController.instance.getTrainerData(trainer: activeTrainer);
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void _onTrainerDataReady(TrainerDataReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        if (_stackIndex != Action.spreadSheet.code) {
-          _stackIndex = 2;
-        }
-
-        _barTitle = _buildBarTitle();
-
-        _prevMonthEnabled =
-            AppData.instance.getActiveDate().millisecondsSinceEpoch >
-                AppData.instance.lastActiveDate.millisecondsSinceEpoch;
-
-        _nextMonthEnabled =
-            AppData.instance.getActiveDate().millisecondsSinceEpoch <
-                AppData.instance.lastMonth.millisecondsSinceEpoch;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,6 +103,48 @@ class _StartPageState extends State<StartPage> {
     }
 
     return result;
+  }
+
+  void _findTrainer(String accessCode) async {
+    bool okay = await AppController.instance.findTrainer(accessCode);
+    if (!okay) {
+      setState(() {
+        _stackIndex = 1;
+      });
+    }
+  }
+
+  void _getTrainerDataIfNeeded() {
+    Trainer activeTrainer = AppData.instance.getTrainer();
+    if (!activeTrainer.isEmpty() &&
+        AppData.instance.getTrainerData().isEmpty()) {
+      AppController.instance.getTrainerData(trainer: activeTrainer);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _onTrainerDataReady(TrainerDataReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        if (_stackIndex != Action.spreadSheet.code) {
+          _stackIndex = 2;
+        }
+
+        _barTitle = _buildBarTitle();
+
+        _prevMonthEnabled =
+            AppData.instance.getActiveDate().millisecondsSinceEpoch >
+                AppData.instance.lastActiveDate.millisecondsSinceEpoch;
+
+        _nextMonthEnabled =
+            AppData.instance.getActiveDate().millisecondsSinceEpoch <
+                AppData.instance.lastMonth.millisecondsSinceEpoch;
+      });
+    }
   }
 
   Widget _buildPopMenu() {

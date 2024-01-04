@@ -18,7 +18,9 @@ class RosterPage extends StatefulWidget {
 
 //-------------------
 class _RosterPageState extends State<RosterPage> {
-  SpreadSheet _spreadSheet = SpreadSheet();
+  SpreadSheet _spreadSheet = SpreadSheet(
+      year: AppData.instance.getActiveYear(),
+      month: AppData.instance.getActiveMonth());
   bool _isSupervisor = false;
   List<Widget> _columnRowWidgets = [];
 
@@ -126,23 +128,12 @@ class _RosterPageState extends State<RosterPage> {
   Widget _buildSupervisorButtons() {
     return Row(
       children: [
-        // OutlinedButton(
-        //     onPressed: () => _showHtmlAndCsv(context),
-        //     child: const Text('Show schema & csv')),
         OutlinedButton(
             onPressed: _onConfirmFinalizeRoster,
             child: const Text('Maak schema defintief'))
       ],
     );
   }
-
-  // void _showHtmlAndCsv(context) {
-  //   String html = SchemaGenerator.instance.generateHtml(_csvRosterList);
-  //   List<String> csvList = SchemaGenerator.instance.generateCsv(_csvRosterList);
-  //   String csv = csvList.join('\n');
-
-  //   _buildDialogShowCsvHtml(context, csv: csv, html: html);
-  // }
 
   void _onConfirmFinalizeRoster() {
     _buildDialogConfirm(context, _areProgramFieldSet());
@@ -152,21 +143,6 @@ class _RosterPageState extends State<RosterPage> {
     AppController.instance.finalizeRoster(_spreadSheet);
     WH.showSnackbar('Training schema is nu definitief!');
   }
-
-  // Future<void> _buildDialogShowCsvHtml(BuildContext context,
-  //     {required String csv, required String html}) {
-  //   return showDialog<void>(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return Dialog(
-  //           child: SizedBox(
-  //             height: AppData.instance.screenHeight * 0.8,
-  //             width: AppData.instance.screenWidth * 0.9,
-  //             child: ShowRosterCsvHtmlView(csv: csv, html: html),
-  //           ),
-  //         );
-  //       });
-  // }
 
   void _buildDialogConfirm(BuildContext context, bool allProgramFieldSet) {
     String msg = allProgramFieldSet

@@ -76,6 +76,8 @@ class _AdminPageState extends State<AdminPage> {
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
         .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+    spreadSheet.year = 2024;
+    spreadSheet.month = 1;
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);

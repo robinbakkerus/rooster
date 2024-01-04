@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
+  final String version = '1.1';
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -39,7 +40,7 @@ class _SplashPageState extends State<SplashPage> {
               ],
             ),
             WH.verSpace(20),
-            const Text('Traininschema v1.0'),
+            Text('Traininschema ${widget.version}'),
           ]),
     ));
   }
