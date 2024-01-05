@@ -40,7 +40,7 @@ class _SplashPageState extends State<SplashPage> with PageMixin {
               ],
             ),
             wh.verSpace(20),
-            Text('Traininschema ${widget.version}'),
+            Text('Trainingschema ${widget.version}'),
           ]),
     ));
   }

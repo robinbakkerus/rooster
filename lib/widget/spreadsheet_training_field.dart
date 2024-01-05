@@ -111,7 +111,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     var items = [
       'training...',
       'rustige duurloop',
-      'duurloop hestel',
+      'duurloop herstel',
       'pyramide loop',
       'climax duurloop',
       'interval kort',

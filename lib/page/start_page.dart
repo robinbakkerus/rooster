@@ -246,8 +246,8 @@ class _StartPageState extends State<StartPage> {
       int month = 1;
       AppController.instance.setActiveDate(DateTime(year, month, 1));
     } else {
-      int month = AppData.instance.getActiveMonth() + 1;
       int year = AppData.instance.getActiveYear();
+      int month = AppData.instance.getActiveMonth() + 1;
       AppController.instance.setActiveDate(DateTime(year, month, 1));
     }
 

@@ -1,6 +1,7 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/page_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
@@ -27,63 +28,75 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
     super.initState();
   }
 
-  void _onReady(AllTrainersDataReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        _allTrainers = AppData.instance.getAllTrainers();
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(18.0),
-      child: Column(
-        children: _getColumnChildren(),
+      child: _buildGrid(),
+    );
+  }
+
+  Widget _buildGrid() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowHeight: 30,
+          horizontalMargin: 10,
+          headingRowColor:
+              MaterialStateColor.resolveWith((states) => c.lightblue),
+          columnSpacing: colSpace,
+          dataRowMinHeight: 15,
+          dataRowMaxHeight: 30,
+          columns: _buildHeader(),
+          rows: _buildDataRows(),
+        ),
       ),
     );
   }
 
-  List<Widget> _getColumnChildren() {
-    List<Widget> list = [];
-    Widget topRow = _buildTopRow();
+  //-------------------------
+  List<DataColumn> _buildHeader() {
+    List<DataColumn> result = [];
 
-    list.add(topRow);
+    var headerLabels = ['Naam', 'Ingevuld?'];
+    for (String label in headerLabels) {
+      result.add(DataColumn(
+          label: Text(label,
+              style: const TextStyle(fontStyle: FontStyle.italic))));
+    }
+    return result;
+  }
+
+  List<DataRow> _buildDataRows() {
+    List<DataRow> result = [];
 
     for (Trainer trainer in _allTrainers) {
-      Widget w = Row(
-        children: [
-          SizedBox(
-              width: c.w25,
-              child: Text(
-                trainer.firstName(),
-                overflow: TextOverflow.ellipsis,
-              )),
-          _buildEntered(trainer),
-        ],
-      );
-      list.add(w);
+      result.add(DataRow(cells: _buildDataCells(trainer)));
     }
 
-    return list;
+    return result;
   }
 
-  Widget _buildTopRow() {
-    Widget topRow = Row(
-      children: [
-        Container(
-            width: c.w25, color: Colors.lightBlue, child: const Text('naam')),
-        Container(
-            width: c.w2,
-            color: Colors.lightGreen,
-            child: const Center(child: Text('Ingevuld?'))),
-      ],
-    );
-    return topRow;
+  List<DataCell> _buildDataCells(Trainer trainer) {
+    List<DataCell> result = [];
+
+    result.add(_buildTrainerDataCell(trainer));
+    result.add(_buildEnteredDataCell(trainer));
+
+    return result;
   }
 
-  Widget _buildEntered(Trainer trainer) {
+  DataCell _buildTrainerDataCell(Trainer trainer) {
+    return DataCell(Text(trainer.firstName()));
+  }
+
+  DataCell _buildEnteredDataCell(Trainer trainer) {
+    return DataCell(_buildEnteredWidget(trainer));
+  }
+
+  Widget _buildEnteredWidget(Trainer trainer) {
     TrainerSchema trainerSchemas =
         SpreadsheetGenerator.instance.getSchemaFromAllTrainerData(trainer);
 
@@ -98,6 +111,14 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
             color: Colors.red,
           );
 
-    return SizedBox(width: c.w2, child: icon);
+    return icon;
+  }
+
+  void _onReady(AllTrainersDataReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _allTrainers = AppData.instance.getAllTrainers();
+      });
+    }
   }
 }
