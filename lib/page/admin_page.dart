@@ -1,6 +1,5 @@
 import 'dart:developer';
-import 'dart:html';
-
+import 'package:universal_html/html.dart' as html;
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
@@ -57,7 +56,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   void _removeCookie() {
-    document.cookie = "ac=";
+    html.document.cookie = "ac=";
   }
 
   void _generateRoster() async {

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:html';
+import 'package:universal_html/html.dart' as html;
 
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
@@ -315,7 +315,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _checkCookie() {
-    final cookie = document.cookie!;
+    final cookie = html.document.cookie!;
     if (cookie.isNotEmpty) {
       List<String> tokens = cookie.split('=');
       if (tokens.isNotEmpty) {

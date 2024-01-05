@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'dart:html';
+import 'package:universal_html/html.dart' as html;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -32,7 +32,7 @@ class AppController {
 
     if (!trainer.isEmpty()) {
       getTrainerData(trainer: trainer);
-      document.cookie = "ac=${trainer.accessCode}";
+      html.document.cookie = "ac=${trainer.accessCode}";
       result = true;
     } else {
       log("no trainer with access code $accessCode");
@@ -107,7 +107,7 @@ class AppController {
 
   ///--------------------
   void finalizeRoster(SpreadSheet spreadSheet) async {
-    // await _sendEmailToTrainers(spreadSheet);
+    await _sendEmailToTrainers(spreadSheet);
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
