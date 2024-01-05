@@ -32,98 +32,108 @@ class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: _buildColumnChildren(),
+      child: _buildGrid(),
+    );
+  }
+
+  Widget _buildGrid() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 30,
+            horizontalMargin: 10,
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 15,
+            dataRowMaxHeight: 30,
+            columns: _buildHeader(),
+            rows: _buildDataRows(),
+          ),
+        ),
       ),
     );
   }
 
-  List<Widget> _buildColumnChildren() {
-    List<Widget> list = [];
-    Widget topRow = _buildTopRow();
+  //-------------------------
+  List<DataColumn> _buildHeader() {
+    List<DataColumn> result = [];
 
-    list.add(topRow);
-
-    for (DateTime dateTime in AppData.instance.getActiveDates()) {
-      String s = AppHelper.instance.getSimpleDayString(dateTime);
-      Widget w = Row(
-        children: [
-          SizedBox(width: w15, child: Text(s)),
-          _buildAvailableRow(dateTime),
-        ],
-      );
-      list.add(w);
-      list.add(wh.verSpace(1));
+    var headerLabels = ['dag'];
+    for (Groep groep in Groep.values) {
+      headerLabels.add(groep.name.toUpperCase());
     }
 
-    return list;
+    for (String label in headerLabels) {
+      result.add(DataColumn(
+          label: Text(label,
+              style: const TextStyle(fontStyle: FontStyle.italic))));
+    }
+    return result;
   }
 
-  Widget _buildTopRow() {
-    Widget topRow = Row(
-      children: [
-        Container(
-            width: w15, color: Colors.lightBlue, child: const Text('Dag')),
-        wh.horSpace(1),
-        Container(width: w2, color: Colors.lightGreen, child: const Text('PR')),
-        wh.horSpace(1),
-        Container(width: w2, color: Colors.lightGreen, child: const Text('R1')),
-        wh.horSpace(1),
-        Container(width: w2, color: Colors.lightGreen, child: const Text('R2')),
-        wh.horSpace(1),
-        Container(width: w2, color: Colors.lightGreen, child: const Text('R3')),
-      ],
-    );
-    return topRow;
+  List<DataRow> _buildDataRows() {
+    List<DataRow> result = [];
+
+    for (DateTime dateTime in AppData.instance.getActiveDates()) {
+      result.add(DataRow(cells: _buildDataCells(dateTime)));
+    }
+    return result;
   }
 
-  Widget _buildAvailableRow(DateTime dateTime) {
-    return Row(
-      children: [
-        _buildAvailableField(Groep.pr, dateTime),
-        wh.horSpace(1),
-        _buildAvailableField(Groep.r1, dateTime),
-        wh.horSpace(1),
-        _buildAvailableField(Groep.r2, dateTime),
-        wh.horSpace(1),
-        _buildAvailableField(Groep.r3, dateTime),
-      ],
-    );
+  List<DataCell> _buildDataCells(DateTime dateTime) {
+    List<DataCell> result = [];
+
+    result.add(_buildDayDataCell(dateTime));
+
+    for (Groep groep in Groep.values) {
+      result.add(_buildGroupDataCell(dateTime, groep));
+    }
+
+    return result;
   }
 
-  Widget _buildAvailableField(Groep group, DateTime dateTime) {
+  DataCell _buildDayDataCell(DateTime dateTime) {
+    String text = AppHelper.instance.getSimpleDayString(dateTime);
+    return DataCell(Text(text));
+  }
+
+  DataCell _buildGroupDataCell(DateTime dateTime, Groep groep) {
     AvailableCounts cnts =
-        AppHelper.instance.getAvailableCounts(group, dateTime);
+        AppHelper.instance.getAvailableCounts(groep, dateTime);
 
-    String fieldText =
+    String text =
         '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
-    Color color = _buildAvailFieldColor(cnts, c.lightGeen);
-    return _buildAvailableFieldWidget(group, dateTime, color, fieldText);
+    Color color = _buildAvailFieldColor(cnts);
+
+    return DataCell(InkWell(
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.1, color: Colors.grey), color: color),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+          child: Text(text),
+        ),
+      ),
+      onTap: () {
+        _dialogBuilder(context, groep, dateTime);
+      },
+    ));
   }
 
-  Color _buildAvailFieldColor(AvailableCounts cnts, Color color) {
+  Color _buildAvailFieldColor(AvailableCounts cnts) {
     if (cnts.confirmed.isNotEmpty) {
-      color = c.lightBrown;
+      return c.lightBrown;
     } else if (cnts.confirmed.isEmpty &&
         cnts.ifNeeded.isEmpty &&
         cnts.notEnteredYet.isEmpty) {
-      color = c.lightOrange;
+      return c.lightOrange;
     }
-    return color;
-  }
-
-  Widget _buildAvailableFieldWidget(
-      Groep group, DateTime dateTime, Color color, String text) {
-    return InkWell(
-      child: Container(
-        decoration: BoxDecoration(border: Border.all(width: 0.1), color: color),
-        width: w2,
-        child: Text(text),
-      ),
-      onTap: () {
-        _dialogBuilder(context, group, dateTime);
-      },
-    );
+    return c.lightGeen;
   }
 
   Future<void> _dialogBuilder(
@@ -133,7 +143,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
       builder: (BuildContext context) {
         return Dialog(
           child: SizedBox(
-            height: 300,
+            height: AppData.instance.screenHeight * 0.8,
             width: 500,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
