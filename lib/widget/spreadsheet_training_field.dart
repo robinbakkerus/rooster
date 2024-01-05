@@ -2,13 +2,10 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
-import 'package:rooster/widget/widget_helper.dart';
 
 class SpreadsheetTrainingColumn extends StatefulWidget {
   final SheetRow sheetRow;
-  final double width;
-  const SpreadsheetTrainingColumn(
-      {required super.key, required this.sheetRow, required this.width});
+  const SpreadsheetTrainingColumn({required super.key, required this.sheetRow});
 
   @override
   State<SpreadsheetTrainingColumn> createState() =>
@@ -32,7 +29,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
       return widget.sheetRow.trainingText;
     } else {
       if (widget.sheetRow.trainingText.isEmpty) {
-        return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '...';
+        return widget.sheetRow.date.weekday == DateTime.saturday ? '' : '*';
       } else {
         return widget.sheetRow.trainingText;
       }
@@ -47,15 +44,16 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color col = _isExtraRow() ? Colors.white : WH.color1;
     return InkWell(
       onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
       child: Container(
-          width: widget.width,
-          decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
-          child: Text(
-            _training,
-            overflow: TextOverflow.ellipsis,
+          decoration: BoxDecoration(border: Border.all(width: 0.1)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
+            child: Text(
+              _training,
+              overflow: TextOverflow.ellipsis,
+            ),
           )),
     );
   }

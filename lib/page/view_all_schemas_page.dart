@@ -18,28 +18,25 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 50,
-            bottom: TabBar(
-              tabs: [
-                _tab1(),
-                _tab2(),
-                _tab3(),
-              ],
-            ),
-          ),
-          body: const TabBarView(
-            children: [
-              TrainerProgressPage(),
-              AvailabilityPage(),
-              RosterPage(),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 1,
+          bottom: TabBar(
+            tabs: [
+              _tab1(),
+              _tab2(),
+              _tab3(),
             ],
           ),
+        ),
+        body: const TabBarView(
+          children: [
+            TrainerProgressPage(),
+            AvailabilityPage(),
+            RosterPage(),
+          ],
         ),
       ),
     );

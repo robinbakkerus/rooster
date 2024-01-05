@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 
 class SpreadsheetGenerator {
   SpreadSheet _spreadSheet = SpreadSheet(
@@ -79,9 +79,6 @@ class SpreadsheetGenerator {
     for (SheetRow sheetRow in spreadSheet.rows) {
       fsRows.add(_mapFromRow(sheetRow));
     }
-    for (SheetRow sheetRow in spreadSheet.extraRows) {
-      fsRows.add(_mapFromRow(sheetRow));
-    }
 
     FsSpreadsheet result = FsSpreadsheet(
         year: spreadSheet.year, month: spreadSheet.month, rows: fsRows);
@@ -107,7 +104,8 @@ class SpreadsheetGenerator {
   void _fillAvailabilityInSpreadsheet(List<Available> availableList) {
     int rowIdx = 0;
     for (Available avail in availableList) {
-      SheetRow sheetRow = SheetRow(date: avail.date, rowIndex: rowIdx);
+      SheetRow sheetRow =
+          SheetRow(date: avail.date, rowIndex: rowIdx, isExtraRow: false);
       for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
         RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groepNr);
         rowCell.availableCounts = avail.counts[groepNr];
@@ -121,7 +119,7 @@ class SpreadsheetGenerator {
 
   Available _genCountProcessDate(DateTime date) {
     Available available = Available(date: date);
-    String mapDateStr = DataHelper.instance.getDateStringForSpreadsheet(date);
+    String mapDateStr = AppHelper.instance.getDateStringForSpreadsheet(date);
 
     for (Groep groep in Groep.values) {
       AvailableCounts availableCounts = AvailableCounts();

@@ -4,14 +4,12 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/widget/widget_helper.dart';
 
 class SpreadsheeDayColumn extends StatefulWidget {
   final SheetRow sheetRow;
-  final double width;
-  const SpreadsheeDayColumn(
-      {required super.key, required this.sheetRow, required this.width});
+  const SpreadsheeDayColumn({required super.key, required this.sheetRow});
 
   @override
   State<SpreadsheeDayColumn> createState() => _SpreadsheeDayColumnState();
@@ -39,15 +37,16 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Color col = widget.sheetRow.isExtraRow ? Colors.white : WH.color1;
     return InkWell(
       onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
       child: Container(
-          width: widget.width,
-          decoration: BoxDecoration(border: Border.all(width: 0.1), color: col),
-          child: Text(
-            DataHelper.instance.getSimpleDayString(widget.sheetRow.date),
-            overflow: TextOverflow.ellipsis,
+          decoration: BoxDecoration(border: Border.all(width: 0.1)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
+            child: Text(
+              AppHelper.instance.getSimpleDayString(widget.sheetRow.date),
+              overflow: TextOverflow.ellipsis,
+            ),
           )),
     );
   }

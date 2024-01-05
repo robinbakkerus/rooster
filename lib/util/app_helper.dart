@@ -1,15 +1,21 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+// ignore: depend_on_referenced_packages
+// import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
-class DataHelper {
-  DataHelper._();
-  static final DataHelper instance = DataHelper._();
+class AppHelper {
+  AppHelper._();
+  static final AppHelper instance = AppHelper._();
 
+  ///----------------------------------------
   // return something like "Din 9" , which can be used to set label
   String getSimpleDayString(DateTime dateTime) {
     String weekday = _weekDay(dateTime.weekday);
@@ -17,8 +23,8 @@ class DataHelper {
     return '$weekday $day';
   }
 
+  ///----------------------------------------
   // return something like "din1", hence the first occurence
-
   String getDateStringForSpreadsheet(DateTime dateTime) {
     int occurence = 0;
     for (DateTime dt in AppData.instance.getActiveDates()) {
@@ -32,7 +38,7 @@ class DataHelper {
     return '???';
   }
 
-  /// --
+  ///----------------------------------------
   DateTime? parseDateTime(Object? value) {
     if (value is int) {
       return DateTime.fromMillisecondsSinceEpoch(value);
@@ -47,17 +53,7 @@ class DataHelper {
     }
   }
 
-  bool isJustModified(TrainerSchema trainerSchema) {
-    if (trainerSchema.modified == null) {
-      return false;
-    } else {
-      return DateTime.now().millisecondsSinceEpoch -
-              trainerSchema.modified!.millisecondsSinceEpoch <
-          5000;
-    }
-  }
-
-  ///---
+  ///----------------------------------------
   ///
   String buildTrainerSchemaId(Trainer trainer) {
     String result = trainer.pk;
@@ -66,6 +62,7 @@ class DataHelper {
     return result;
   }
 
+  ///----------------------------------------
   /// build list of DaySchema's from single TrainerSchemas object
   List<DaySchema> buildFromTrainerSchemas(TrainerSchema trainerSchemas) {
     if (trainerSchemas.isEmpty()) {
@@ -105,7 +102,7 @@ class DataHelper {
     return daySchemaList;
   }
 
-  ///---
+  ///----------------------------------------
   TrainerSchema buildFromDaySchemas(List<DaySchema> daySchemas) {
     int tueOcc = 1;
     int thuOcc = 1;
@@ -134,13 +131,13 @@ class DataHelper {
     }
 
     schemaMap['id'] =
-        DataHelper.instance.buildTrainerSchemaId(AppData.instance.getTrainer());
+        AppHelper.instance.buildTrainerSchemaId(AppData.instance.getTrainer());
     schemaMap['modified'] = DateTime.now();
     TrainerSchema result = TrainerSchema.fromMap(schemaMap);
     return result;
   }
 
-  ///--
+  ///----------------------------------------
   TrainerSchema buildNewSchemaForTrainer(Trainer trainer) {
     int din = trainer.dinsdag;
     int don = trainer.donderdag;
@@ -153,7 +150,7 @@ class DataHelper {
       map['zat$i'] = zat;
     }
 
-    map['id'] = DataHelper.instance.buildTrainerSchemaId(trainer);
+    map['id'] = AppHelper.instance.buildTrainerSchemaId(trainer);
     map['trainerPk'] = trainer.pk;
     map['year'] = AppData.instance.getActiveYear();
     map['month'] = AppData.instance.getActiveMonth();
@@ -163,7 +160,7 @@ class DataHelper {
     return result;
   }
 
-  //------------------
+  ///----------------------------------------//------------------
   List<DateTime> getDaysInBetween(DateTime startDate) {
     DateTime endDate = DateTime(startDate.year, startDate.month + 1, 0);
     List<DateTime> days = [];
@@ -173,10 +170,10 @@ class DataHelper {
     return days;
   }
 
-  //------------------
+  ///----------------------------------------//------------------
   AvailableCounts getAvailableCounts(Groep group, DateTime dateTime) {
     for (SheetRow sheetRow in AppData.instance.getSpreadsheet().rows) {
-      if (DataHelper.instance.isSameDate(sheetRow.date, dateTime)) {
+      if (AppHelper.instance.isSameDate(sheetRow.date, dateTime)) {
         return sheetRow.rowCells[group.index].availableCounts;
       }
     }
@@ -200,10 +197,12 @@ class DataHelper {
     daySchemaList.add(daySchema);
   }
 
+  ///-----------------
   bool isSameDate(DateTime dt1, DateTime dt2) {
     return dt1.year == dt2.year && dt1.month == dt2.month && dt1.day == dt2.day;
   }
 
+  ///-----------------
   String getFirstName(Trainer trainer) {
     List<String> tokens = trainer.fullname.split(' ');
     if (tokens.isNotEmpty) {
@@ -211,6 +210,44 @@ class DataHelper {
     } else {
       return trainer.fullname;
     }
+  }
+
+  ///-----------------
+  String monthAsString(DateTime date) {
+    String dayMonth = DateFormat.MMMM('nl_NL').format(date);
+    return dayMonth;
+  }
+
+  ///-----------------
+  String dayAsString(DateTime date) {
+    String dag = DateFormat.EEEE('nl_NL').format(date).substring(0, 3);
+    dag += ' ${date.day}';
+    return dag;
+  }
+
+  ///-----------------
+  void getDeviceType(BuildContext context) async {
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    final deviceInfo = await deviceInfoPlugin.deviceInfo;
+    final allInfo = deviceInfo.data;
+    log(allInfo.toString());
+  }
+
+  ///--------------------
+  TargetPlatform getPlatform() {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return TargetPlatform.android;
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return TargetPlatform.iOS;
+    } else {
+      return TargetPlatform.windows;
+    }
+  }
+
+  ///--------------------
+  bool isWindows() {
+    TargetPlatform platform = getPlatform();
+    return platform == TargetPlatform.windows;
   }
 
   /// -------- private methods --------------------------------

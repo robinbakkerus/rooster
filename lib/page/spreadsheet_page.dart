@@ -2,6 +2,8 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:rooster/widget/widget_helper.dart';
@@ -21,8 +23,9 @@ class _RosterPageState extends State<RosterPage> {
   SpreadSheet _spreadSheet = SpreadSheet(
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
+
   bool _isSupervisor = false;
-  List<Widget> _columnRowWidgets = [];
+  Widget _dataGrid = Container();
 
   _RosterPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
@@ -34,7 +37,7 @@ class _RosterPageState extends State<RosterPage> {
   void initState() {
     _spreadSheet = AppData.instance.getSpreadsheet();
     _isSupervisor = AppData.instance.getTrainer().isSupervisor();
-    _columnRowWidgets = _buildRows();
+    _dataGrid = _buildGrid();
 
     super.initState();
   }
@@ -42,87 +45,123 @@ class _RosterPageState extends State<RosterPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(18.0),
-      child: Column(
-        children: _columnRowWidgets,
+      padding: const EdgeInsets.all(10.0),
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _dataGrid,
+            WH.verSpace(10),
+            _isSupervisor ? _buildSupervisorButtons() : Container(),
+          ],
+        ),
       ),
     );
   }
 
-  List<Widget> _buildRows() {
-    List<Widget> widgetList = [];
-
-    widgetList.add(_buildHeaderRow());
-    widgetList.add(WH.verSpace(2));
-
-    List<SheetRow> sheetList = [];
-    sheetList.addAll(_spreadSheet.rows);
-    sheetList.addAll(_spreadSheet.extraRows);
-    sheetList.sort((a, b) => a.date.compareTo(b.date));
-
-    for (SheetRow sheetRow in sheetList) {
-      Widget w = Row(
-        children: _buildRosterRowFields(sheetRow),
-      );
-      widgetList.add(w);
-      widgetList.add(WH.verSpace(1));
-    }
-
-    widgetList.add(WH.verSpace(20));
-    if (_isSupervisor) {
-      widgetList.add(_buildSupervisorButtons());
-    }
-    return widgetList;
+//--------------------------------------------------------
+  Widget _buildGrid() {
+    double colSpace = AppHelper.instance.isWindows() ? 15 : 6;
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 30,
+            horizontalMargin: 10,
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => C.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 15,
+            dataRowMaxHeight: 30,
+            columns: _buildHeader(),
+            rows: _buildDataRows(),
+          ),
+        ),
+      ),
+    );
   }
 
-  List<Widget> _buildRosterRowFields(SheetRow sheetRow) {
-    List<Widget> widgets = [];
+  //-------------------------
+  List<DataColumn> _buildHeader() {
+    List<DataColumn> result = [];
 
-    widgets.add(SpreadsheeDayColumn(
-        key: UniqueKey(), sheetRow: sheetRow, width: WH.w1));
+    result.add(const DataColumn(
+        label: Text('Dag', style: TextStyle(fontStyle: FontStyle.italic))));
+    result.add(const DataColumn(
+        label:
+            Text('Training', style: TextStyle(fontStyle: FontStyle.italic))));
 
-    widgets.add(SpreadsheetTrainingColumn(
-        key: UniqueKey(), sheetRow: sheetRow, width: WH.w2));
+    for (Groep groep in Groep.values) {
+      result.add(DataColumn(
+          label: Text(groep.name.toUpperCase(),
+              style: const TextStyle(fontStyle: FontStyle.italic))));
+    }
+    return result;
+  }
 
-    if (sheetRow.rowCells.length == Groep.values.length) {
-      for (Groep groep in Groep.values) {
-        widgets.add(_buildRosterFieldWidget(sheetRow, colIndex: groep.index));
-        widgets.add(WH.horSpace(1));
+  List<DataRow> _buildDataRows() {
+    List<DataRow> result = [];
+
+    _spreadSheet.rows.sort((a, b) => a.date.compareTo(b.date));
+
+    for (SheetRow fsRow in _spreadSheet.rows) {
+      MaterialStateColor col =
+          MaterialStateColor.resolveWith((states) => Colors.white);
+      if (fsRow.isExtraRow) {
+        col = MaterialStateColor.resolveWith((states) => Colors.white);
+      } else if (fsRow.date.weekday == DateTime.tuesday) {
+        col = MaterialStateColor.resolveWith((states) => C.lightGeen);
+      } else if (fsRow.date.weekday == DateTime.thursday) {
+        col = MaterialStateColor.resolveWith((states) => C.lightOrange);
+      } else if (fsRow.date.weekday == DateTime.saturday) {
+        col = MaterialStateColor.resolveWith((states) => C.lightBrown);
+      }
+
+      DataRow dataRow = DataRow(cells: _buildDataCells(fsRow), color: col);
+      result.add(dataRow);
+    }
+
+    return result;
+  }
+
+  List<DataCell> _buildDataCells(SheetRow row) {
+    List<DataCell> result = [];
+
+    result.add(_buildDayCell(row));
+    result.add(_buildTrainingCell(row));
+
+    if (!row.isExtraRow) {
+      for (int i = 0; i < Groep.values.length; i++) {
+        result.add(_buildCell(row.rowCells[i].text));
+      }
+    } else {
+      for (int i = 0; i < Groep.values.length; i++) {
+        result.add(_buildCell(''));
       }
     }
 
-    return widgets;
+    return result;
   }
 
-  Widget _buildHeaderRow() {
-    var widths = [WH.w1, WH.w2, WH.w12, WH.w12, WH.w12, WH.w12, WH.w12];
-    List<Widget> widgets = [];
-    for (int i = 0; i < _spreadSheet.header.length; i++) {
-      widgets.add(Container(
-        width: widths[i],
+  DataCell _buildCell(String text) {
+    return DataCell(Text(text));
+  }
+
+  DataCell _buildDayCell(SheetRow sheetRow) {
+    return DataCell(SpreadsheeDayColumn(key: UniqueKey(), sheetRow: sheetRow));
+  }
+
+  DataCell _buildTrainingCell(SheetRow sheetRow) {
+    double w = AppHelper.instance.isWindows() ? 200 : 100;
+    return DataCell(Container(
         decoration:
-            BoxDecoration(border: Border.all(width: 0.1), color: WH.color2),
-        child: Text(_spreadSheet.header[i]),
-      ));
-      widgets.add(WH.horSpace(1));
-    }
-
-    return Row(
-      children: widgets,
-    );
-  }
-
-  Widget _buildRosterFieldWidget(SheetRow sheetRow, {required int colIndex}) {
-    RowCell rowCell = sheetRow.rowCells[colIndex];
-    return Container(
-      width: WH.w12,
-      decoration:
-          BoxDecoration(border: Border.all(width: 0.1), color: WH.color1),
-      child: Text(
-        rowCell.text,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
+            BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey)),
+        width: w,
+        child:
+            SpreadsheetTrainingColumn(key: UniqueKey(), sheetRow: sheetRow)));
   }
 
   Widget _buildSupervisorButtons() {
@@ -194,7 +233,7 @@ class _RosterPageState extends State<RosterPage> {
     if (mounted) {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
-        _columnRowWidgets = _buildRows();
+        _dataGrid = _buildGrid();
       });
     }
   }
@@ -202,7 +241,7 @@ class _RosterPageState extends State<RosterPage> {
   void _onTrainingUpdated(TrainingUpdatedEvent event) {
     if (mounted) {
       _spreadSheet.rows[event.rowIndex].trainingText = event.training;
-      _columnRowWidgets = _buildRows();
+      _dataGrid = _buildGrid();
     }
   }
 
@@ -214,18 +253,18 @@ class _RosterPageState extends State<RosterPage> {
         } else {
           _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
         }
-        _columnRowWidgets = _buildRows();
+        _dataGrid = _buildGrid();
       });
     }
   }
 
   void _addExtraRow(ExtraDayUpdatedEvent event) {
-    int index = _spreadSheet.extraRows.length;
+    int index = _spreadSheet.rows.length;
     DateTime date = DateTime(AppData.instance.getActiveYear(),
         AppData.instance.getActiveMonth(), event.dag);
     SheetRow extraRow = SheetRow(rowIndex: index, date: date, isExtraRow: true);
     extraRow.trainingText = event.text;
-    _spreadSheet.extraRows.add(extraRow);
+    _spreadSheet.rows.add(extraRow);
   }
 
   void _updateExtraRow(ExtraDayUpdatedEvent event) {
@@ -233,8 +272,8 @@ class _RosterPageState extends State<RosterPage> {
     DateTime date = DateTime(actDate.year, actDate.month, event.dag);
     SheetRow? sheetRow = AppData.instance
         .getSpreadsheet()
-        .extraRows
-        .firstWhereOrNull((e) => e.date == date);
+        .rows
+        .firstWhereOrNull((e) => e.date == date && e.isExtraRow);
     if (sheetRow != null) {
       sheetRow.trainingText = event.text;
     }
@@ -243,10 +282,10 @@ class _RosterPageState extends State<RosterPage> {
   void _removeExtraRow(ExtraDayUpdatedEvent event) {
     DateTime actDate = AppData.instance.getActiveDate();
     DateTime date = DateTime(actDate.year, actDate.month, event.dag);
-    SheetRow? sheetRow =
-        _spreadSheet.extraRows.firstWhereOrNull((e) => e.date == date);
+    SheetRow? sheetRow = _spreadSheet.rows
+        .firstWhereOrNull((e) => e.date == date && e.isExtraRow);
     if (sheetRow != null) {
-      _spreadSheet.extraRows.remove(sheetRow);
+      _spreadSheet.rows.remove(sheetRow);
     }
   }
 
@@ -255,8 +294,8 @@ class _RosterPageState extends State<RosterPage> {
     DateTime date = DateTime(actDate.year, actDate.month, event.dag);
     return AppData.instance
             .getSpreadsheet()
-            .extraRows
-            .firstWhereOrNull((e) => e.date == date) !=
+            .rows
+            .firstWhereOrNull((e) => e.date == date && e.isExtraRow) !=
         null;
   }
 }

@@ -1,10 +1,11 @@
 import 'dart:developer';
 import 'dart:html';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/firestore_helper.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -16,9 +17,10 @@ class AppController {
   static AppController instance = AppController._();
 
   /// get screen widt and save this
-  void initializeAppData(BuildContext context) {
+  Future<void> initializeAppData(BuildContext context) async {
     _setScreenSizes(context);
     _setDates();
+    await initializeDateFormatting('nl_NL', null);
   }
 
   /// find the trainer gived the access code
@@ -69,7 +71,7 @@ class AppController {
   void updateTrainerSchemas() {
     List<DaySchema> daySchemas = AppData.instance.getNewSchemas();
     TrainerSchema trainerSchemas =
-        DataHelper.instance.buildFromDaySchemas(daySchemas);
+        AppHelper.instance.buildFromDaySchemas(daySchemas);
     FirestoreHelper.instance.createOrUpdateTrainerSchemas(trainerSchemas, true);
     getTrainerData(trainer: AppData.instance.getTrainer());
   }
@@ -151,7 +153,7 @@ class AppController {
         : trainer;
 
     result.trainer = useTrainer!;
-    String schemaId = DataHelper.instance.buildTrainerSchemaId(useTrainer);
+    String schemaId = AppHelper.instance.buildTrainerSchemaId(useTrainer);
 
     TrainerSchema trainerSchemas =
         await FirestoreHelper.instance.getTrainerSchema(schemaId);
@@ -160,7 +162,7 @@ class AppController {
       result.trainerSchemas = trainerSchemas;
     } else if (!forAllTrainers) {
       TrainerSchema newTrainerSchemas =
-          DataHelper.instance.buildNewSchemaForTrainer(useTrainer);
+          AppHelper.instance.buildNewSchemaForTrainer(useTrainer);
 
       bool updateSchema = false;
       bool updateOkay = await FirestoreHelper.instance

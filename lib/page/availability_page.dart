@@ -1,7 +1,7 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -45,7 +45,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
     list.add(topRow);
 
     for (DateTime dateTime in AppData.instance.getActiveDates()) {
-      String s = DataHelper.instance.getSimpleDayString(dateTime);
+      String s = AppHelper.instance.getSimpleDayString(dateTime);
       Widget w = Row(
         children: [
           SizedBox(width: w15, child: Text(s)),
@@ -93,7 +93,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
 
   Widget _buildAvailableField(Groep group, DateTime dateTime) {
     AvailableCounts cnts =
-        DataHelper.instance.getAvailableCounts(group, dateTime);
+        AppHelper.instance.getAvailableCounts(group, dateTime);
 
     String fieldText =
         '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
@@ -160,7 +160,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
 
   Widget _buildAvailDetail(Groep group, DateTime dateTime) {
     AvailableCounts cnts =
-        DataHelper.instance.getAvailableCounts(group, dateTime);
+        AppHelper.instance.getAvailableCounts(group, dateTime);
 
     List<Widget> colWidgets = [];
 

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:rooster/model/app_models.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 
 class AppData {
   AppData._() {
@@ -74,7 +74,7 @@ class AppData {
   // ---
   void setActiveDate(DateTime date) {
     _activeDate = date;
-    List<DateTime> allDates = DataHelper.instance.getDaysInBetween(date);
+    List<DateTime> allDates = AppHelper.instance.getDaysInBetween(date);
     _activeDates = allDates
         .where((e) =>
             e.weekday == DateTime.tuesday ||
@@ -171,7 +171,7 @@ class AppData {
     List<List<DaySchema>> result = [];
 
     List<DaySchema> oldSchemas =
-        DataHelper.instance.buildFromTrainerSchemas(trainerSchemas);
+        AppHelper.instance.buildFromTrainerSchemas(trainerSchemas);
     oldSchemas.sort((a, b) => a.day.compareTo(b.day));
     result.add(oldSchemas);
 

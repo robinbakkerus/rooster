@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 
 class Trainer {
   final String accessCode;
@@ -459,8 +459,8 @@ class TrainerSchema {
         zat4: map['zat4'],
         zat5: map['zat5'],
         isNew: map['isNew'],
-        created: DataHelper.instance.parseDateTime(map['created']),
-        modified: DataHelper.instance.parseDateTime(map['modified']));
+        created: AppHelper.instance.parseDateTime(map['created']),
+        modified: AppHelper.instance.parseDateTime(map['modified']));
   }
 
   String toJson() => json.encode(toMap());
@@ -608,7 +608,6 @@ class SpreadSheet {
   int month = 1;
   List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
   List<SheetRow> rows = [];
-  List<SheetRow> extraRows = [];
 
   void addRow(SheetRow row) {
     rows.add(row);
@@ -631,7 +630,7 @@ class SheetRow {
   SheetRow({
     required this.rowIndex,
     required this.date,
-    this.isExtraRow = false,
+    required this.isExtraRow,
   });
 
   Trainer getTrainerByGroup(Groep group) {
@@ -643,7 +642,7 @@ class SheetRow {
   }
 
   String dateStr() {
-    return DataHelper.instance.getDateStringForSpreadsheet(date);
+    return AppHelper.instance.getDateStringForSpreadsheet(date);
   }
 
   @override

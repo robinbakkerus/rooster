@@ -1,7 +1,7 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/data_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
@@ -174,7 +174,7 @@ class _ScheduleItemWidgetState extends State<ScheduleItemWidget> {
   Widget _dayLabel() {
     DateTime dt = DateTime(
         widget.daySchema.year, widget.daySchema.month, widget.daySchema.day);
-    String label = DataHelper.instance.getSimpleDayString(dt);
+    String label = AppHelper.instance.getSimpleDayString(dt);
     return SizedBox(
       width: w15,
       child: Padding(
