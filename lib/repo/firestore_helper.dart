@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/simulator.dart';
+import 'package:rooster/util/app_mixin.dart';
 
-class FirestoreHelper {
+class FirestoreHelper with AppMixin {
   FirestoreHelper._();
   static final FirestoreHelper instance = FirestoreHelper._();
 
@@ -102,9 +101,9 @@ class FirestoreHelper {
             result.add(trainer);
           }
         },
-        onError: (e) => log("Error completing: $e"),
+        onError: (e) => lp("Error completing: $e"),
       ).catchError((e) {
-        log('Error in getAllTrainers : $e');
+        lp('Error in getAllTrainers : $e');
         throw e;
       });
     } else {
@@ -122,7 +121,7 @@ class FirestoreHelper {
     await trainerRef.doc(trainer.pk).set(trainer.toMap()).then((val) {
       result = trainer;
     }).catchError((e) {
-      log('Error in createOrUpdateTrainer $e');
+      lp('Error in createOrUpdateTrainer $e');
       throw e;
     });
 
@@ -143,7 +142,7 @@ class FirestoreHelper {
         .set(lrf.toMap())
         .then((val) {})
         .catchError((e) {
-      log('Error in saveLastRosterFinal $e');
+      lp('Error in saveLastRosterFinal $e');
       throw e;
     });
 
@@ -157,7 +156,7 @@ class FirestoreHelper {
     await trainerRef.doc('last_published').get().then((val) {
       result = LastRosterFinal.fromMap(val.data() as Map<String, dynamic>);
     }).catchError((e) {
-      log(' Error in getLastRosterFinal $e');
+      lp(' Error in getLastRosterFinal $e');
       throw e;
     });
 
@@ -172,7 +171,7 @@ class FirestoreHelper {
         .set(fsSpreadsheet.toMap())
         .then((val) {})
         .catchError((e) {
-      log('Error in saveFsSpreadsheet $e');
+      lp('Error in saveFsSpreadsheet $e');
       throw e;
     });
   }
@@ -204,7 +203,7 @@ class FirestoreHelper {
         .add(map)
         .then((DocumentReference doc) => result = true)
         .onError((e, _) {
-      log('Error in sendEmail $e');
+      lp('Error in sendEmail $e');
       return false;
     });
 

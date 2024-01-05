@@ -463,14 +463,6 @@ class TrainerSchema {
         modified: AppHelper.instance.parseDateTime(map['modified']));
   }
 
-  String toJson() => json.encode(toMap());
-  factory TrainerSchema.fromJson(String source) =>
-      TrainerSchema.fromMap(json.decode(source));
-  @override
-  String toString() {
-    return 'TrainerSchemas(id: $id, trainerPk: $trainerPk, year: $year, month: $month, din1: $din1, din2: $din2, din3: $din3, din4: $din4, din5: $din5, don1: $don1, don2: $don2, don3: $don3, don4: $don4, don5: $don5, zat1: $zat1, zat2: $zat2, zat3: $zat3, zat4: $zat4, zat5: $zat5, created: $created, modified: $modified, isNew: $isNew)';
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -489,21 +481,21 @@ class TrainerSchema {
         trainerPk: '',
         year: 2024,
         month: 1,
-        din1: 0,
-        din2: 0,
-        din3: 0,
-        din4: 0,
-        din5: 0,
-        don1: 0,
-        don2: 0,
-        don3: 0,
-        don4: 0,
-        don5: 0,
-        zat1: 0,
-        zat2: 0,
-        zat3: 0,
-        zat4: 0,
-        zat5: 0,
+        din1: 1,
+        din2: 1,
+        din3: 1,
+        din4: 1,
+        din5: 1,
+        don1: 1,
+        don2: 1,
+        don3: 1,
+        don4: 1,
+        don5: 1,
+        zat1: 1,
+        zat2: 1,
+        zat3: 1,
+        zat4: 1,
+        zat5: 1,
         isNew: true,
         modified: null);
   }

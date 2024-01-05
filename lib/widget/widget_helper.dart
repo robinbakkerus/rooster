@@ -7,13 +7,13 @@ class WidgetHelper {
   final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
   Widget horSpace(double h) {
-    return Container(
+    return SizedBox(
       width: h,
     );
   }
 
   Widget verSpace(double w) {
-    return Container(
+    return SizedBox(
       height: w,
     );
   }

@@ -1,24 +1,22 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
-// import 'package:collection/collection.dart';
+import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_mixin.dart';
 
-class AppHelper {
+class AppHelper with AppMixin {
   AppHelper._();
   static final AppHelper instance = AppHelper._();
 
   ///----------------------------------------
   // return something like "Din 9" , which can be used to set label
   String getSimpleDayString(DateTime dateTime) {
-    String weekday = _weekDay(dateTime.weekday);
+    String weekday = _getShortWeekDay(dateTime);
     String day = dateTime.day.toString();
     return '$weekday $day';
   }
@@ -31,7 +29,7 @@ class AppHelper {
       if (dt.weekday == dateTime.weekday) {
         occurence++;
         if (dt.day == dateTime.day) {
-          return _weekDay(dt.weekday).toLowerCase() + occurence.toString();
+          return _getShortWeekDay(dt).toLowerCase() + occurence.toString();
         }
       }
     }
@@ -126,7 +124,7 @@ class AppHelper {
         satOcc++;
         schemaMap[mapName] = daySchema.available;
       } else {
-        log('dit kan niet');
+        lp('dit kan niet');
       }
     }
 
@@ -181,22 +179,6 @@ class AppHelper {
     return AvailableCounts();
   }
 
-  //----- private ---------------------------
-
-  void _handleThisDay(Map<dynamic, dynamic> trainerSchemasMap, String mapName,
-      int year, int month, DateTime dt, List<DaySchema> daySchemaList) {
-    int available = trainerSchemasMap[mapName];
-
-    DaySchema daySchema = DaySchema(
-      year: year,
-      month: month,
-      day: dt.day,
-      available: available,
-    );
-
-    daySchemaList.add(daySchema);
-  }
-
   ///-----------------
   bool isSameDate(DateTime dt1, DateTime dt2) {
     return dt1.year == dt2.year && dt1.month == dt2.month && dt1.day == dt2.day;
@@ -219,6 +201,7 @@ class AppHelper {
   }
 
   ///-----------------
+  /// return something like: 'woensdag'
   String dayAsString(DateTime date) {
     String dag = DateFormat.EEEE('nl_NL').format(date).substring(0, 3);
     dag += ' ${date.day}';
@@ -230,7 +213,7 @@ class AppHelper {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final deviceInfo = await deviceInfoPlugin.deviceInfo;
     final allInfo = deviceInfo.data;
-    log(allInfo.toString());
+    lp(allInfo.toString());
   }
 
   ///--------------------
@@ -250,29 +233,47 @@ class AppHelper {
     return platform == TargetPlatform.windows;
   }
 
+  ///--------------------
+  int getAvailability(Trainer trainer, DateTime dateTime) {
+    TrainerData? trainerData = AppData.instance
+        .getAllTrainerData()
+        .firstWhereOrNull((e) => e.trainer == trainer);
+
+    String mapName = getDateStringForSpreadsheet(dateTime);
+    if (trainerData != null) {
+      Map<String, dynamic> map = trainerData.trainerSchemas.toMap();
+      if (map[mapName] != null) {
+        return map[mapName];
+      }
+    }
+    return 0;
+  }
+
   /// -------- private methods --------------------------------
 
-  String _weekDay(int day) {
-    if (day == DateTime.sunday) {
-      return "zon";
-    } else if (day == DateTime.monday)
-      return "maa";
-    else if (day == DateTime.tuesday)
-      return "din";
-    else if (day == DateTime.wednesday)
-      return "woe";
-    else if (day == DateTime.thursday)
-      return "don";
-    else if (day == DateTime.friday)
-      return "vry";
-    else
-      return "zat";
+  void _handleThisDay(Map<dynamic, dynamic> trainerSchemasMap, String mapName,
+      int year, int month, DateTime dt, List<DaySchema> daySchemaList) {
+    int available = trainerSchemasMap[mapName];
+
+    DaySchema daySchema = DaySchema(
+      year: year,
+      month: month,
+      day: dt.day,
+      available: available,
+    );
+
+    daySchemaList.add(daySchema);
+  }
+
+  String _getShortWeekDay(DateTime dateTime) {
+    String dag = dayAsString(dateTime);
+    return dag.substring(0, 3);
   }
 
   int _getYearFromSchemaId(String trainerSchemaId) {
     List<String> tokens = trainerSchemaId.split('_');
     if (tokens.length < 2) {
-      log("!! dit kan niet _getYearFromSchemaId $trainerSchemaId");
+      lp("!! dit kan niet _getYearFromSchemaId $trainerSchemaId");
       return 2024;
     } else {
       return int.parse(tokens[1]);
@@ -282,7 +283,7 @@ class AppHelper {
   int _getMonthFromSchemaId(String trainerSchemaId) {
     List<String> tokens = trainerSchemaId.split('_');
     if (tokens.length < 3) {
-      log("!! dit kan niet _getMonthFromSchemaId $trainerSchemaId");
+      lp("!! dit kan niet _getMonthFromSchemaId $trainerSchemaId");
       return 1;
     } else {
       return int.parse(tokens[2]);

@@ -35,7 +35,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
           children: [
             TrainerProgressPage(),
             AvailabilityPage(),
-            RosterPage(),
+            SpreadsheetPage(),
           ],
         ),
       ),

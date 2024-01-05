@@ -2,7 +2,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 
 class AvailabilityPage extends StatefulWidget {
@@ -12,7 +12,7 @@ class AvailabilityPage extends StatefulWidget {
   State<AvailabilityPage> createState() => _AvailabilityPageState();
 }
 
-class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
+class _AvailabilityPageState extends State<AvailabilityPage> with AppMixin {
   _AvailabilityPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
   }
@@ -209,6 +209,19 @@ class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
       colWidgets.add(w);
     }
 
+    colWidgets.add(wh.verSpace(20));
+
+    colWidgets.add(const Text('Niet aanwezig',
+        style: TextStyle(
+          color: Colors.red,
+        )));
+    colWidgets.add(_horLine());
+
+    for (Trainer trainer in _getUnavailbeTrainers(dateTime)) {
+      Widget w = Text(trainer.firstName());
+      colWidgets.add(w);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: colWidgets,
@@ -216,10 +229,22 @@ class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
   }
 
   _horLine() {
-    return Container(
-      height: 1,
+    return const Divider(
       color: Colors.grey,
     );
+  }
+
+  List<Trainer> _getUnavailbeTrainers(DateTime dateTime) {
+    List<Trainer> result = [];
+
+    for (Trainer trainer in AppData.instance.getAllTrainers()) {
+      int avail = AppHelper.instance.getAvailability(trainer, dateTime);
+      if (avail == 0) {
+        result.add(trainer);
+      }
+    }
+
+    return result;
   }
 }
 

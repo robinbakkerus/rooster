@@ -2,7 +2,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class TrainerProgressPage extends StatefulWidget {
 }
 
 class _TrainerProgressPageState extends State<TrainerProgressPage>
-    with PageMixin {
+    with AppMixin {
   // varbs
   List<Trainer> _allTrainers = [];
 

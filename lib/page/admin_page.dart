@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
@@ -15,7 +15,7 @@ class AdminPage extends StatefulWidget {
   State<AdminPage> createState() => _AdminPageState();
 }
 
-class _AdminPageState extends State<AdminPage> {
+class _AdminPageState extends State<AdminPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -67,7 +67,7 @@ class _AdminPageState extends State<AdminPage> {
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
         .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
-    log('todo1 $spreadSheet');
+    lp(spreadSheet.toString());
   }
 
   void saveFsSpreadsheet() async {
@@ -80,6 +80,5 @@ class _AdminPageState extends State<AdminPage> {
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
-    log('todo2 $fsSpreadsheet');
   }
 }

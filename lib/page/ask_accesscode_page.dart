@@ -1,6 +1,6 @@
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 
 class AskAccessCodePage extends StatefulWidget {
@@ -10,7 +10,7 @@ class AskAccessCodePage extends StatefulWidget {
   State<AskAccessCodePage> createState() => _AskAccessCodePageState();
 }
 
-class _AskAccessCodePageState extends State<AskAccessCodePage> with PageMixin {
+class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
   final _textCtrl = TextEditingController();
   bool _findTriggered = false;
 

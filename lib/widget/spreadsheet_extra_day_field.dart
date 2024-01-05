@@ -5,7 +5,7 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 
 class SpreadsheeDayColumn extends StatefulWidget {
   final SheetRow sheetRow;
@@ -17,7 +17,7 @@ class SpreadsheeDayColumn extends StatefulWidget {
 
 //--------------------------------
 class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn>
-    with PageMixin {
+    with AppMixin {
   final _textTextCtrl = TextEditingController();
   final _textDayCtrl = TextEditingController();
   bool _showRemoveButton = false;

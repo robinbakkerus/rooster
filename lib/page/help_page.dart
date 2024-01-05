@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:universal_html/html.dart' as html;
 
-class HelpPage extends StatelessWidget with PageMixin {
+class HelpPage extends StatelessWidget with AppMixin {
   HelpPage({super.key});
 
   @override

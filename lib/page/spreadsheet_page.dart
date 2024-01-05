@@ -3,22 +3,22 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 
-class RosterPage extends StatefulWidget {
-  const RosterPage({super.key});
+class SpreadsheetPage extends StatefulWidget {
+  const SpreadsheetPage({super.key});
 
   @override
-  State<RosterPage> createState() => _RosterPageState();
+  State<SpreadsheetPage> createState() => _SpreadsheetPageState();
 }
 
 //-------------------
-class _RosterPageState extends State<RosterPage> with PageMixin {
+class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   SpreadSheet _spreadSheet = SpreadSheet(
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
@@ -26,7 +26,7 @@ class _RosterPageState extends State<RosterPage> with PageMixin {
   bool _isSupervisor = false;
   Widget _dataGrid = Container();
 
-  _RosterPageState() {
+  _SpreadsheetPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
     AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     AppEvents.onExtraDayUpdatedEvent(_onExtraDayUpdated);
@@ -61,7 +61,7 @@ class _RosterPageState extends State<RosterPage> with PageMixin {
 
 //--------------------------------------------------------
   Widget _buildGrid() {
-    double colSpace = AppHelper.instance.isWindows() ? 15 : 6;
+    double colSpace = AppHelper.instance.isWindows() ? 25 : 10;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Scrollbar(

@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:rooster/model/app_models.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/util/app_mixin.dart';
 
-class AppData {
+class AppData with AppMixin {
   AppData._() {
     _initialize();
   }
@@ -112,7 +111,7 @@ class AppData {
     if (ds != null) {
       ds.available = newValue;
     } else {
-      log('!!! dit kan niet (updateAvailability)');
+      lp('!!! dit kan niet (updateAvailability)');
     }
   }
 

@@ -2,7 +2,7 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/page_mixin.dart';
+import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 
 class TrainerSettingsPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class TrainerSettingsPage extends StatefulWidget {
 }
 
 class _TrainerSettingsPageState extends State<TrainerSettingsPage>
-    with PageMixin {
+    with AppMixin {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
   List<Widget> _columnWidgets = [];
@@ -287,7 +287,7 @@ class VoorkeurWidget extends StatefulWidget {
 }
 
 //--
-class _VoorkeurWidgetState extends State<VoorkeurWidget> with PageMixin {
+class _VoorkeurWidgetState extends State<VoorkeurWidget> with AppMixin {
   int _selectedValue = 0;
 
   @override
