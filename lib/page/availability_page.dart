@@ -2,7 +2,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:flutter/material.dart';
 
 class AvailabilityPage extends StatefulWidget {
@@ -12,7 +12,7 @@ class AvailabilityPage extends StatefulWidget {
   State<AvailabilityPage> createState() => _AvailabilityPageState();
 }
 
-class _AvailabilityPageState extends State<AvailabilityPage> {
+class _AvailabilityPageState extends State<AvailabilityPage> with PageMixin {
   _AvailabilityPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
   }
@@ -53,7 +53,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
         ],
       );
       list.add(w);
-      list.add(WH.verSpace(1));
+      list.add(wh.verSpace(1));
     }
 
     return list;
@@ -64,13 +64,13 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       children: [
         Container(
             width: w15, color: Colors.lightBlue, child: const Text('Dag')),
-        WH.horSpace(1),
+        wh.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('PR')),
-        WH.horSpace(1),
+        wh.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R1')),
-        WH.horSpace(1),
+        wh.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R2')),
-        WH.horSpace(1),
+        wh.horSpace(1),
         Container(width: w2, color: Colors.lightGreen, child: const Text('R3')),
       ],
     );
@@ -81,11 +81,11 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
     return Row(
       children: [
         _buildAvailableField(Groep.pr, dateTime),
-        WH.horSpace(1),
+        wh.horSpace(1),
         _buildAvailableField(Groep.r1, dateTime),
-        WH.horSpace(1),
+        wh.horSpace(1),
         _buildAvailableField(Groep.r2, dateTime),
-        WH.horSpace(1),
+        wh.horSpace(1),
         _buildAvailableField(Groep.r3, dateTime),
       ],
     );
@@ -97,17 +97,17 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
 
     String fieldText =
         '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
-    Color color = _buildAvailFieldColor(cnts, WH.color1);
+    Color color = _buildAvailFieldColor(cnts, c.lightGeen);
     return _buildAvailableFieldWidget(group, dateTime, color, fieldText);
   }
 
   Color _buildAvailFieldColor(AvailableCounts cnts, Color color) {
     if (cnts.confirmed.isNotEmpty) {
-      color = WH.color2;
+      color = c.lightBrown;
     } else if (cnts.confirmed.isEmpty &&
         cnts.ifNeeded.isEmpty &&
         cnts.notEnteredYet.isEmpty) {
-      color = WH.color3;
+      color = c.lightOrange;
     }
     return color;
   }
@@ -174,7 +174,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(WH.verSpace(20));
+    colWidgets.add(wh.verSpace(20));
 
     colWidgets.add(const Text(
       'Alleen als nodig',
@@ -186,7 +186,7 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(WH.verSpace(20));
+    colWidgets.add(wh.verSpace(20));
 
     colWidgets.add(const Text('Nog niet ingevuld',
         style: TextStyle(

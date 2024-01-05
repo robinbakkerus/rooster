@@ -1,6 +1,6 @@
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:flutter/material.dart';
 
 class AskAccessCodePage extends StatefulWidget {
@@ -10,7 +10,7 @@ class AskAccessCodePage extends StatefulWidget {
   State<AskAccessCodePage> createState() => _AskAccessCodePageState();
 }
 
-class _AskAccessCodePageState extends State<AskAccessCodePage> {
+class _AskAccessCodePageState extends State<AskAccessCodePage> with PageMixin {
   final _textCtrl = TextEditingController();
   bool _findTriggered = false;
 
@@ -92,7 +92,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> {
     _findTriggered = false;
     if (!flag) {
       final String msg = 'Kan geen trainer met accesscode $accesscode vinden!';
-      WH.showSnackbar(msg, color: Colors.orange);
+      wh.showSnackbar(msg, color: Colors.orange);
     }
   }
 }

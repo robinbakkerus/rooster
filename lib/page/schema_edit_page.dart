@@ -2,7 +2,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
 
@@ -13,7 +13,7 @@ class SchemaEditPage extends StatefulWidget {
   State<SchemaEditPage> createState() => _SchemaEditPageState();
 }
 
-class _SchemaEditPageState extends State<SchemaEditPage> {
+class _SchemaEditPageState extends State<SchemaEditPage> with PageMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<DaySchema> _daySchemaList = [];
 
@@ -118,7 +118,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> {
       }
     }
 
-    WH.showSnackbar(msg, color: col);
+    wh.showSnackbar(msg, color: col);
   }
 
   bool _isReadonly() {

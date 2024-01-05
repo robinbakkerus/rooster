@@ -5,7 +5,7 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/util/app_helper.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 
 class SpreadsheeDayColumn extends StatefulWidget {
   final SheetRow sheetRow;
@@ -16,7 +16,8 @@ class SpreadsheeDayColumn extends StatefulWidget {
 }
 
 //--------------------------------
-class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
+class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn>
+    with PageMixin {
   final _textTextCtrl = TextEditingController();
   final _textDayCtrl = TextEditingController();
   bool _showRemoveButton = false;
@@ -71,7 +72,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
                 _showRemoveButton
                     ? _buildRemoveExtraRowButton(context)
                     : Container(),
-                WH.verSpace(10),
+                wh.verSpace(10),
                 _buildCloseButton(context),
               ],
             ),
@@ -88,7 +89,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: SizedBox(
-            width: WH.w1,
+            width: c.w1,
             child: TextField(
                 controller: _textDayCtrl,
                 keyboardType: TextInputType.number,
@@ -101,7 +102,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
                 )),
           ),
         ),
-        WH.horSpace(10),
+        wh.horSpace(10),
         Text(_monthAsString()),
       ],
     );
@@ -149,7 +150,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn> {
           setState(() {
             int dag = widget.sheetRow.date.day;
             AppEvents.fireExtraDayUpdatedEvent(
-                dag, WH.removeExtraSpreadsheetRow);
+                dag, c.removeExtraSpreadsheetRow);
           });
           Navigator.of(context, rootNavigator: true)
               .pop(); // dismisses only the dialog and returns nothing

@@ -1,5 +1,5 @@
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -10,7 +10,7 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends State<SplashPage> with PageMixin {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -39,7 +39,7 @@ class _SplashPageState extends State<SplashPage> {
                         color: Colors.lightBlue)),
               ],
             ),
-            WH.verSpace(20),
+            wh.verSpace(20),
             Text('Traininschema ${widget.version}'),
           ]),
     ));

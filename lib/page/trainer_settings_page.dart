@@ -2,7 +2,7 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/widget/widget_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:flutter/material.dart';
 
 class TrainerSettingsPage extends StatefulWidget {
@@ -12,7 +12,8 @@ class TrainerSettingsPage extends StatefulWidget {
   State<TrainerSettingsPage> createState() => _TrainerSettingsPageState();
 }
 
-class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
+class _TrainerSettingsPageState extends State<TrainerSettingsPage>
+    with PageMixin {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
   List<Widget> _columnWidgets = [];
@@ -56,7 +57,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
 
     list.addAll(_readOnlyValues());
     list.addAll(_voorkeurDagen());
-    list.add(WH.verSpace(10));
+    list.add(wh.verSpace(10));
     list.addAll(_voorkeurGroep());
     return list;
   }
@@ -83,7 +84,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         ],
       ),
     ));
-    list.add(WH.verSpace(10));
+    list.add(wh.verSpace(10));
     return list;
   }
 
@@ -94,11 +95,11 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: WH.w15,
+            width: c.w15,
             child: Text(label),
           ),
           SizedBox(
-              width: WH.w25 * 2,
+              width: c.w25 * 2,
               child: Text(
                 _getStringValue(mapElem),
                 overflow: TextOverflow.ellipsis,
@@ -115,11 +116,11 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: WH.w1,
+            width: c.w1,
             child: const Text('email'),
           ),
           SizedBox(
-            width: WH.w25 * 3,
+            width: c.w25 * 3,
             child: TextField(
               controller: _textCtrl,
               textCapitalization: TextCapitalization.characters,
@@ -217,7 +218,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
     String msg = okay
         ? 'Met succes voorkeuren aangepast'
         : 'Fout tijdens aanpassen voorkeuren';
-    WH.showSnackbar(msg, color: Colors.lightGreen);
+    wh.showSnackbar(msg, color: Colors.lightGreen);
     setState(() {
       _trainer = _updateTrainer;
     });
@@ -226,10 +227,10 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage> {
   Widget? _voorkeurTopRow(String label) {
     return Row(
       children: [
-        _topRowBox(WH.w2, 'Dag', Colors.blue),
-        _topRowBox(WH.w15, 'Ja', Colors.green),
-        _topRowBox(WH.w15, 'Nee', Colors.red),
-        _topRowBox(WH.w25, 'Als nodig', Colors.lightBlueAccent),
+        _topRowBox(c.w2, 'Dag', Colors.blue),
+        _topRowBox(c.w15, 'Ja', Colors.green),
+        _topRowBox(c.w15, 'Nee', Colors.red),
+        _topRowBox(c.w25, 'Als nodig', Colors.lightBlueAccent),
       ],
     );
   }
@@ -286,7 +287,7 @@ class VoorkeurWidget extends StatefulWidget {
 }
 
 //--
-class _VoorkeurWidgetState extends State<VoorkeurWidget> {
+class _VoorkeurWidgetState extends State<VoorkeurWidget> with PageMixin {
   int _selectedValue = 0;
 
   @override
@@ -312,7 +313,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 1, 4, 1),
       child: SizedBox(
-        width: WH.w2,
+        width: c.w2,
         child: Text(
           widget.mapName,
           overflow: TextOverflow.ellipsis,
@@ -325,7 +326,7 @@ class _VoorkeurWidgetState extends State<VoorkeurWidget> {
     return Padding(
       padding: const EdgeInsets.all(1.0),
       child: SizedBox(
-        width: WH.w15,
+        width: c.w15,
         child: Radio<int>(
           activeColor: color,
           value: currentValue,

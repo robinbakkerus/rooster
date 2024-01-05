@@ -1,9 +1,9 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:rooster/widget/widget_helper.dart';
 
 class TrainerProgressPage extends StatefulWidget {
   const TrainerProgressPage({super.key});
@@ -12,7 +12,8 @@ class TrainerProgressPage extends StatefulWidget {
   State<TrainerProgressPage> createState() => _TrainerProgressPageState();
 }
 
-class _TrainerProgressPageState extends State<TrainerProgressPage> {
+class _TrainerProgressPageState extends State<TrainerProgressPage>
+    with PageMixin {
   // varbs
   List<Trainer> _allTrainers = [];
 
@@ -54,7 +55,7 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
       Widget w = Row(
         children: [
           SizedBox(
-              width: WH.w25,
+              width: c.w25,
               child: Text(
                 trainer.firstName(),
                 overflow: TextOverflow.ellipsis,
@@ -72,9 +73,9 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
     Widget topRow = Row(
       children: [
         Container(
-            width: WH.w25, color: Colors.lightBlue, child: const Text('naam')),
+            width: c.w25, color: Colors.lightBlue, child: const Text('naam')),
         Container(
-            width: WH.w2,
+            width: c.w2,
             color: Colors.lightGreen,
             child: const Center(child: Text('Ingevuld?'))),
       ],
@@ -97,6 +98,6 @@ class _TrainerProgressPageState extends State<TrainerProgressPage> {
             color: Colors.red,
           );
 
-    return SizedBox(width: WH.w2, child: icon);
+    return SizedBox(width: c.w2, child: icon);
   }
 }

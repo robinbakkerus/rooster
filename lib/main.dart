@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
               .copyWith(dragDevices: {PointerDeviceKind.mouse})
           : const MaterialScrollBehavior()
               .copyWith(dragDevices: {PointerDeviceKind.touch}),
-      scaffoldMessengerKey: WH.scaffoldKey,
+      scaffoldMessengerKey: WidgetHelper.instance.scaffoldKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primarySwatch: Colors.blue,

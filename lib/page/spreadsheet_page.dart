@@ -2,11 +2,10 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/util/page_mixin.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
-import 'package:rooster/widget/widget_helper.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
@@ -19,7 +18,7 @@ class RosterPage extends StatefulWidget {
 }
 
 //-------------------
-class _RosterPageState extends State<RosterPage> {
+class _RosterPageState extends State<RosterPage> with PageMixin {
   SpreadSheet _spreadSheet = SpreadSheet(
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
@@ -52,7 +51,7 @@ class _RosterPageState extends State<RosterPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _dataGrid,
-            WH.verSpace(10),
+            wh.verSpace(10),
             _isSupervisor ? _buildSupervisorButtons() : Container(),
           ],
         ),
@@ -72,7 +71,7 @@ class _RosterPageState extends State<RosterPage> {
             headingRowHeight: 30,
             horizontalMargin: 10,
             headingRowColor:
-                MaterialStateColor.resolveWith((states) => C.lightblue),
+                MaterialStateColor.resolveWith((states) => c.lightblue),
             columnSpacing: colSpace,
             dataRowMinHeight: 15,
             dataRowMaxHeight: 30,
@@ -113,11 +112,11 @@ class _RosterPageState extends State<RosterPage> {
       if (fsRow.isExtraRow) {
         col = MaterialStateColor.resolveWith((states) => Colors.white);
       } else if (fsRow.date.weekday == DateTime.tuesday) {
-        col = MaterialStateColor.resolveWith((states) => C.lightGeen);
+        col = MaterialStateColor.resolveWith((states) => c.lightGeen);
       } else if (fsRow.date.weekday == DateTime.thursday) {
-        col = MaterialStateColor.resolveWith((states) => C.lightOrange);
+        col = MaterialStateColor.resolveWith((states) => c.lightOrange);
       } else if (fsRow.date.weekday == DateTime.saturday) {
-        col = MaterialStateColor.resolveWith((states) => C.lightBrown);
+        col = MaterialStateColor.resolveWith((states) => c.lightBrown);
       }
 
       DataRow dataRow = DataRow(cells: _buildDataCells(fsRow), color: col);
@@ -180,7 +179,7 @@ class _RosterPageState extends State<RosterPage> {
 
   void _doFinalizeRoster(BuildContext context) async {
     AppController.instance.finalizeRoster(_spreadSheet);
-    WH.showSnackbar('Training schema is nu definitief!');
+    wh.showSnackbar('Training schema is nu definitief!');
   }
 
   void _buildDialogConfirm(BuildContext context, bool allProgramFieldSet) {
@@ -248,7 +247,7 @@ class _RosterPageState extends State<RosterPage> {
   void _onExtraDayUpdated(ExtraDayUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        if (event.text == WH.removeExtraSpreadsheetRow) {
+        if (event.text == c.removeExtraSpreadsheetRow) {
           _removeExtraRow(event);
         } else {
           _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
