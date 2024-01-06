@@ -40,7 +40,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
 
   void _addTrainers() {
     List<Trainer> trainers = [
-      p.trainerAnne,
+      // p.trainerAnne,
       // p.trainerPaula,
       // p.trainerRobin,
       // p.trainerFried,
@@ -50,7 +50,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       // p.trainerMaria,
       // p.trainerOlav,
       // p.trainerPauline,
-      // p.trainerRonald
+      // p.trainerRonald,
+      p.trainerCyriel
     ];
 
     for (Trainer trainer in trainers) {

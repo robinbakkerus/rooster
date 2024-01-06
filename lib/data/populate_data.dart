@@ -15,35 +15,39 @@ Trainer trainerRobin = Trainer(
     zamo: 0,
     roles: 'A,S,T');
 
-Trainer trainerPaula =
-    _buildTrainer('PvA', 'Paula van Agt', 'PACO', 0, 0, 1, 1, 0);
-Trainer trainerOlav = _buildTrainer('OB', 'Olav Boiten', 'OSLO', 1, 0, 0, 0, 0);
-Trainer trainerFried =
-    _buildTrainer('FvH', 'Fried van Hoek', 'FARO', 0, 2, 1, 1, 0);
-Trainer trainerMaria =
-    _buildTrainer('MvH', 'Maria van Hout', 'METS', 0, 1, 1, 2, 0);
-Trainer trainerJeroen =
-    _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA', 2, 1, 0, 0, 0);
-Trainer trainerJanneke =
-    _buildTrainer('JK', 'Janneke Kemkers', 'JAVA', 1, 1, 0, 0, 0);
-Trainer trainerPauline =
-    _buildTrainer('PG', 'Pauline Geenen', 'PILA', 0, 0, 1, 1, 1);
-Trainer trainerHuib =
-    _buildTrainer('HC', 'Huib van Chapelle', 'HACO', 0, 0, 1, 1, 1);
-Trainer trainerRonald =
-    _buildTrainer('RV', 'Ronald Vissers', 'ROME', 2, 1, 2, 0, 2);
-Trainer trainerAnne =
-    _buildTrainer('AJ', 'Anne Joustra', 'AKEN', 0, 0, 1, 1, 0);
+Trainer trainerPaula = _buildTrainer(
+    'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0);
+Trainer trainerOlav = _buildTrainer(
+    'OB', 'Olav Boiten', 'OSLO', 'olav.boiten@gmail.com', 1, 0, 0, 0, 0);
+Trainer trainerFried = _buildTrainer(
+    'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 0);
+Trainer trainerMaria = _buildTrainer(
+    'MvH', 'Maria van Hout', 'METS', 'maria.vanhout@onsnet.nu', 0, 1, 1, 2, 0);
+Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
+    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 0);
+Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
+        'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0)
+    .copyWith(dinsdag: 0, donderdag: 0);
+Trainer trainerPauline = _buildTrainer(
+    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 1, 1, 1);
+Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
+    'huiblachapelle@icloud.com', 0, 0, 1, 1, 1);
+Trainer trainerRonald = _buildTrainer(
+    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 2, 1, 2, 0, 2);
+Trainer trainerAnne = _buildTrainer(
+    'AJ', 'Anne Joustra', 'AKEN', 'a.joustra595242@kpnmail.nl', 0, 0, 1, 1, 0);
+Trainer trainerCyriel = _buildTrainer(
+    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 2, 2, 0);
 
 // _buildTRainer
-Trainer _buildTrainer(String pk, String fullname, String accesscode, int pr,
-    int r1, int r2, int r3, int zaterdag) {
+Trainer _buildTrainer(String pk, String fullname, String accesscode,
+    String email, int pr, int r1, int r2, int r3, int zaterdag) {
   int zamo = (zaterdag > 0) ? 1 : 0;
   return Trainer(
       accessCode: accesscode,
       pk: pk,
       fullname: fullname,
-      email: '',
+      email: email,
       dinsdag: 1,
       donderdag: 1,
       zaterdag: zaterdag,
