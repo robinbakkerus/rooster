@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:rooster/controller/app_controler.dart';
@@ -28,8 +29,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _generateRoster, child: const Text('Maak rooster')),
           OutlinedButton(
-              onPressed: saveFsSpreadsheet,
-              child: const Text('Firestore spreadsheet'))
+              onPressed: _saveFsSpreadsheet,
+              child: const Text('Firestore spreadsheet')),
+          OutlinedButton(
+              onPressed: _deleteOldLogs, child: const Text('Delete old logs'))
         ],
       ),
     );
@@ -70,7 +73,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     lp(spreadSheet.toString());
   }
 
-  void saveFsSpreadsheet() async {
+  void _saveFsSpreadsheet() async {
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
@@ -80,5 +83,15 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
+  }
+
+  void _deleteOldLogs() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference logRef = firestore.collection('logs');
+    await logRef.get().then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
   }
 }

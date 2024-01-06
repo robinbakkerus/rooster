@@ -5,6 +5,24 @@ import 'package:flutter/foundation.dart';
 
 import 'package:rooster/util/app_helper.dart';
 
+//------------------
+enum Groep {
+  pr,
+  r1,
+  r2,
+  r3,
+  zamo;
+}
+
+enum LogAction {
+  saveSchema,
+  modifySchema,
+  modifySettings,
+  saveSpreadsheet,
+  finalizeSpreadsheet,
+  modifyTrainerField;
+}
+
 class Trainer {
   final String accessCode;
   final String pk; // this is also the firestore dbs ID
@@ -518,15 +536,6 @@ class TrainerData {
   }
 
   TrainerData();
-}
-
-//------------------
-enum Groep {
-  pr,
-  r1,
-  r2,
-  r3,
-  zamo;
 }
 
 ///---------------------------

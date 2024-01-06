@@ -76,7 +76,7 @@ class FirestoreHelper with AppMixin {
       await schemaRef.doc(trainerSchemas.id).set(trainerSchemas.toMap()).then(
           (value) {
         result = true;
-        _handleSucces('updated trainerschema');
+        _handleSucces(LogAction.modifySchema);
       }, onError: (e) => _updateError("$e"));
     } else {
       result = true;
@@ -120,6 +120,7 @@ class FirestoreHelper with AppMixin {
     CollectionReference trainerRef = firestore.collection('trainer');
     await trainerRef.doc(trainer.pk).set(trainer.toMap()).then((val) {
       result = trainer;
+      _handleSucces(LogAction.modifySettings);
     }).catchError((e) {
       lp('Error in createOrUpdateTrainer $e');
       throw e;
@@ -137,11 +138,9 @@ class FirestoreHelper with AppMixin {
         month: AppData.instance.getActiveMonth());
 
     CollectionReference trainerRef = firestore.collection('metadata');
-    await trainerRef
-        .doc('last_published')
-        .set(lrf.toMap())
-        .then((val) {})
-        .catchError((e) {
+    await trainerRef.doc('last_published').set(lrf.toMap()).then((val) {
+      _handleSucces(LogAction.finalizeSpreadsheet);
+    }).catchError((e) {
       lp('Error in saveLastRosterFinal $e');
       throw e;
     });
@@ -235,10 +234,15 @@ class FirestoreHelper with AppMixin {
 
   void _updateError(Object? ex) {}
 
-  void _handleSucces(String msg) {
+  void _handleSucces(LogAction logAction) {
+    Map<String, dynamic> map = {
+      'at': DateTime.now(),
+      'action': logAction.index
+    };
+
     CollectionReference logsRef = firestore.collection('logs');
     String id =
         '${AppData.instance.getTrainer().pk}-${DateTime.now().microsecondsSinceEpoch}';
-    logsRef.doc(id).set({'message': msg});
+    logsRef.doc(id).set(map);
   }
 }

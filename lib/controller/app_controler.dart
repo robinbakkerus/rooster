@@ -161,17 +161,26 @@ class AppController {
     if (!trainerSchemas.isEmpty()) {
       result.trainerSchemas = trainerSchemas;
     } else if (!forAllTrainers) {
-      TrainerSchema newTrainerSchemas =
-          AppHelper.instance.buildNewSchemaForTrainer(useTrainer);
-
-      bool updateSchema = false;
-      bool updateOkay = await FirestoreHelper.instance
-          .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema);
-      if (updateOkay) {
-        result.trainerSchemas = newTrainerSchemas;
+      try {
+        await _createNewTrainerSchema(useTrainer, result);
+      } catch (ex) {
+        log('ex $ex');
       }
     }
     return result;
+  }
+
+  Future<void> _createNewTrainerSchema(
+      Trainer useTrainer, TrainerData result) async {
+    TrainerSchema newTrainerSchemas =
+        AppHelper.instance.buildNewSchemaForTrainer(useTrainer);
+
+    bool updateSchema = false;
+    bool updateOkay = await FirestoreHelper.instance
+        .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema);
+    if (updateOkay) {
+      result.trainerSchemas = newTrainerSchemas;
+    }
   }
 
   void _setDates() async {
