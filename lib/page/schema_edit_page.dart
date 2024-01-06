@@ -17,6 +17,7 @@ class SchemaEditPage extends StatefulWidget {
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<DaySchema> _daySchemaList = [];
+  List<DataRow> _dataRows = [];
 
   _SchemaEditPageState();
 
@@ -31,6 +32,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     if (mounted) {
       setState(() {
         _daySchemaList = AppData.instance.getNewSchemas();
+        _dataRows = _buildDataRows();
       });
     }
 
@@ -41,54 +43,111 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   void _onSchemaUpdated(SchemaUpdatedEvent event) {
     if (mounted) {
-      setState(() {});
+      setState(() {
+        _daySchemaList = AppData.instance.getNewSchemas();
+        _dataRows = _buildDataRows();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> columnWidgets = [];
-    columnWidgets.add(_buildTopRow()!);
-    for (DaySchema daySchema in _daySchemaList) {
-      columnWidgets
-          .add(ScheduleItemWidget(key: UniqueKey(), daySchema: daySchema));
-    }
-
     return Scaffold(
-      body: SizedBox(
-        height: AppData.instance.screenHeight - 150,
-        // width: AppData.instance.screenWidth,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: columnWidgets,
-        ),
-      ),
+      body: _buildGrid(),
       floatingActionButton: _getFab(),
     );
   }
 
-  Widget? _buildTopRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _topRowBox(w15, 'Dag', Colors.blue),
-        _topRowBox(w15, 'Ja', Colors.green),
-        _topRowBox(w15, 'Nee', Colors.red),
-        _topRowBox(w2, 'Als nodig', Colors.lightBlueAccent),
-      ],
+  Widget _buildGrid() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowHeight: 30,
+          horizontalMargin: 10,
+          headingRowColor:
+              MaterialStateColor.resolveWith((states) => c.lightblue),
+          columnSpacing: colSpace,
+          dataRowMinHeight: 25,
+          dataRowMaxHeight: 50,
+          columns: _buildHeader(),
+          rows: _dataRows,
+        ),
+      ),
     );
   }
 
-  Widget _topRowBox(double width, String title, Color color) {
-    return Container(
-      width: width,
-      color: color,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
-        child: Text(title),
-      ),
-    );
+  //-------------------------
+  List<DataColumn> _buildHeader() {
+    List<DataColumn> result = [];
+
+    var headerLabels = ['Dag', 'Ja', 'Nee', 'Als nodig'];
+    var colors = [Colors.black, Colors.green, Colors.red, Colors.brown];
+
+    for (int i = 0; i < headerLabels.length; i++) {
+      result.add(DataColumn(
+          label: Center(
+        child: Text(headerLabels[i],
+            style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                color: colors[i])),
+      )));
+    }
+    return result;
+  }
+
+  List<DataRow> _buildDataRows() {
+    List<DataRow> result = [];
+
+    for (DaySchema daySchema in _daySchemaList) {
+      result.add(DataRow(
+          cells: _buildDataCells(daySchema), color: _getRowColor(daySchema)));
+    }
+
+    return result;
+  }
+
+  MaterialStateColor _getRowColor(DaySchema daySchema) {
+    MaterialStateColor col =
+        MaterialStateColor.resolveWith((states) => Colors.white);
+
+    DateTime date = DateTime(daySchema.year, daySchema.month, daySchema.day);
+
+    if (date.weekday == DateTime.tuesday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightGeen);
+    } else if (date.weekday == DateTime.thursday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightOrange);
+    } else if (date.weekday == DateTime.saturday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightBrown);
+    }
+
+    return col;
+  }
+
+  List<DataCell> _buildDataCells(DaySchema daySchema) {
+    List<DataCell> result = [];
+
+    result.add(_buildDayDataCell(daySchema));
+    result.add(_buildRadioButtonDataCell(daySchema, 1, Colors.green));
+    result.add(_buildRadioButtonDataCell(daySchema, 0, Colors.red));
+    result.add(_buildRadioButtonDataCell(daySchema, 2, Colors.brown));
+
+    return result;
+  }
+
+  DataCell _buildDayDataCell(DaySchema daySchema) {
+    DateTime datetime =
+        DateTime(daySchema.year, daySchema.month, daySchema.day);
+    String label = AppHelper.instance.getSimpleDayString(datetime);
+    return DataCell(Center(child: Text(label)));
+  }
+
+  DataCell _buildRadioButtonDataCell(
+      DaySchema daySchema, int value, Color color) {
+    return DataCell(RadioButtonWidget(
+        key: UniqueKey(), daySchema: daySchema, rbValue: value, color: color));
   }
 
   Widget? _getFab() {
@@ -132,69 +191,40 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 ///----------------------------------------------------------------
 ///
 
-class ScheduleItemWidget extends StatefulWidget {
+class RadioButtonWidget extends StatefulWidget {
   final DaySchema daySchema;
+  final int rbValue;
+  final Color color;
 
-  const ScheduleItemWidget({
+  const RadioButtonWidget({
     required Key key,
     required this.daySchema,
+    required this.rbValue,
+    required this.color,
   }) : super(key: key);
 
   @override
-  State<ScheduleItemWidget> createState() => _ScheduleItemWidgetState();
+  State<RadioButtonWidget> createState() => _RadioButtonWidgetState();
 }
 
 ///------------------------------------------------
 
-class _ScheduleItemWidgetState extends State<ScheduleItemWidget> {
+class _RadioButtonWidgetState extends State<RadioButtonWidget> {
   int? selectedOption = 1;
-
-  int _getAvailable() => widget.daySchema.available;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(0)),
-          shape: BoxShape.rectangle,
-          border: Border.all(
-            color: Colors.grey,
-            width: 0.2,
-          )),
-      child: Row(
-        children: [
-          _dayLabel(),
-          _radioButton(1, Colors.green),
-          _radioButton(0, Colors.red),
-          _radioButton(2, Colors.brown),
-        ],
-      ),
-    );
+    return _radioButton();
   }
 
-  Widget _dayLabel() {
-    DateTime dt = DateTime(
-        widget.daySchema.year, widget.daySchema.month, widget.daySchema.day);
-    String label = AppHelper.instance.getSimpleDayString(dt);
-    return SizedBox(
-      width: w15,
+  Widget _radioButton() {
+    return Center(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 1, 1, 1),
-        child: Text(label,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  Widget _radioButton(int currentValue, Color color) {
-    return SizedBox(
-      width: w15,
-      child: Center(
+        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
         child: Radio<int>(
-          activeColor: color,
-          value: currentValue,
-          groupValue: _getAvailable(),
+          activeColor: widget.color,
+          value: widget.daySchema.available,
+          groupValue: widget.rbValue,
           onChanged: (val) => onChangeValue(val),
         ),
       ),
@@ -203,9 +233,7 @@ class _ScheduleItemWidgetState extends State<ScheduleItemWidget> {
 
   void onChangeValue(int? value) {
     setState(() {
-      selectedOption = value;
-      widget.daySchema.available = value!;
-      AppData.instance.updateAvailability(widget.daySchema, value);
+      AppData.instance.updateAvailability(widget.daySchema, widget.rbValue);
       AppEvents.fireSchemaUpdated();
     });
   }
