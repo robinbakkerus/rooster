@@ -309,6 +309,11 @@ class SpreadsheetGenerator {
   }
 
   void _postProcessSpreadsheet() {
+    _postProcessZamo();
+    _postProcessThursdayPR();
+  }
+
+  void _postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
         sheetRow.trainingText = '';
@@ -318,6 +323,14 @@ class SpreadsheetGenerator {
         sheetRow.rowCells[Groep.zamo.index].text = 'Hu/Pa/Ro';
       } else {
         sheetRow.rowCells[Groep.zamo.index].setTrainer(Trainer.empty());
+      }
+    }
+  }
+
+  void _postProcessThursdayPR() {
+    for (SheetRow sheetRow in _spreadSheet.rows) {
+      if (sheetRow.date.weekday == DateTime.thursday) {
+        sheetRow.rowCells[Groep.pr.index].text = '(met R1)';
       }
     }
   }
