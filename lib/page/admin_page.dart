@@ -74,14 +74,17 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _saveFsSpreadsheet() async {
-    List<Available> availableList =
-        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
-    SpreadSheet spreadSheet = SpreadsheetGenerator.instance
-        .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
-    spreadSheet.year = 2024;
-    spreadSheet.month = 1;
+    // List<Available> availableList =
+    //     SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
+    // SpreadSheet spreadSheet = SpreadsheetGenerator.instance
+    //     .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+    // spreadSheet.year = 2024;
+    // spreadSheet.month = 1;
+    // FsSpreadsheet fsSpreadsheet =
+    //     SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+
     FsSpreadsheet fsSpreadsheet =
-        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+        FsSpreadsheet(year: 2024, month: 1, rows: _januariRows());
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
   }
 
@@ -93,5 +96,94 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         doc.reference.delete();
       }
     });
+  }
+
+  List<FsSpreadsheetRow> _januariRows() {
+    List<FsSpreadsheetRow> rows = [];
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 2),
+        trainingText: 'Kerstvakantie training',
+        isExtraRow: false,
+        rowCells: ['Olav', 'Robin', 'Fried', 'Paula', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 4),
+        trainingText: 'Kerstvakantie training',
+        isExtraRow: false,
+        rowCells: ['(met R1)', 'Ronald', '(met R3)', 'Anne', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 6),
+        trainingText: 'ZAMO',
+        isExtraRow: false,
+        rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 9),
+        trainingText: 'korte training + NY borrel',
+        isExtraRow: false,
+        rowCells: ['Olav', 'Jeroen', 'Maria', 'Anne', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 11),
+        trainingText: 'Tempo duurloop D2',
+        isExtraRow: false,
+        rowCells: ['(met R1)', 'Ronald', 'Fried', 'Pauline', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 13),
+        trainingText: 'ZAMO',
+        isExtraRow: false,
+        rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 16),
+        trainingText: 'Fartlek',
+        isExtraRow: false,
+        rowCells: ['Janneke', 'Robin', 'Ronald', 'Huib', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 18),
+        trainingText: 'Duurloop D1',
+        isExtraRow: false,
+        rowCells: ['(met R1)', 'Jeroen', 'Cyriel', 'Fried', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 20),
+        trainingText: 'ZAMO',
+        isExtraRow: false,
+        rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 23),
+        trainingText: 'Herstelduurloop',
+        isExtraRow: false,
+        rowCells: ['Olav', 'Janneke', 'Maria', 'Huib', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 25),
+        trainingText: 'Climaxduurloop D1/D2',
+        isExtraRow: false,
+        rowCells: ['(met R1)', 'Jeroen', 'Cyriel', 'Pauline', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 27),
+        trainingText: 'ZAMO',
+        isExtraRow: false,
+        rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 30),
+        trainingText: 'Interval korte afstand',
+        isExtraRow: false,
+        rowCells: ['Janneke', 'Robin', 'Maria', 'Paula', '']));
+
+    rows.add(FsSpreadsheetRow(
+        date: DateTime(2024, 1, 21),
+        trainingText: 'Houffalize ultra trail	',
+        isExtraRow: true,
+        rowCells: []));
+
+    return rows;
   }
 }
