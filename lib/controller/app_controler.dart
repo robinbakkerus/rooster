@@ -223,5 +223,7 @@ class AppController {
     AppData.instance.screenWidth = width;
     double height = (MediaQuery.of(context).size.height);
     AppData.instance.screenHeight = height;
+
+    AppData.instance.shortestSide = MediaQuery.of(context).size.shortestSide;
   }
 }

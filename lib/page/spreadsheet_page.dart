@@ -157,7 +157,9 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   DataCell _buildTrainingCell(SheetRow sheetRow) {
-    double w = AppHelper.instance.isWindows() ? 200 : 100;
+    double w = AppHelper.instance.isWindows() || AppHelper.instance.isTablet()
+        ? 200
+        : 100;
     return DataCell(Container(
         decoration:
             BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey)),

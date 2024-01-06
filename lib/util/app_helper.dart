@@ -233,6 +233,14 @@ class AppHelper with AppMixin {
     return platform == TargetPlatform.windows;
   }
 
+  bool isTablet() {
+    if (isWindows()) {
+      return false;
+    } else {
+      return AppData.instance.shortestSide > 600;
+    }
+  }
+
   ///--------------------
   int getAvailability(Trainer trainer, DateTime dateTime) {
     TrainerData? trainerData = AppData.instance
