@@ -5,6 +5,7 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
+import 'package:rooster/widget/spreadsheet_trainer_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -30,6 +31,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
     AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     AppEvents.onExtraDayUpdatedEvent(_onExtraDayUpdated);
+    AppEvents.onSpreadsheetTrainerUpdatedEvent(_onSpreadTrainerUpdated);
   }
 
   @override
@@ -134,19 +136,20 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
     if (!row.isExtraRow) {
       for (int i = 0; i < Groep.values.length; i++) {
-        result.add(_buildCell(row.rowCells[i].text));
+        result.add(_buildTrainerCell(row, Groep.values[i]));
       }
     } else {
       for (int i = 0; i < Groep.values.length; i++) {
-        result.add(_buildCell(''));
+        result.add(const DataCell(Text('')));
       }
     }
 
     return result;
   }
 
-  DataCell _buildCell(String text) {
-    return DataCell(Text(text));
+  DataCell _buildTrainerCell(SheetRow sheetRow, Groep groep) {
+    return DataCell(SpreadsheetTrainerColumn(
+        key: UniqueKey(), sheetRow: sheetRow, groep: groep));
   }
 
   DataCell _buildDayCell(SheetRow sheetRow) {
@@ -252,6 +255,16 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         } else {
           _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
         }
+        _dataGrid = _buildGrid();
+      });
+    }
+  }
+
+  void _onSpreadTrainerUpdated(SpreadsheetTrainerUpdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        _spreadSheet.rows[event.rowIndex].rowCells[event.colIndex].text =
+            event.text;
         _dataGrid = _buildGrid();
       });
     }

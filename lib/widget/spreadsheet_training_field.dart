@@ -108,8 +108,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   Widget _buildDropdown() {
-    var items = [
-      'training...',
+    var topVal = 'training...';
+    var trainingItems = [
+      topVal,
       'rustige duurloop',
       'duurloop herstel',
       'pyramide loop',
@@ -121,11 +122,11 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
       'fartlek'
     ];
     return DropdownButton(
-        value: 'training...',
-        items: items.map((String items) {
+        value: topVal,
+        items: trainingItems.map((String item) {
           return DropdownMenuItem(
-            value: items,
-            child: Text(items),
+            value: item,
+            child: Text(item),
           );
         }).toList(),
         onChanged: _onDropdownSelected);

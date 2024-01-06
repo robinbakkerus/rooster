@@ -19,9 +19,9 @@ class TrainerDataReadyEvent {}
 class SchemaUpdatedEvent {}
 
 // event that is send from widget with radiobuttons, to tell parent page that some value is changed
-class TrainerUdatedEvent {
+class TrainerUpdatedEvent {
   Trainer trainer;
-  TrainerUdatedEvent({
+  TrainerUpdatedEvent({
     required this.trainer,
   });
 }
@@ -44,6 +44,14 @@ class ExtraDayUpdatedEvent {
   ExtraDayUpdatedEvent(this.dag, this.text);
 }
 
+class SpreadsheetTrainerUpdatedEvent {
+  final int rowIndex;
+  final int colIndex;
+  final String text;
+
+  SpreadsheetTrainerUpdatedEvent(this.rowIndex, this.colIndex, this.text);
+}
+
 /*
 	Static class that contains all onXxx and fireXxx methods.
 */
@@ -64,7 +72,7 @@ class AppEvents {
 
   static void fireSchemaUpdated() => _sEventBus.fire(SchemaUpdatedEvent());
   static void fireTrainerUpdated(Trainer trainer) =>
-      _sEventBus.fire(TrainerUdatedEvent(trainer: trainer));
+      _sEventBus.fire(TrainerUpdatedEvent(trainer: trainer));
 
   static void fireAllTrainerDataReady() =>
       _sEventBus.fire(AllTrainersDataReadyEvent());
@@ -77,6 +85,10 @@ class AppEvents {
   static void fireExtraDayUpdatedEvent(int dag, String text) =>
       _sEventBus.fire(ExtraDayUpdatedEvent(dag, text));
 
+  static void fireSpreadsheetTrainerUpdated(
+          int rowIndex, int colIndex, String text) =>
+      _sEventBus.fire(SpreadsheetTrainerUpdatedEvent(rowIndex, colIndex, text));
+
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
@@ -88,7 +100,7 @@ class AppEvents {
       _sEventBus.on<SchemaUpdatedEvent>().listen((event) => func(event));
 
   static void onTrainerUpdatedEvent(OnTrainerUpdatedEventFunc func) =>
-      _sEventBus.on<TrainerUdatedEvent>().listen((event) => func(event));
+      _sEventBus.on<TrainerUpdatedEvent>().listen((event) => func(event));
 
   static void onAllTrainersAndSchemasReadyEvent(
           OnAllTrainerDataReadyEventFunc func) =>
@@ -102,6 +114,12 @@ class AppEvents {
 
   static void onExtraDayUpdatedEvent(OnExtraDayUpdatedEventFunc func) =>
       _sEventBus.on<ExtraDayUpdatedEvent>().listen((event) => func(event));
+
+  static void onSpreadsheetTrainerUpdatedEvent(
+          OnSpreadsheetTrainerUpdatedEventFunc func) =>
+      _sEventBus
+          .on<SpreadsheetTrainerUpdatedEvent>()
+          .listen((event) => func(event));
 }
 
 /// ----- typedef's -----------
@@ -112,7 +130,7 @@ typedef OnTrainerDataReadyEventFunc = void Function(
 
 typedef OnSchemaUpdateEventFunc = void Function(SchemaUpdatedEvent event);
 
-typedef OnTrainerUpdatedEventFunc = void Function(TrainerUdatedEvent event);
+typedef OnTrainerUpdatedEventFunc = void Function(TrainerUpdatedEvent event);
 
 typedef OnAllTrainerDataReadyEventFunc = void Function(
     AllTrainersDataReadyEvent event);
@@ -122,3 +140,6 @@ typedef OnDatesReadyEventFunc = void Function(DatesReadyEvent event);
 typedef OnTrainingUpdatedEventFunc = void Function(TrainingUpdatedEvent event);
 
 typedef OnExtraDayUpdatedEventFunc = void Function(ExtraDayUpdatedEvent event);
+
+typedef OnSpreadsheetTrainerUpdatedEventFunc = void Function(
+    SpreadsheetTrainerUpdatedEvent event);

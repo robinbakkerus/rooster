@@ -261,7 +261,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
     }
   }
 
-  void _onTrainerUpdated(TrainerUdatedEvent event) {
+  void _onTrainerUpdated(TrainerUpdatedEvent event) {
     if (mounted) {
       setState(() {
         _trainer = AppData.instance.getTrainer();
