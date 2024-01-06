@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:rooster/util/app_helper.dart';
 
-//------------------
+//------------------ enum ----------------------
 enum Groep {
   pr,
   r1,
@@ -22,6 +22,21 @@ enum LogAction {
   finalizeSpreadsheet,
   modifyTrainerField;
 }
+
+enum PageEnum {
+  splashPage(0),
+  askAccessCode(1),
+  editSchema(2),
+  trainerSettings(3),
+  spreadSheet(4),
+  helpPage(5),
+  adminPage(6);
+
+  const PageEnum(this.code);
+  final int code;
+}
+
+///------------------------------------------
 
 class Trainer {
   final String accessCode;

@@ -24,20 +24,21 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
 
-  bool _isSupervisor = false;
+  bool _isEditable = false;
   Widget _dataGrid = Container();
 
-  _SpreadsheetPageState() {
+  _SpreadsheetPageState();
+
+  @override
+  void initState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
     AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     AppEvents.onExtraDayUpdatedEvent(_onExtraDayUpdated);
     AppEvents.onSpreadsheetTrainerUpdatedEvent(_onSpreadTrainerUpdated);
-  }
 
-  @override
-  void initState() {
     _spreadSheet = AppData.instance.getSpreadsheet();
-    _isSupervisor = AppData.instance.getTrainer().isSupervisor();
+    _isEditable = AppData.instance.getTrainer().isSupervisor() &&
+        !AppData.instance.schemaIsFinal();
     _dataGrid = _buildGrid();
 
     super.initState();
@@ -54,7 +55,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
           children: [
             _dataGrid,
             wh.verSpace(10),
-            _isSupervisor ? _buildSupervisorButtons() : Container(),
+            _isEditable ? _buildSupervisorButtons() : Container(),
           ],
         ),
       ),
@@ -238,6 +239,14 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
         _dataGrid = _buildGrid();
+        _isEditable = AppData.instance.getTrainer().isSupervisor() &&
+            !AppData.instance.schemaIsFinal();
+
+        if (AppData.instance.schemaIsFinal()) {
+          wh.showSnackbar(
+              'Schema is al definitief: er kunnen geen wijzigingen worden aangebracht',
+              color: Colors.orange);
+        }
       });
     }
   }

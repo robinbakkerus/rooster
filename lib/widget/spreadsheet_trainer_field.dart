@@ -35,9 +35,9 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   @override
   Widget build(BuildContext context) {
     String txt = widget.sheetRow.rowCells[widget.groep.index].text;
-    bool addBorder = txt.isNotEmpty;
+    bool addBorder = txt.isNotEmpty && _isEditable();
     return InkWell(
-      onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
+      onTap: _isEditable() ? () => _dialogBuilder(context) : null,
       child: Container(
           decoration:
               addBorder ? BoxDecoration(border: Border.all(width: 0.1)) : null,
@@ -117,8 +117,9 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     Navigator.of(context, rootNavigator: true).pop();
   }
 
-  bool _isSupervisor() {
-    return AppData.instance.getTrainer().isSupervisor();
+  bool _isEditable() {
+    return AppData.instance.getTrainer().isSupervisor() &&
+        !AppData.instance.schemaIsFinal();
   }
 
   Widget _buildOtherTrainerField() {

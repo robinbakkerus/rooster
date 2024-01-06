@@ -1,6 +1,7 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+// import 'package:rooster/page/start_page.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +18,13 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<DaySchema> _daySchemaList = [];
 
-  _SchemaEditPageState() {
+  _SchemaEditPageState();
+
+  @override
+  void initState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
     AppEvents.onSchemaUpdatedEvent(_onSchemaUpdated);
+    super.initState();
   }
 
   void _onReady(TrainerDataReadyEvent event) {
@@ -29,7 +34,9 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
       });
     }
 
-    _showSnackbar();
+    if (AppData.instance.stackIndex == PageEnum.editSchema.code) {
+      _showSnackbar();
+    }
   }
 
   void _onSchemaUpdated(SchemaUpdatedEvent event) {
@@ -112,19 +119,13 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
           'Met succes nieuw schema aangemaakt, deze wordt nu als ingevuld beschouwd';
     } else {
       msg += 'Met succes schema geopend';
-      if (_isReadonly()) {
+      if (AppData.instance.schemaIsFinal()) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;
       }
     }
 
     wh.showSnackbar(msg, color: col);
-  }
-
-  bool _isReadonly() {
-    DateTime activeDate = AppData.instance.getActiveDate();
-    DateTime lastActiveDate = AppData.instance.lastActiveDate;
-    return !activeDate.isAfter(lastActiveDate);
   }
 }
 

@@ -38,10 +38,12 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn>
 
   @override
   Widget build(BuildContext context) {
+    Decoration? decoration =
+        _isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
-      onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
+      onTap: _isEditable() ? () => _dialogBuilder(context) : null,
       child: Container(
-          decoration: BoxDecoration(border: Border.all(width: 0.1)),
+          decoration: decoration,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
             child: Text(
@@ -113,8 +115,9 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn>
     return formatter.format(AppData.instance.getActiveDate());
   }
 
-  bool _isSupervisor() {
-    return AppData.instance.getTrainer().isSupervisor();
+  bool _isEditable() {
+    return AppData.instance.getTrainer().isSupervisor() &&
+        !AppData.instance.schemaIsFinal();
   }
 
   Widget _buildExtraTextField() {

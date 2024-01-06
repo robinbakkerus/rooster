@@ -24,7 +24,6 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   // varbs
   String _barTitle = '???';
-  int _stackIndex = 0;
   String _accessCode = '';
 
   // This corresponds with action button next right arrow action (these are handled seperately)
@@ -46,7 +45,7 @@ class _StartPageState extends State<StartPage> {
         _findTrainer(_accessCode);
       } else {
         setState(() {
-          _stackIndex = 1; //ask accessCode
+          _setStackIndex(PageEnum.askAccessCode.code); //ask accessCode
         });
       }
     });
@@ -58,7 +57,7 @@ class _StartPageState extends State<StartPage> {
     return Scaffold(
       appBar: _showTabBar() ? _appBar() : null,
       body: IndexedStack(
-        index: _stackIndex,
+        index: _getStackIndex(),
         children: [
           const SplashPage(), //0
           const AskAccessCodePage(), //1
@@ -73,7 +72,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   bool _showTabBar() {
-    return _stackIndex > 1;
+    return _getStackIndex() > 1;
   }
 
   PreferredSizeWidget? _appBar() {
@@ -90,15 +89,15 @@ class _StartPageState extends State<StartPage> {
   String _buildBarTitle() {
     String result = '${AppData.instance.getTrainer().firstName()}: ';
 
-    if (_stackIndex == Action.editSchema.code) {
+    if (_getStackIndex() == PageEnum.editSchema.code) {
       result += AppData.instance.getActiveMonthAsString();
-    } else if (_stackIndex == Action.trainerSettings.code) {
+    } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
       result += ' Instellingen';
-    } else if (_stackIndex == Action.spreadSheet.code) {
+    } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       result = ' Schema ${AppData.instance.getActiveMonthAsString()}';
-    } else if (_stackIndex == Action.helpPage.code) {
+    } else if (_getStackIndex() == PageEnum.helpPage.code) {
       return 'Help pagina';
-    } else if (_stackIndex == Action.adminPage.code) {
+    } else if (_getStackIndex() == PageEnum.adminPage.code) {
       return 'Admin pagina';
     }
 
@@ -109,7 +108,7 @@ class _StartPageState extends State<StartPage> {
     bool okay = await AppController.instance.findTrainer(accessCode);
     if (!okay) {
       setState(() {
-        _stackIndex = 1;
+        _setStackIndex(1);
       });
     }
   }
@@ -130,8 +129,8 @@ class _StartPageState extends State<StartPage> {
   void _onTrainerDataReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
-        if (_stackIndex != Action.spreadSheet.code) {
-          _stackIndex = 2;
+        if (_getStackIndex() != PageEnum.spreadSheet.code) {
+          _setStackIndex(2);
         }
 
         _barTitle = _buildBarTitle();
@@ -235,7 +234,7 @@ class _StartPageState extends State<StartPage> {
     AppController.instance
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
-    if (_stackIndex == Action.spreadSheet.code) {
+    if (_getStackIndex() == PageEnum.spreadSheet.code) {
       AppController.instance.generateSpreadsheet();
     }
   }
@@ -254,14 +253,14 @@ class _StartPageState extends State<StartPage> {
     AppController.instance
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
-    if (_stackIndex == Action.spreadSheet.code) {
+    if (_getStackIndex() == PageEnum.spreadSheet.code) {
       AppController.instance.generateSpreadsheet();
     }
   }
 
   void _gotoEditSchemas() {
     setState(() {
-      _stackIndex = 2;
+      _setStackIndex(2);
       _barTitle = _buildBarTitle();
       _toggleActionEnabled(2);
     });
@@ -270,7 +269,7 @@ class _StartPageState extends State<StartPage> {
   void _gotoSpreadsheet() {
     AppController.instance.generateSpreadsheet();
     setState(() {
-      _stackIndex = 4;
+      _setStackIndex(4);
       _barTitle = _buildBarTitle();
       _toggleActionEnabled(4);
     });
@@ -278,7 +277,7 @@ class _StartPageState extends State<StartPage> {
 
   void _gotoTrainerSettings() {
     setState(() {
-      _stackIndex = 3;
+      _setStackIndex(3);
       _barTitle = _buildBarTitle();
       AppEvents.fireSchemaUpdated();
       _toggleActionEnabled(3);
@@ -287,7 +286,7 @@ class _StartPageState extends State<StartPage> {
 
   void _gotoHelpPage() {
     setState(() {
-      _stackIndex = 5;
+      _setStackIndex(5);
       _barTitle = _buildBarTitle();
       _toggleActionEnabled(5);
     });
@@ -295,7 +294,7 @@ class _StartPageState extends State<StartPage> {
 
   void _gotoAdminPage() {
     setState(() {
-      _stackIndex = 6;
+      _setStackIndex(6);
       _barTitle = _buildBarTitle();
       _toggleActionEnabled(6);
     });
@@ -323,15 +322,9 @@ class _StartPageState extends State<StartPage> {
       }
     }
   }
-}
 
-enum Action {
-  editSchema(2),
-  trainerSettings(3),
-  spreadSheet(4),
-  helpPage(5),
-  adminPage(6);
-
-  const Action(this.code);
-  final int code;
+  int _getStackIndex() => AppData.instance.stackIndex;
+  void _setStackIndex(int value) {
+    AppData.instance.stackIndex = value;
+  }
 }

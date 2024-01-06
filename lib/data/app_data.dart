@@ -19,8 +19,14 @@ class AppData {
   double screenWidth = 600.0; //assume
   double screenHeight = 600.0; //assume
   double shortestSide = 600; //assume
-  late String trainerId = "";
+  String trainerId = "";
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
+
+  DateTime _activeDate = DateTime(2024, 1, 1);
+  DateTime lastActiveDate = DateTime(2024, 1, 1);
+  DateTime lastMonth = DateTime(2024, 1, 1);
+  int stackIndex = 0;
+
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
   }
@@ -59,10 +65,6 @@ class AppData {
     return result;
   }
 
-  DateTime _activeDate = DateTime(2024, 1, 1);
-  DateTime lastActiveDate = DateTime(2024, 1, 1);
-  DateTime lastMonth = DateTime(2024, 1, 1);
-
   Trainer getTrainer() {
     return _trainerData.trainer;
   }
@@ -80,6 +82,12 @@ class AppData {
   }
 
   List<DateTime> _activeDates = [];
+
+  bool schemaIsFinal() {
+    DateTime activeDate = AppData.instance.getActiveDate();
+    DateTime lastActiveDate = AppData.instance.lastActiveDate;
+    return !activeDate.isAfter(lastActiveDate);
+  }
 
   // ---
   void setActiveDate(DateTime date) {

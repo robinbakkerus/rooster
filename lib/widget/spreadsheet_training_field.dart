@@ -44,10 +44,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
+    Decoration? decoration =
+        isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
-      onTap: _isSupervisor() ? () => _dialogBuilder(context) : null,
+      onTap: isEditable() ? () => _dialogBuilder(context) : null,
       child: Container(
-          decoration: BoxDecoration(border: Border.all(width: 0.1)),
+          decoration: decoration,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
             child: Text(
@@ -133,8 +135,10 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   bool _isExtraRow() => widget.sheetRow.isExtraRow;
-  bool _isSupervisor() {
-    return AppData.instance.getTrainer().isSupervisor();
+
+  bool isEditable() {
+    return AppData.instance.getTrainer().isSupervisor() &&
+        !AppData.instance.schemaIsFinal();
   }
 
   void _onDropdownSelected(Object? value) {

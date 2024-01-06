@@ -1,3 +1,4 @@
+import 'package:rooster/data/app_data.dart';
 import 'package:rooster/page/all_entered_schemas.dart';
 import 'package:rooster/page/availability_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
@@ -26,7 +27,9 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
         appBar: AppBar(
           toolbarHeight: 1,
           bottom: TabBar(
+            tabAlignment: TabAlignment.start,
             isScrollable: true,
+            onTap: _onTap,
             tabs: [
               _tab1(),
               _tab2(),
@@ -45,6 +48,14 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
         ),
       ),
     );
+  }
+
+  void _onTap(value) {
+    if (AppData.instance.schemaIsFinal() && value == 3) {
+      wh.showSnackbar(
+          'Schema is al definitief: er kunnen geen wijzigingen worden aangebracht',
+          color: Colors.orange);
+    }
   }
 
   //-- widgets for tabs
