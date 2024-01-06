@@ -3,6 +3,7 @@ import 'package:rooster/page/availability_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/util/app_mixin.dart';
 
 class ViewAllSchemasPage extends StatefulWidget {
   const ViewAllSchemasPage({super.key});
@@ -11,7 +12,7 @@ class ViewAllSchemasPage extends StatefulWidget {
   State<ViewAllSchemasPage> createState() => _ViewAllSchemasPageState();
 }
 
-class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
+class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
   @override
   void initState() {
     super.initState();
@@ -20,11 +21,12 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 1,
           bottom: TabBar(
+            isScrollable: true,
             tabs: [
               _tab1(),
               _tab2(),
@@ -48,30 +50,54 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
   //-- widgets for tabs
 
   Tab _tab1() {
-    return const Tab(
+    return Tab(
         child: Row(children: [
-      Text('Voortgang'),
+      SizedBox(
+        width: c.w2,
+        child: const Text(
+          'Voortgang',
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     ]));
   }
 
   Tab _tab2() {
-    return const Tab(
+    return Tab(
         child: Row(children: [
-      Text('Ingevulde schemas'),
+      SizedBox(
+        width: c.w2,
+        child: const Text(
+          'Ingevulde schemas',
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     ]));
   }
 
   Tab _tab3() {
-    return const Tab(
+    return Tab(
         child: Row(children: [
-      Text('Beschikbaarheid'),
+      SizedBox(
+        width: c.w2,
+        child: const Text(
+          'Beschikbaarheid',
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     ]));
   }
 
   Tab _tab4() {
-    return const Tab(
+    return Tab(
         child: Row(children: [
-      Text('Schema'),
+      SizedBox(
+        width: c.w2,
+        child: const Text(
+          'Schema',
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     ]));
   }
 
