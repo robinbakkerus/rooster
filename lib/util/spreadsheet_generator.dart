@@ -153,9 +153,11 @@ class SpreadsheetGenerator {
     List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
-    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
-        rowNr: rowNr, groepNr: groepNr);
-    _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
+    if (!_isSaturday(rowNr) && !_isThursdayPR(rowNr, groepNr)) {
+      Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
+          rowNr: rowNr, groepNr: groepNr);
+      _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
+    }
   }
 
 //-----------------------
@@ -224,7 +226,7 @@ class SpreadsheetGenerator {
   // here we make weight higher or lower in order to make choice
   void _applyWeights(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
-    if (!_isSaturday(rowNr)) {
+    if (!_isSaturday(rowNr) && !_isThursdayPR(rowNr, groepNr)) {
       _applyDaysNotAvailable(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
       _applyAlreadyScheduled(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
     }
@@ -258,6 +260,12 @@ class SpreadsheetGenerator {
   bool _isSaturday(int rowNr) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     return sheetRow.date.weekday == DateTime.saturday;
+  }
+
+  bool _isThursdayPR(int rowNr, int groepNr) {
+    SheetRow sheetRow = _spreadSheet.rows[rowNr];
+    return sheetRow.date.weekday == DateTime.thursday &&
+        groepNr == Groep.pr.index;
   }
 
   // hoe vaak afwezig vanaf dateTime

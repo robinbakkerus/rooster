@@ -22,7 +22,7 @@ Trainer trainerOlav = _buildTrainer(
 Trainer trainerFried = _buildTrainer(
     'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 0);
 Trainer trainerMaria = _buildTrainer(
-    'MvH', 'Maria van Hout', 'METS', 'maria.vanhout@onsnet.nu', 0, 1, 1, 2, 0);
+    'MvH', 'Maria van Hout', 'METS', 'maria.vanhout@onsnet.nu', 0, 0, 1, 1, 0);
 Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
     'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 0);
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',

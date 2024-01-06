@@ -47,11 +47,11 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       // p.trainerHuib,
       // p.trainerJanneke,
       // p.trainerJeroen,
-      // p.trainerMaria,
+      p.trainerMaria,
       // p.trainerOlav,
       // p.trainerPauline,
       // p.trainerRonald,
-      p.trainerCyriel
+      // p.trainerCyriel
     ];
 
     for (Trainer trainer in trainers) {
