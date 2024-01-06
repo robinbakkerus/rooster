@@ -748,10 +748,12 @@ class FsSpreadsheet {
   int year = 2024;
   int month = 1;
   List<FsSpreadsheetRow> rows = [];
+  bool isFinal = false;
   FsSpreadsheet({
     required this.year,
     required this.month,
     required this.rows,
+    required this.isFinal,
   });
 
   String getID() {
@@ -763,6 +765,7 @@ class FsSpreadsheet {
       'year': year,
       'month': month,
       'rows': rows.map((x) => x.toMap()).toList(),
+      'isFinal': isFinal,
     };
   }
 
@@ -775,6 +778,7 @@ class FsSpreadsheet {
           (x) => FsSpreadsheetRow.fromMap(x as Map<String, dynamic>),
         ),
       ),
+      isFinal: map['isFinal'] as bool,
     );
   }
 

@@ -81,7 +81,10 @@ class SpreadsheetGenerator {
     }
 
     FsSpreadsheet result = FsSpreadsheet(
-        year: spreadSheet.year, month: spreadSheet.month, rows: fsRows);
+        year: spreadSheet.year,
+        month: spreadSheet.month,
+        rows: fsRows,
+        isFinal: true);
     return result;
   }
 

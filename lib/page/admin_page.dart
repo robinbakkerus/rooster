@@ -83,8 +83,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     // FsSpreadsheet fsSpreadsheet =
     //     SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
 
-    FsSpreadsheet fsSpreadsheet =
-        FsSpreadsheet(year: 2024, month: 1, rows: _januariRows());
+    FsSpreadsheet fsSpreadsheet = FsSpreadsheet(
+        year: 2024, month: 1, rows: _januariRows(), isFinal: true);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
   }
 
