@@ -307,11 +307,10 @@ class TrainerAccess {
       trainer: Trainer.fromMap(map['trainer']),
     );
   }
-  String toJson() => json.encode(toMap());
-  factory TrainerAccess.fromJson(String source) =>
-      TrainerAccess.fromMap(json.decode(source));
+
   @override
   String toString() => 'TrainerAccess(trainer: $trainer)';
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

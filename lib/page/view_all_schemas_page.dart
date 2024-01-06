@@ -1,3 +1,4 @@
+import 'package:rooster/page/all_entered_schemas.dart';
 import 'package:rooster/page/availability_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
@@ -28,12 +29,14 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
               _tab1(),
               _tab2(),
               _tab3(),
+              _tab4(),
             ],
           ),
         ),
         body: const TabBarView(
           children: [
             TrainerProgressPage(),
+            AllEnteredSchemas(),
             AvailabilityPage(),
             SpreadsheetPage(),
           ],
@@ -54,11 +57,18 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> {
   Tab _tab2() {
     return const Tab(
         child: Row(children: [
-      Text('Beschikbaarheid'),
+      Text('Ingevulde schemas'),
     ]));
   }
 
   Tab _tab3() {
+    return const Tab(
+        child: Row(children: [
+      Text('Beschikbaarheid'),
+    ]));
+  }
+
+  Tab _tab4() {
     return const Tab(
         child: Row(children: [
       Text('Schema'),

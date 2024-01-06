@@ -102,14 +102,8 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
 
     bool entered = !trainerSchemas.isEmpty();
     Icon icon = entered
-        ? const Icon(
-            Icons.done,
-            color: Colors.green,
-          )
-        : const Icon(
-            Icons.block,
-            color: Colors.red,
-          );
+        ? const Icon(Icons.done, color: Colors.green)
+        : const Icon(Icons.block, color: Colors.red);
 
     return icon;
   }
