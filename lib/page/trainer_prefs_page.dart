@@ -7,22 +7,21 @@ import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
-class TrainerSettingsPage extends StatefulWidget {
-  const TrainerSettingsPage({super.key});
+class TrainerPrefsPage extends StatefulWidget {
+  const TrainerPrefsPage({super.key});
 
   @override
-  State<TrainerSettingsPage> createState() => _TrainerSettingsPageState();
+  State<TrainerPrefsPage> createState() => _TrainerPrefsPageState();
 }
 
-class _TrainerSettingsPageState extends State<TrainerSettingsPage>
-    with AppMixin {
+class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
   List<Widget> _columnWidgets = [];
   final _textCtrl = TextEditingController();
   Widget? _fab;
 
-  _TrainerSettingsPageState() {
+  _TrainerPrefsPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
     AppEvents.onTrainerUpdatedEvent(_onTrainerUpdated);
     AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdated);

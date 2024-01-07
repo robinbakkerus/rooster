@@ -10,7 +10,7 @@ import 'package:rooster/page/ask_accesscode_page.dart';
 import 'package:rooster/page/help_page.dart';
 import 'package:rooster/page/schema_edit_page.dart';
 import 'package:rooster/page/splash_page.dart';
-import 'package:rooster/page/trainer_settings_page.dart';
+import 'package:rooster/page/trainer_prefs_page.dart';
 import 'package:rooster/page/view_all_schemas_page.dart';
 import 'package:flutter/material.dart';
 
@@ -63,7 +63,7 @@ class _StartPageState extends State<StartPage> {
           SplashPage(), //0
           AskAccessCodePage(), //1
           SchemaEditPage(), //2
-          TrainerSettingsPage(), //3
+          TrainerPrefsPage(), //3
           ViewAllSchemasPage(), //4
           HelpPage(), //5
           AdminPage(), //6
