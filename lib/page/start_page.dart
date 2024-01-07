@@ -58,14 +58,14 @@ class _StartPageState extends State<StartPage> {
       appBar: _showTabBar() ? _appBar() : null,
       body: IndexedStack(
         index: _getStackIndex(),
-        children: [
-          const SplashPage(), //0
-          const AskAccessCodePage(), //1
-          const SchemaEditPage(), //2
-          const TrainerSettingsPage(), //3
-          const ViewAllSchemasPage(), //4
+        children: const [
+          SplashPage(), //0
+          AskAccessCodePage(), //1
+          SchemaEditPage(), //2
+          TrainerSettingsPage(), //3
+          ViewAllSchemasPage(), //4
           HelpPage(), //5
-          const AdminPage(), //6
+          AdminPage(), //6
         ],
       ),
     );
@@ -179,10 +179,10 @@ class _StartPageState extends State<StartPage> {
             value: '4',
             child: Text("Spreadsheet & voortgang"),
           ),
-          const PopupMenuItem(
-            value: '5',
-            child: Text("Help pagina"),
-          ),
+          // const PopupMenuItem(
+          //   value: '5',
+          //   child: Text("Help pagina"),
+          // ),
           _adminPopup(),
         ];
       },

@@ -17,7 +17,6 @@ class SchemaEditPage extends StatefulWidget {
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<DaySchema> _daySchemaList = [];
-  List<DataRow> _dataRows = [];
 
   _SchemaEditPageState();
 
@@ -32,7 +31,6 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     if (mounted) {
       setState(() {
         _daySchemaList = AppData.instance.getNewSchemas();
-        _dataRows = _buildDataRows();
       });
     }
 
@@ -45,7 +43,6 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     if (mounted) {
       setState(() {
         _daySchemaList = AppData.instance.getNewSchemas();
-        _dataRows = _buildDataRows();
       });
     }
   }
@@ -70,9 +67,9 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
               MaterialStateColor.resolveWith((states) => c.lightblue),
           columnSpacing: colSpace,
           dataRowMinHeight: 25,
-          dataRowMaxHeight: 50,
+          dataRowMaxHeight: 40,
           columns: _buildHeader(),
-          rows: _dataRows,
+          rows: _buildDataRows(),
         ),
       ),
     );
