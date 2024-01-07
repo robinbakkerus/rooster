@@ -17,7 +17,6 @@ class TrainerPrefsPage extends StatefulWidget {
 class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
-  List<Widget> _columnWidgets = [];
   final _textCtrl = TextEditingController();
   Widget? _fab;
 
@@ -31,7 +30,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   void initState() {
     _trainer = AppData.instance.getTrainer();
     _updateTrainer = _trainer.copyWith();
-    _columnWidgets = _buildColumnWidgets();
     _fab = _getFab();
     super.initState();
   }
@@ -43,7 +41,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _columnWidgets,
+        children: _buildColumnWidgets(),
       ),
       floatingActionButton: _fab,
     );
@@ -72,15 +70,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     list.add(_readOnlyRow('Naam', 'fullname'));
     list.add(_readOnlyRow('Rollen', 'roles'));
     list.add(_emailRow());
-    list.add(Padding(
-      padding: const EdgeInsets.fromLTRB(20, 1, 20, 1),
-      child: Container(
-        height: 1,
-        color: Colors.grey,
-      ),
+    list.add(const Divider(
+      height: 10,
     ));
 
-    list.add(wh.verSpace(10));
     return list;
   }
 
@@ -91,14 +84,16 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w15,
+            width: c.w1,
             child: Text(label),
           ),
+          wh.horSpace(10),
           SizedBox(
               width: c.w25 * 2,
               child: Text(
                 _getStringValue(mapElem),
                 overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.grey),
               )),
         ],
       ),
@@ -115,8 +110,9 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
             width: c.w1,
             child: const Text('email'),
           ),
+          wh.horSpace(10),
           SizedBox(
-            width: c.w25 * 3,
+            width: c.w25 * 2,
             child: TextField(
               controller: _textCtrl,
               textCapitalization: TextCapitalization.characters,
@@ -269,7 +265,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = _trainer.copyWith();
-        _columnWidgets = _buildColumnWidgets();
         _textCtrl.text = _trainer.email;
         _fab = _getFab();
       });
@@ -281,7 +276,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = event.trainer;
-        _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
       });
     }
@@ -294,7 +288,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         Map<String, dynamic> map = _updateTrainer.toMap();
         map[event.paramName] = event.newValue;
         _updateTrainer = Trainer.fromMap(map);
-        _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
       });
     }
