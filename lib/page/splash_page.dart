@@ -41,7 +41,7 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
               color: Colors.orange),
           child: AnimatedTextKit(
             animatedTexts: [
-              ScaleAnimatedText('LO'),
+              FadeAnimatedText('LO'),
             ],
           ),
         ),
@@ -53,7 +53,7 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
               color: Colors.lightBlue),
           child: AnimatedTextKit(
             animatedTexts: [
-              ScaleAnimatedText('NU'),
+              FadeAnimatedText('NU'),
             ],
           ),
         ),
