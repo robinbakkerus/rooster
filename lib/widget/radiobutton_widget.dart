@@ -62,7 +62,7 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
     setState(() {
       if (widget.daySchema != null) {
         AppData.instance.updateAvailability(widget.daySchema!, widget.rbValue);
-        AppEvents.fireTrainerUpdated(AppData.instance.getTrainer());
+        AppEvents.fireSchemaUpdated();
       } else {
         if (widget.paramName.isNotEmpty) {
           AppEvents.fireTrainerPrefUpdated(widget.paramName, widget.rbValue);
