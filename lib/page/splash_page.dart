@@ -1,10 +1,11 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
-  final String version = '1.5';
+  final String version = '1.6';
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -21,27 +22,42 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text('LO',
-                    style: TextStyle(
-                        fontSize: 100,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange)),
-                Text('NU',
-                    style: TextStyle(
-                        fontSize: 100,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.lightBlue)),
-              ],
-            ),
+            _animatedText(),
             wh.verSpace(20),
             Text('Trainingschema ${widget.version}'),
           ]),
     ));
+  }
+
+  Widget _animatedText() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        DefaultTextStyle(
+          style: const TextStyle(
+              fontSize: 120.0,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold,
+              color: Colors.orange),
+          child: AnimatedTextKit(
+            animatedTexts: [
+              ScaleAnimatedText('LO'),
+            ],
+          ),
+        ),
+        DefaultTextStyle(
+          style: const TextStyle(
+              fontSize: 120.0,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold,
+              color: Colors.lightBlue),
+          child: AnimatedTextKit(
+            animatedTexts: [
+              ScaleAnimatedText('NU'),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
