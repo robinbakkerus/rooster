@@ -135,7 +135,13 @@ class AppData {
     }
   }
 
-  ///--- update the avavailability in the oldSchemas list
+  void updateTrainerPref(String paramName, int newValue) {
+    Map<String, dynamic> map = _trainerData.trainer.toMap();
+    map[paramName] = newValue;
+    _trainerData.trainer = Trainer.fromMap(map);
+  }
+
+  ///-----------------------------------
   bool isSchemaDirty() {
     for (int i = 0; i < getOldSchemas().length; i++) {
       DaySchema oldS = getOldSchemas()[i];

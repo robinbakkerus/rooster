@@ -5,6 +5,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/widget/radiobutton_widget.dart';
 
 class SchemaEditPage extends StatefulWidget {
   const SchemaEditPage({super.key});
@@ -57,18 +58,21 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   Widget _buildGrid() {
     double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
     return Scrollbar(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowHeight: 30,
-          horizontalMargin: 10,
-          headingRowColor:
-              MaterialStateColor.resolveWith((states) => c.lightblue),
-          columnSpacing: colSpace,
-          dataRowMinHeight: 25,
-          dataRowMaxHeight: 40,
-          columns: _buildHeader(),
-          rows: _buildDataRows(),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 30,
+            horizontalMargin: 10,
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 25,
+            dataRowMaxHeight: 40,
+            columns: _buildHeader(),
+            rows: _buildDataRows(),
+          ),
         ),
       ),
     );
@@ -76,22 +80,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   //-------------------------
   List<DataColumn> _buildHeader() {
-    List<DataColumn> result = [];
-
-    var headerLabels = ['Dag', 'Ja', 'Nee', 'Als nodig'];
-    var colors = [Colors.black, Colors.green, Colors.red, Colors.brown];
-
-    for (int i = 0; i < headerLabels.length; i++) {
-      result.add(DataColumn(
-          label: Center(
-        child: Text(headerLabels[i],
-            style: TextStyle(
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-                color: colors[i])),
-      )));
-    }
-    return result;
+    return wh.buildYesNoIfNeededHeader();
   }
 
   List<DataRow> _buildDataRows() {
@@ -99,27 +88,11 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
     for (DaySchema daySchema in _daySchemaList) {
       result.add(DataRow(
-          cells: _buildDataCells(daySchema), color: _getRowColor(daySchema)));
+          cells: _buildDataCells(daySchema),
+          color: wh.getDaySchemaRowColor(daySchema)));
     }
 
     return result;
-  }
-
-  MaterialStateColor _getRowColor(DaySchema daySchema) {
-    MaterialStateColor col =
-        MaterialStateColor.resolveWith((states) => Colors.white);
-
-    DateTime date = DateTime(daySchema.year, daySchema.month, daySchema.day);
-
-    if (date.weekday == DateTime.tuesday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightGeen);
-    } else if (date.weekday == DateTime.thursday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightOrange);
-    } else if (date.weekday == DateTime.saturday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightBrown);
-    }
-
-    return col;
   }
 
   List<DataCell> _buildDataCells(DaySchema daySchema) {
@@ -186,54 +159,6 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
 ///----------------------------------------------------------------
 ///
-
-class RadioButtonWidget extends StatefulWidget {
-  final DaySchema daySchema;
-  final int rbValue;
-  final Color color;
-
-  const RadioButtonWidget({
-    required Key key,
-    required this.daySchema,
-    required this.rbValue,
-    required this.color,
-  }) : super(key: key);
-
-  @override
-  State<RadioButtonWidget> createState() => _RadioButtonWidgetState();
-}
-
-///------------------------------------------------
-
-class _RadioButtonWidgetState extends State<RadioButtonWidget> {
-  int? selectedOption = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return _radioButton();
-  }
-
-  Widget _radioButton() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-        child: Radio<int>(
-          activeColor: widget.color,
-          value: widget.daySchema.available,
-          groupValue: widget.rbValue,
-          onChanged: (val) => onChangeValue(val),
-        ),
-      ),
-    );
-  }
-
-  void onChangeValue(int? value) {
-    setState(() {
-      AppData.instance.updateAvailability(widget.daySchema, widget.rbValue);
-      AppEvents.fireSchemaUpdated();
-    });
-  }
-}
 
 final double w1 = 0.1 * AppData.instance.screenWidth;
 final double w15 = 0.15 * AppData.instance.screenWidth;

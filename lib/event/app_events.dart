@@ -52,6 +52,16 @@ class SpreadsheetTrainerUpdatedEvent {
   SpreadsheetTrainerUpdatedEvent(this.rowIndex, this.colIndex, this.text);
 }
 
+class TrainerPrefUpdatedEvent {
+  final String paramName;
+  final int newValue;
+
+  TrainerPrefUpdatedEvent(
+    this.paramName,
+    this.newValue,
+  );
+}
+
 /*
 	Static class that contains all onXxx and fireXxx methods.
 */
@@ -89,6 +99,9 @@ class AppEvents {
           int rowIndex, int colIndex, String text) =>
       _sEventBus.fire(SpreadsheetTrainerUpdatedEvent(rowIndex, colIndex, text));
 
+  static void fireTrainerPrefUpdated(String paramName, int newValue) =>
+      _sEventBus.fire(TrainerPrefUpdatedEvent(paramName, newValue));
+
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
@@ -120,6 +133,9 @@ class AppEvents {
       _sEventBus
           .on<SpreadsheetTrainerUpdatedEvent>()
           .listen((event) => func(event));
+
+  static void onTrainerPrefUpdatedEvent(OnTrainerPrefUpdatedEventFunc func) =>
+      _sEventBus.on<TrainerPrefUpdatedEvent>().listen((event) => func(event));
 }
 
 /// ----- typedef's -----------
@@ -140,6 +156,8 @@ typedef OnDatesReadyEventFunc = void Function(DatesReadyEvent event);
 typedef OnTrainingUpdatedEventFunc = void Function(TrainingUpdatedEvent event);
 
 typedef OnExtraDayUpdatedEventFunc = void Function(ExtraDayUpdatedEvent event);
-
 typedef OnSpreadsheetTrainerUpdatedEventFunc = void Function(
     SpreadsheetTrainerUpdatedEvent event);
+
+typedef OnTrainerPrefUpdatedEventFunc = void Function(
+    TrainerPrefUpdatedEvent event);

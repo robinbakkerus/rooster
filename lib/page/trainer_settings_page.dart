@@ -2,8 +2,10 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/widget/radiobutton_widget.dart';
 
 class TrainerSettingsPage extends StatefulWidget {
   const TrainerSettingsPage({super.key});
@@ -23,6 +25,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
   _TrainerSettingsPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
     AppEvents.onTrainerUpdatedEvent(_onTrainerUpdated);
+    AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdated);
   }
 
   @override
@@ -39,14 +42,9 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
     // Build a Form widget using the _formKey created above.
     return Scaffold(
       body: Column(
-        children: [
-          SizedBox(
-            height: AppData.instance.screenHeight - 200,
-            child: Column(
-              children: _columnWidgets,
-            ),
-          ),
-        ],
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _columnWidgets,
       ),
       floatingActionButton: _fab,
     );
@@ -56,9 +54,16 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
     List<Widget> list = [];
 
     list.addAll(_readOnlyValues());
-    list.addAll(_voorkeurDagen());
-    list.add(wh.verSpace(10));
-    list.addAll(_voorkeurGroep());
+    list.add(const Padding(
+      padding: EdgeInsets.only(left: 20, top: 10),
+      child: Text('Voorkeur dagen'),
+    ));
+    list.add(_buildGrid1());
+    list.add(const Padding(
+      padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+      child: Text('Voorkeur groepen'),
+    ));
+    list.add(_buildGrid2());
     return list;
   }
 
@@ -75,15 +80,7 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
         color: Colors.grey,
       ),
     ));
-    list.add(const Padding(
-      padding: EdgeInsets.fromLTRB(20, 1, 20, 1),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text('Voorkeurinstellingen : '),
-        ],
-      ),
-    ));
+
     list.add(wh.verSpace(10));
     return list;
   }
@@ -134,10 +131,6 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
                   _fab = _getFab();
                 });
               },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'email',
-              ),
             ),
           ),
         ],
@@ -150,51 +143,99 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
     return map[mapElem];
   }
 
-  List<Widget> _voorkeurDagen() {
-    List<Widget> list = [];
-    list.add(_voorkeurTopRow('Dag')!);
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'dinsdag',
-    ));
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'donderdag',
-    ));
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'zaterdag',
-    ));
-    return list;
+  ///------------------------------------------------
+  Widget _buildGrid1() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 30,
+            horizontalMargin: 10,
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 25,
+            dataRowMaxHeight: 40,
+            columns: _buildHeader(),
+            rows: _buildDataRows1(),
+          ),
+        ),
+      ),
+    );
   }
 
-  List<Widget> _voorkeurGroep() {
-    List<Widget> list = [];
-    list.add(_voorkeurTopRow('Groep')!);
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'pr',
-    ));
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'r1',
-    ));
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'r2',
-    ));
-    list.add(VoorkeurWidget(
-      key: UniqueKey(),
-      trainer: _updateTrainer,
-      mapName: 'r3',
-    ));
-    return list;
+  ///------------------------------------------------
+  Widget _buildGrid2() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 30,
+            horizontalMargin: 10,
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 25,
+            dataRowMaxHeight: 40,
+            columns: _buildHeader(),
+            rows: _buildDataRows2(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //-------------------------
+  List<DataColumn> _buildHeader() {
+    return wh.buildYesNoIfNeededHeader();
+  }
+
+  List<DataRow> _buildDataRows1() {
+    List<DataRow> result = [];
+
+    var days = ['dinsdag', 'donderdag', 'zaterdag'];
+
+    for (String dag in days) {
+      result.add(DataRow(cells: _buildDataCells1(dag)));
+    }
+
+    return result;
+  }
+
+  List<DataRow> _buildDataRows2() {
+    List<DataRow> result = [];
+
+    for (Groep groep in Groep.values) {
+      result.add(DataRow(cells: _buildDataCells1(groep.name)));
+    }
+
+    return result;
+  }
+
+  List<DataCell> _buildDataCells1(String paramName) {
+    List<DataCell> result = [];
+
+    result.add(DataCell(Text(paramName)));
+    result.add(_buildRadioButtonDataCell(paramName, 1, Colors.green));
+    result.add(_buildRadioButtonDataCell(paramName, 0, Colors.red));
+    result.add(_buildRadioButtonDataCell(paramName, 2, Colors.brown));
+
+    return result;
+  }
+
+  DataCell _buildRadioButtonDataCell(String paramName, int value, Color color) {
+    return DataCell(RadioButtonWidget(
+        key: UniqueKey(),
+        paramName: paramName,
+        trainer: _updateTrainer,
+        rbValue: value,
+        color: color));
   }
 
   Widget? _getFab() {
@@ -224,31 +265,6 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
     });
   }
 
-  Widget? _voorkeurTopRow(String label) {
-    return Row(
-      children: [
-        _topRowBox(c.w2, 'Dag', Colors.blue),
-        _topRowBox(c.w15, 'Ja', Colors.green),
-        _topRowBox(c.w15, 'Nee', Colors.red),
-        _topRowBox(c.w25, 'Als nodig', Colors.lightBlueAccent),
-      ],
-    );
-  }
-
-  Widget _topRowBox(double width, String title, Color color) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 1, 4, 1),
-      child: Container(
-        width: width,
-        color: color,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 1, 4, 1),
-          child: Text(title),
-        ),
-      ),
-    );
-  }
-
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
@@ -266,6 +282,19 @@ class _TrainerSettingsPageState extends State<TrainerSettingsPage>
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = event.trainer;
+        _columnWidgets = _buildColumnWidgets();
+        _fab = _getFab();
+      });
+    }
+  }
+
+  void _onTrainerPrefUpdated(TrainerPrefUpdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        _trainer = AppData.instance.getTrainer();
+        Map<String, dynamic> map = _updateTrainer.toMap();
+        map[event.paramName] = event.newValue;
+        _updateTrainer = Trainer.fromMap(map);
         _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
       });

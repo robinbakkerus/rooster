@@ -1,8 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:rooster/util/app_helper.dart';
 
 //------------------ enum ----------------------
@@ -216,10 +214,6 @@ class Trainer {
   bool isAdmin() {
     return roles.contains(RegExp('A'));
   }
-
-  String toJson() => json.encode(toMap());
-  factory Trainer.fromJson(String source) =>
-      Trainer.fromMap(json.decode(source));
 }
 
 //----------- DaySchema -------------
@@ -269,9 +263,6 @@ class DaySchema {
     );
   }
 
-  String toJson() => json.encode(toMap());
-  factory DaySchema.fromJson(String source) =>
-      DaySchema.fromMap(json.decode(source));
   @override
   String toString() {
     return 'DS(y: $year, m: $month, d: $day, avail: $available)';

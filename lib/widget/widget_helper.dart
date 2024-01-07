@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
 
 class WidgetHelper {
   WidgetHelper._();
   static final WidgetHelper instance = WidgetHelper._();
 
+  final AppConstants c = AppConstants();
+
   final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
+  ///--------------------------------------
   Widget horSpace(double h) {
     return SizedBox(
       width: h,
@@ -18,6 +23,7 @@ class WidgetHelper {
     );
   }
 
+  ///-------------------------------
   void showSnackbar(String msg,
       {Color color = Colors.lightBlue, int seconds = 3}) {
     SnackBar snackBar = SnackBar(
@@ -26,5 +32,43 @@ class WidgetHelper {
         duration: Duration(seconds: seconds));
 
     scaffoldKey.currentState?.showSnackBar(snackBar);
+  }
+
+  ///--------------------------------------
+  List<DataColumn> buildYesNoIfNeededHeader() {
+    List<DataColumn> result = [];
+
+    var headerLabels = ['Dag', 'Ja', 'Nee', 'Als nodig'];
+    var colors = [Colors.black, Colors.green, Colors.red, Colors.brown];
+
+    for (int i = 0; i < headerLabels.length; i++) {
+      result.add(DataColumn(
+          label: Center(
+        child: Text(headerLabels[i],
+            style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                color: colors[i])),
+      )));
+    }
+    return result;
+  }
+
+  ///-----------------------------
+  MaterialStateColor getDaySchemaRowColor(DaySchema daySchema) {
+    MaterialStateColor col =
+        MaterialStateColor.resolveWith((states) => Colors.white);
+
+    DateTime date = DateTime(daySchema.year, daySchema.month, daySchema.day);
+
+    if (date.weekday == DateTime.tuesday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightGeen);
+    } else if (date.weekday == DateTime.thursday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightOrange);
+    } else if (date.weekday == DateTime.saturday) {
+      col = MaterialStateColor.resolveWith((states) => c.lightBrown);
+    }
+
+    return col;
   }
 }
