@@ -36,6 +36,7 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     _checkCookie();
+    AppController.instance.getZamoTrainers();
     _getTrainerDataIfNeeded();
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
@@ -197,6 +198,7 @@ class _StartPageState extends State<StartPage> {
       );
     } else {
       return const PopupMenuItem(
+        height: 1,
         value: '0',
         child: Text(""),
       );

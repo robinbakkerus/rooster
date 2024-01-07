@@ -62,35 +62,33 @@ class AppHelper with AppMixin {
 
   ///----------------------------------------
   /// build list of DaySchema's from single TrainerSchemas object
-  List<DaySchema> buildFromTrainerSchemas(TrainerSchema trainerSchemas) {
-    if (trainerSchemas.isEmpty()) {
+  List<DaySchema> buildFromTrainerSchemas(TrainerSchema trainerSchema) {
+    if (trainerSchema.isEmpty()) {
       return [];
     }
 
     List<DaySchema> daySchemaList = [];
-    String id = trainerSchemas.id;
+    String id = trainerSchema.id;
     int year = _getYearFromSchemaId(id);
     int month = _getMonthFromSchemaId(id);
 
-    Map<dynamic, dynamic> map = trainerSchemas.toMap();
+    Map<dynamic, dynamic> map = trainerSchema.toMap();
 
     int tueOcc = 1;
     int thuOcc = 1;
     int satOcc = 1;
 
     for (DateTime dt in AppData.instance.getActiveDates()) {
-      if (dt.weekday == DateTime.tuesday &&
-          AppData.instance.getTrainer().dinsdag > 0) {
+      if (dt.weekday == DateTime.tuesday) {
         String mapName = 'din$tueOcc';
         _handleThisDay(map, mapName, year, month, dt, daySchemaList);
         tueOcc++;
-      } else if (dt.weekday == DateTime.thursday &&
-          AppData.instance.getTrainer().donderdag > 0) {
+      } else if (dt.weekday == DateTime.thursday) {
         String mapName = 'don$thuOcc';
         _handleThisDay(map, mapName, year, month, dt, daySchemaList);
         thuOcc++;
       } else if (dt.weekday == DateTime.saturday &&
-          AppData.instance.getTrainer().zaterdag > 0) {
+          AppData.instance.isZamoTrainer(trainerSchema.trainerPk)) {
         String mapName = 'zat$satOcc';
         _handleThisDay(map, mapName, year, month, dt, daySchemaList);
         satOcc++;

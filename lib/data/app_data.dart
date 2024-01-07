@@ -26,6 +26,7 @@ class AppData {
   DateTime lastActiveDate = DateTime(2024, 1, 1);
   DateTime lastMonth = DateTime(2024, 1, 1);
   int stackIndex = 0;
+  List<String> zamoTrainers = [];
 
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
@@ -144,6 +145,10 @@ class AppData {
       }
     }
     return false;
+  }
+
+  bool isZamoTrainer(String trainerPk) {
+    return zamoTrainers.contains(trainerPk);
   }
 
   List<String> maanden = [

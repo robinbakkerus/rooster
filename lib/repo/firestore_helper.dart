@@ -129,6 +129,30 @@ class FirestoreHelper with AppMixin {
     return result;
   }
 
+  ///--------------------------------------------
+
+  Future<List<String>> getZamoTrainers() async {
+    List<String> result = [];
+
+    if (!AppData.instance.simulate) {
+      CollectionReference zamoRef = firestore.collection('metadata');
+      await zamoRef.doc('zamo_trainers').get().then(
+        (val) {
+          Map<String, dynamic> map = val.data() as Map<String, dynamic>;
+          return map['trainers'];
+        },
+        onError: (e) => lp("Error completing getZamoTrainers: $e"),
+      ).catchError((e) {
+        lp('Error in getZamoTrainers : $e');
+        throw e;
+      });
+    } else {
+      return ['HC', 'PG', 'RV'];
+    }
+
+    return result;
+  }
+
   ///--------------------------
   Future<LastRosterFinal> saveLastRosterFinal() async {
     LastRosterFinal lrf = LastRosterFinal(

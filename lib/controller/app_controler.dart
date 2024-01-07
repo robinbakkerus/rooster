@@ -50,6 +50,13 @@ class AppController {
     AppEvents.fireTrainerDataReady();
   }
 
+  // get Zamo trainers
+  Future<void> getZamoTrainers() async {
+    List<String> zamoTrainers =
+        await FirestoreHelper.instance.getZamoTrainers();
+    AppData.instance.zamoTrainers = zamoTrainers;
+  }
+
   /// get TrainerData for all trainers
   Future<List<TrainerData>> _getAllTrainerData() async {
     List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();

@@ -1,7 +1,6 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-// import 'package:rooster/page/start_page.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
