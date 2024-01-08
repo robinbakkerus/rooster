@@ -250,9 +250,27 @@ class SpreadsheetGenerator {
   void _applyWeights(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
     if (!_isSaturday(rowNr) && !_isThursdayPR(rowNr, groepNr)) {
+      _applyOnlyIfNeeded(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
       _applyDaysNotAvailable(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
       _applyAlreadyScheduled(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
     }
+  }
+
+  // if trainer is not available future days its score goes up
+  void _applyOnlyIfNeeded(List<TrainerWeight> trainerWeightList,
+      {required int rowNr, required int groepNr}) {
+    for (TrainerWeight tw in trainerWeightList) {
+      Trainer trainer = tw.trainer;
+      if (_isOnlyIfNeeded(trainer, groepNr)) {
+        tw.weight += AppData.instance.applyWeightValues.onlyIfNeeded;
+      }
+    }
+  }
+
+  bool _isOnlyIfNeeded(Trainer trainer, int groepNr) {
+    Map<String, dynamic> map = trainer.toMap();
+    int value = map[Groep.values[groepNr].name];
+    return value == 2;
   }
 
   // if trainer is not available future days its score goes up
@@ -274,8 +292,9 @@ class SpreadsheetGenerator {
       {required int rowNr, required int groepNr}) {
     for (TrainerWeight tw in trainerWeightList) {
       Trainer trainer = tw.trainer;
-      tw.weight = _getWeightForAlreadyScheduledDays(trainer,
+      double applyWeight = _getApplyWeightForAlreadyScheduledDays(trainer,
           rowNr: rowNr, groepNr: groepNr);
+      tw.weight += applyWeight;
     }
   }
 
@@ -312,13 +331,13 @@ class SpreadsheetGenerator {
   }
 
   // hoe vaak afwezig vanaf dateTime
-  double _getWeightForAlreadyScheduledDays(Trainer trainer,
+  double _getApplyWeightForAlreadyScheduledDays(Trainer trainer,
       {required int rowNr, required int groepNr}) {
     double result = 0.0;
 
     int countDays = 1;
     List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
-    for (int i = rowNr; i >= 0; i--) {
+    for (int i = rowNr - 1; i >= 0; i--) {
       for (RowCell rowCell in _spreadSheet.rows[i].rowCells) {
         Trainer schedTrainer = rowCell.getTrainer();
         if (schedTrainer == trainer) {

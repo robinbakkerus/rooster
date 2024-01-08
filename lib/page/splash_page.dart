@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
-  final String version = '1.7';
+  final String version = '1.1';
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -41,7 +41,8 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
               color: Colors.orange),
           child: AnimatedTextKit(
             animatedTexts: [
-              FadeAnimatedText('LO'),
+              ScaleAnimatedText('LO',
+                  duration: const Duration(milliseconds: 3000)),
             ],
           ),
         ),
@@ -53,7 +54,8 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
               color: Colors.lightBlue),
           child: AnimatedTextKit(
             animatedTexts: [
-              FadeAnimatedText('NU'),
+              ScaleAnimatedText('NU',
+                  duration: const Duration(milliseconds: 3000)),
             ],
           ),
         ),
