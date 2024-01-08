@@ -84,7 +84,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w1,
+            width: c.w15,
             child: Text(label),
           ),
           wh.horSpace(10),
@@ -112,7 +112,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
           ),
           wh.horSpace(10),
           SizedBox(
-            width: c.w25 * 2,
+            width: c.w25 * 3,
             child: TextField(
               controller: _textCtrl,
               textCapitalization: TextCapitalization.characters,
