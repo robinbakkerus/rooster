@@ -40,15 +40,13 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
       value = _getValueFromParamName(widget.trainer!);
     }
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-        child: Radio<int>(
-          activeColor: widget.color,
-          value: value,
-          groupValue: widget.rbValue,
-          onChanged: (val) => onChangeValue(val),
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+      child: Radio<int>(
+        activeColor: widget.color,
+        value: value,
+        groupValue: widget.rbValue,
+        onChanged: (val) => onChangeValue(val),
       ),
     );
   }

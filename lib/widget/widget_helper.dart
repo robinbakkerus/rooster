@@ -43,7 +43,8 @@ class WidgetHelper {
 
     for (int i = 0; i < headerLabels.length; i++) {
       result.add(DataColumn(
-          label: Center(
+          label: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
         child: Text(headerLabels[i],
             style: TextStyle(
                 fontStyle: FontStyle.italic,
