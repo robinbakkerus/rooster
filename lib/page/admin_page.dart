@@ -32,7 +32,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               onPressed: _saveFsSpreadsheet,
               child: const Text('Firestore spreadsheet')),
           OutlinedButton(
-              onPressed: _deleteOldLogs, child: const Text('Delete old logs'))
+              onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
+          OutlinedButton(
+              onPressed: _addApplyWeightValues,
+              child: const Text('Add ApplyWeightValue(s)'))
         ],
       ),
     );
@@ -47,11 +50,11 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       // p.trainerHuib,
       // p.trainerJanneke,
       // p.trainerJeroen,
-      p.trainerMaria,
+      // p.trainerMaria,
       // p.trainerOlav,
       // p.trainerPauline,
       // p.trainerRonald,
-      // p.trainerCyriel
+      p.trainerCyriel
     ];
 
     for (Trainer trainer in trainers) {
@@ -75,15 +78,6 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _saveFsSpreadsheet() async {
-    // List<Available> availableList =
-    //     SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
-    // SpreadSheet spreadSheet = SpreadsheetGenerator.instance
-    //     .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
-    // spreadSheet.year = 2024;
-    // spreadSheet.month = 1;
-    // FsSpreadsheet fsSpreadsheet =
-    //     SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
-
     FsSpreadsheet fsSpreadsheet = FsSpreadsheet(
         year: 2024, month: 1, rows: _januariRows(), isFinal: true);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
@@ -97,6 +91,15 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         doc.reference.delete();
       }
     });
+  }
+
+  void _addApplyWeightValues() async {
+    ApplyWeightValues weightValues = p.getApplyWeightValues();
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference ref = firestore.collection('metadata');
+    await ref.doc('apply_weights').set(weightValues.toMap()).then((val) {
+      lp('weights added ');
+    }).onError((error, stackTrace) => lp(error.toString()));
   }
 
   List<FsSpreadsheetRow> _januariRows() {

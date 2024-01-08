@@ -57,6 +57,13 @@ class AppController {
     AppData.instance.zamoTrainers = zamoTrainers;
   }
 
+// get Zamo trainers
+  Future<void> getApplyWeightValues() async {
+    ApplyWeightValues applyWeightValues =
+        await FirestoreHelper.instance.getApplyWeightValues();
+    AppData.instance.applyWeightValues = applyWeightValues;
+  }
+
   /// get TrainerData for all trainers
   Future<List<TrainerData>> _getAllTrainerData() async {
     List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();

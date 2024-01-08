@@ -94,3 +94,18 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
   result = TrainerSchema.fromMap(map);
   return result;
 }
+
+// ApplyWeightValues
+ApplyWeightValues getApplyWeightValues() {
+  List<ApplyWeightStartValue> startValues = [];
+  startValues.add(ApplyWeightStartValue(trainerPk: '*', value: 100.0));
+  startValues.add(ApplyWeightStartValue(trainerPk: 'OB', value: 110.0));
+  startValues.add(ApplyWeightStartValue(trainerPk: 'FvH', value: 110.0));
+  startValues.add(ApplyWeightStartValue(trainerPk: 'RV', value: 110.0));
+  List<double> alreadyScheduled = [-10.0, -13.0, -12.0, -11.0];
+  ApplyWeightValues weightValues = ApplyWeightValues(
+      startValues: startValues,
+      onlyIfNeeded: -25,
+      alreadyScheduled: alreadyScheduled);
+  return weightValues;
+}

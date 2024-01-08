@@ -3,6 +3,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/simulator.dart';
 import 'package:rooster/util/app_mixin.dart';
+import 'package:rooster/data/populate_data.dart' as p;
 
 class FirestoreHelper with AppMixin {
   FirestoreHelper._();
@@ -121,9 +122,8 @@ class FirestoreHelper with AppMixin {
     await trainerRef.doc(trainer.pk).set(trainer.toMap()).then((val) {
       result = trainer;
       _handleSucces(LogAction.modifySettings);
-    }).catchError((e) {
-      lp('Error in createOrUpdateTrainer $e');
-      throw e;
+    }).onError((error, stackTrace) {
+      lp('Error in createOrUpdateTrainer $error');
     });
 
     return result;
@@ -151,6 +151,30 @@ class FirestoreHelper with AppMixin {
     }
 
     return result;
+  }
+
+  ///--------------------------------------------
+
+  Future<ApplyWeightValues> getApplyWeightValues() async {
+    ApplyWeightValues? result;
+
+    if (!AppData.instance.simulate) {
+      CollectionReference ref = firestore.collection('metadata');
+      await ref.doc('apply_weights').get().then(
+        (val) {
+          Map<String, dynamic> map = val.data() as Map<String, dynamic>;
+          result = ApplyWeightValues.fromMap(map);
+        },
+        onError: (e) => lp("Error getting weight_values: $e"),
+      ).catchError((e) {
+        lp('Error in getZamoTrainers : $e');
+        throw e;
+      });
+    } else {
+      result = p.getApplyWeightValues();
+    }
+
+    return result!;
   }
 
   ///--------------------------

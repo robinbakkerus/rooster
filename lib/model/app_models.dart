@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:flutter/foundation.dart';
+
 import 'package:rooster/util/app_helper.dart';
 
 //------------------ enum ----------------------
@@ -607,6 +608,92 @@ class Available {
   }
 }
 
+///-------- ApplyWeight
+
+class ApplyWeightValues {
+  List<ApplyWeightStartValue> startValues = [];
+  double onlyIfNeeded = -15;
+  // the first [0] value is the default value, the [1] value means 1 training day before etc
+  List<double> alreadyScheduled = [];
+
+  ApplyWeightValues({
+    required this.startValues,
+    required this.onlyIfNeeded,
+    required this.alreadyScheduled,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'startValues': startValues.map((x) => x.toMap()).toList(),
+      'onlyIfNeeded': onlyIfNeeded,
+      'alreadyScheduled': alreadyScheduled,
+    };
+  }
+
+  factory ApplyWeightValues.fromMap(Map<String, dynamic> map) {
+    return ApplyWeightValues(
+      startValues: List<ApplyWeightStartValue>.from(
+          map['startValues']?.map((x) => ApplyWeightStartValue.fromMap(x))),
+      onlyIfNeeded: map['onlyIfNeeded'],
+      alreadyScheduled: List<double>.from(map['alreadyScheduled']),
+    );
+  }
+
+  @override
+  String toString() =>
+      'ApplyWeightValues(startValues: $startValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ApplyWeightValues &&
+        listEquals(other.startValues, startValues) &&
+        other.onlyIfNeeded == onlyIfNeeded &&
+        listEquals(other.alreadyScheduled, alreadyScheduled);
+  }
+
+  @override
+  int get hashCode =>
+      startValues.hashCode ^ onlyIfNeeded.hashCode ^ alreadyScheduled.hashCode;
+}
+
+///------------ ApplyWeightStartValue
+class ApplyWeightStartValue {
+  final String trainerPk;
+  final double value;
+
+  ApplyWeightStartValue({
+    required this.trainerPk,
+    required this.value,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'trainerPk': trainerPk,
+      'value': value,
+    };
+  }
+
+  factory ApplyWeightStartValue.fromMap(Map<String, dynamic> map) {
+    return ApplyWeightStartValue(
+      trainerPk: map['trainerPk'],
+      value: map['value'],
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ApplyWeightStartValue &&
+        other.trainerPk == trainerPk &&
+        other.value == value;
+  }
+
+  @override
+  int get hashCode => trainerPk.hashCode ^ value.hashCode;
+}
+
 ///------- Spreadsheet
 
 class SpreadSheet {
@@ -735,7 +822,7 @@ class LastRosterFinal {
 
 class TrainerWeight {
   final Trainer trainer;
-  int weight = 50;
+  double weight = 100.0;
   TrainerWeight({
     required this.trainer,
     required this.weight,

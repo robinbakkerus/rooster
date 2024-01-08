@@ -27,6 +27,7 @@ class AppData {
   DateTime lastMonth = DateTime(2024, 1, 1);
   int stackIndex = 0;
   List<String> zamoTrainers = [];
+  late ApplyWeightValues applyWeightValues;
 
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;

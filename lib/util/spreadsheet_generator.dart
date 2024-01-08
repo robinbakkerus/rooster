@@ -165,16 +165,39 @@ class SpreadsheetGenerator {
     List<TrainerWeight> result = [];
 
     for (Trainer trainer in cnts.confirmed) {
-      result.add(TrainerWeight(trainer: trainer, weight: 100));
+      double weight = _getStartWeight(trainer);
+      result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
     for (Trainer trainer in cnts.ifNeeded) {
-      result.add(TrainerWeight(trainer: trainer, weight: 85));
+      double weight = _getStartWeight(trainer) +
+          AppData.instance.applyWeightValues.onlyIfNeeded;
+      result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
     for (Trainer trainer in cnts.notEnteredYet) {
-      result.add(TrainerWeight(trainer: trainer, weight: 100));
+      //todo should we make this optional
+      double weight = _getStartWeight(trainer);
+      result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
 
     return result;
+  }
+
+  double _getStartWeight(Trainer trainer) {
+    ApplyWeightStartValue? startVal = AppData
+        .instance.applyWeightValues.startValues
+        .firstWhereOrNull((e) => e.trainerPk == trainer.pk);
+    if (startVal != null) {
+      return startVal.value;
+    } else {
+      ApplyWeightStartValue? startVal = AppData
+          .instance.applyWeightValues.startValues
+          .firstWhereOrNull((e) => e.trainerPk == '*');
+      if (startVal != null) {
+        return startVal.value;
+      } else {
+        return 100.0; //we should never come here
+      }
+    }
   }
 
   Trainer _getTrainerFromPossibleList(List<TrainerWeight> possibleTrainers,
@@ -185,7 +208,7 @@ class SpreadsheetGenerator {
       return possibleTrainers.last.trainer;
     } else if (possibleTrainers.length > 1) {
       possibleTrainers.sort((a, b) => b.weight.compareTo(a.weight));
-      int weight = possibleTrainers.first.weight;
+      double weight = possibleTrainers.first.weight;
       List<TrainerWeight> sortedTrainers =
           possibleTrainers.where((e) => e.weight == weight).toList();
       if (sortedTrainers.length == 1) {
@@ -232,6 +255,7 @@ class SpreadsheetGenerator {
     }
   }
 
+  // if trainer is not available future days its score goes up
   void _applyDaysNotAvailable(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
     for (TrainerWeight tw in trainerWeightList) {
@@ -245,15 +269,13 @@ class SpreadsheetGenerator {
     }
   }
 
+// if trainer is already sceduled before its score goes down
   void _applyAlreadyScheduled(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
     for (TrainerWeight tw in trainerWeightList) {
       Trainer trainer = tw.trainer;
-      int scheduledCnt =
-          _countDaysAlreadyScheduled(trainer, rowNr: rowNr, groepNr: groepNr);
-      if (scheduledCnt > 0) {
-        tw.weight -= (scheduledCnt * 10);
-      }
+      tw.weight = _getWeightForAlreadyScheduledDays(trainer,
+          rowNr: rowNr, groepNr: groepNr);
     }
   }
 
@@ -290,19 +312,22 @@ class SpreadsheetGenerator {
   }
 
   // hoe vaak afwezig vanaf dateTime
-  int _countDaysAlreadyScheduled(Trainer trainer,
+  double _getWeightForAlreadyScheduledDays(Trainer trainer,
       {required int rowNr, required int groepNr}) {
-    int result = 0;
+    double result = 0.0;
 
-    for (SheetRow sheetRow in _spreadSheet.rows) {
-      if (sheetRow.rowIndex < rowNr) {
-        for (RowCell rowCell in sheetRow.rowCells) {
-          Trainer schedTrainer = rowCell.getTrainer();
-          if (schedTrainer == trainer) {
-            result++;
-          }
+    int countDays = 1;
+    List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
+    for (int i = rowNr; i >= 0; i--) {
+      for (RowCell rowCell in _spreadSheet.rows[i].rowCells) {
+        Trainer schedTrainer = rowCell.getTrainer();
+        if (schedTrainer == trainer) {
+          int idx = countDays > values.length - 1 ? 0 : countDays;
+          double w = values[idx];
+          result += w;
         }
       }
+      countDays++;
     }
 
     return result;
