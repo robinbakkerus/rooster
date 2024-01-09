@@ -153,7 +153,7 @@ class SpreadsheetGenerator {
     List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
-    if (!_isSaturday(rowNr) && !_isThursdayPR(rowNr, groepNr)) {
+    if (!_isThursdayPR(rowNr, groepNr)) {
       Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
           rowNr: rowNr, groepNr: groepNr);
       _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
@@ -360,11 +360,12 @@ class SpreadsheetGenerator {
   void _postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
-        sheetRow.trainingText = '';
+        sheetRow.trainingText = 'ZaMo';
+        String zamoTrainer = sheetRow.rowCells[Groep.zamo.index].text;
         for (int i = 0; i < Groep.values.length; i++) {
           sheetRow.rowCells[i].text = '';
         }
-        sheetRow.rowCells[Groep.zamo.index].text = 'Hu/Pa/Ro';
+        sheetRow.rowCells[Groep.zamo.index].text = zamoTrainer;
       } else {
         sheetRow.rowCells[Groep.zamo.index].setTrainer(Trainer.empty());
       }
