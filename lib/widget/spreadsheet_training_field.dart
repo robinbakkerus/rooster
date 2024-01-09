@@ -47,7 +47,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     Decoration? decoration =
         isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
-      onTap: isEditable() ? () => _dialogBuilder(context) : null,
+      onTap: isEditable()
+          ? () => _buildSupervisorDialog(context)
+          : () => _buildTrainerDialog(context),
       child: Container(
           decoration: decoration,
           child: Padding(
@@ -60,7 +62,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     );
   }
 
-  Future<void> _dialogBuilder(BuildContext context) {
+  Future<void> _buildSupervisorDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -103,6 +105,20 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
                     child: const Text("Close"))
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _buildTrainerDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(_textCtrl.text),
           ),
         );
       },
