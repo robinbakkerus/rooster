@@ -42,7 +42,7 @@ class _StartPageState extends State<StartPage> {
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
 
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 3), () {
       if (_accessCode.length == 4) {
         _findTrainer(_accessCode);
       } else {

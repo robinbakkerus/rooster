@@ -22,14 +22,14 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _animatedText(),
+            _animatedLonuText(),
             wh.verSpace(20),
-            Text('Trainingschema ${widget.version}'),
+            _animatedVersionText()
           ]),
     ));
   }
 
-  Widget _animatedText() {
+  Widget _animatedLonuText() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -60,6 +60,18 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _animatedVersionText() {
+    return DefaultTextStyle(
+      style: const TextStyle(fontSize: 12.0, color: Colors.black),
+      child: AnimatedTextKit(
+        animatedTexts: [
+          TyperAnimatedText('Trainingschema ${widget.version}',
+              speed: const Duration(milliseconds: 80)),
+        ],
+      ),
     );
   }
 }
