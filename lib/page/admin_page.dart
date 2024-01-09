@@ -35,7 +35,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
           OutlinedButton(
               onPressed: _addApplyWeightValues,
-              child: const Text('Add ApplyWeightValue(s)'))
+              child: const Text('Add ApplyWeightValue(s)')),
+          OutlinedButton(
+              onPressed: _addTrainingItems,
+              child: const Text('Add training items'))
         ],
       ),
     );
@@ -100,6 +103,16 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     CollectionReference ref = firestore.collection('metadata');
     await ref.doc('apply_weights').set(weightValues.toMap()).then((val) {
       lp('weights added ');
+    }).onError((error, stackTrace) => lp(error.toString()));
+  }
+
+  void _addTrainingItems() async {
+    List<String> items = p.getTrainerItems();
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference ref = firestore.collection('metadata');
+    var map = {'items': items};
+    await ref.doc('training_items').set(map).then((val) {
+      lp('training items added ');
     }).onError((error, stackTrace) => lp(error.toString()));
   }
 }

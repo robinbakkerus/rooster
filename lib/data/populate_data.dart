@@ -110,6 +110,23 @@ ApplyWeightValues getApplyWeightValues() {
   return weightValues;
 }
 
+// ApplyWeightValues
+List<String> getTrainerItems() {
+  return [
+    'Herstelduurloop',
+    'Duurloop D1',
+    'Tempo Duurloop D2',
+    'Climaxduurloop D1/D2',
+    'Fartlek',
+    'Interval korte afstand',
+    'Intervalduurloop D1/D2',
+    'Bosloop',
+    'Gulbergen',
+    'Pyramideloop'
+  ];
+}
+
+//---------------- spreadsheets
 FsSpreadsheet spreadSheetJanuari() {
   return FsSpreadsheet(
       year: 2024, month: 1, rows: _januariRows(), isFinal: true);

@@ -155,6 +155,30 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  Future<List<String>> getTrainingItems() async {
+    List<String> result = [];
+
+    if (!AppData.instance.simulate) {
+      CollectionReference ref = firestore.collection('metadata');
+      await ref.doc('training_items').get().then(
+        (val) {
+          Map<String, dynamic> map = val.data() as Map<String, dynamic>;
+          result = List<String>.from(map['items'] as List);
+        },
+        onError: (e) => lp("Error getting trainer_items: $e"),
+      ).catchError((e) {
+        lp('Error in getTrainerItems : $e');
+        throw e;
+      });
+    } else {
+      return p.getTrainerItems();
+    }
+
+    return result;
+  }
+
+  ///--------------------------------------------
+
   Future<ApplyWeightValues> getApplyWeightValues() async {
     ApplyWeightValues? result;
 

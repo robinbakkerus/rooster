@@ -110,19 +110,10 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   Widget _buildDropdown() {
-    var topVal = 'training...';
-    var trainingItems = [
-      topVal,
-      'rustige duurloop',
-      'duurloop herstel',
-      'pyramide loop',
-      'climax duurloop',
-      'interval kort',
-      'interval lang',
-      'bosloop',
-      'gulbergen',
-      'fartlek'
-    ];
+    String topVal = 'training...';
+    List<String> trainingItems = [topVal];
+    trainingItems.addAll(AppData.instance.trainerItems);
+
     return DropdownButton(
         value: topVal,
         items: trainingItems.map((String item) {

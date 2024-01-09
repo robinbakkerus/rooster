@@ -57,11 +57,18 @@ class AppController {
     AppData.instance.zamoTrainers = zamoTrainers;
   }
 
-// get Zamo trainers
+  // get Zamo trainers
   Future<void> getApplyWeightValues() async {
     ApplyWeightValues applyWeightValues =
         await FirestoreHelper.instance.getApplyWeightValues();
     AppData.instance.applyWeightValues = applyWeightValues;
+  }
+
+  // get trainer_items (to fill combobox)
+  Future<void> getTrainingItems() async {
+    List<String> trainerItems =
+        await FirestoreHelper.instance.getTrainingItems();
+    AppData.instance.trainerItems = trainerItems;
   }
 
   /// get TrainerData for all trainers
