@@ -1,3 +1,4 @@
+import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
 Trainer trainerRobin = Trainer(
@@ -74,24 +75,29 @@ TrainerSchema trainerSchemasRonald = _buildTrainerSchema(trainerRonald);
 
 TrainerSchema _buildTrainerSchema(Trainer trainer) {
   TrainerSchema result = TrainerSchema.empty();
+  AppData.instance.setActiveDate(DateTime.now());
+
   Map<String, dynamic> map = result.toMap();
   map['id'] = '${trainer.pk}_2024_1';
-
+  map['year'] = DateTime.now().year;
+  map['month'] = DateTime.now().month;
   map['trainerPk'] = trainer.pk;
-  for (int i = 1; i < 6; i++) {
-    String elem = 'din$i';
-    map[elem] = trainer.dinsdag;
-  }
-  for (int i = 1; i < 6; i++) {
-    String elem = 'don$i';
-    map[elem] = trainer.donderdag;
-  }
-  for (int i = 1; i < 6; i++) {
-    String elem = 'zat$i';
-    map[elem] = trainer.zaterdag;
-  }
 
   result = TrainerSchema.fromMap(map);
+
+  for (DateTime dateTime in AppData.instance.getActiveDates()) {
+    int avail = 0;
+    if (dateTime.weekday == DateTime.tuesday) {
+      avail = trainer.dinsdag;
+    } else if (dateTime.weekday == DateTime.thursday) {
+      avail = trainer.donderdag;
+    } else if (dateTime.weekday == DateTime.saturday) {
+      avail = trainer.zaterdag;
+    }
+
+    result.availableList.add(avail);
+  }
+
   return result;
 }
 

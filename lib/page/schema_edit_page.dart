@@ -16,7 +16,7 @@ class SchemaEditPage extends StatefulWidget {
 
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
-  List<DaySchema> _daySchemaList = [];
+  List<int> _availableList = [];
 
   _SchemaEditPageState();
 
@@ -30,7 +30,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
-        _daySchemaList = AppData.instance.getNewSchemas();
+        _availableList = AppData.instance.newAvailaibleList;
       });
     }
 
@@ -42,7 +42,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   void _onSchemaUpdated(SchemaUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        _daySchemaList = AppData.instance.getNewSchemas();
+        _availableList = AppData.instance.newAvailaibleList;
       });
     }
   }
@@ -86,37 +86,48 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   List<DataRow> _buildDataRows() {
     List<DataRow> result = [];
 
-    for (DaySchema daySchema in _daySchemaList) {
-      result.add(DataRow(
-          cells: _buildDataCells(daySchema),
-          color: wh.getDaySchemaRowColor(daySchema)));
+    for (int dateIndex = 0; dateIndex < _availableList.length; dateIndex++) {
+      DateTime date = AppData.instance.getActiveDates()[dateIndex];
+
+      bool addRow = date.weekday != DateTime.saturday ||
+          date.weekday == DateTime.saturday &&
+              AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk);
+
+      if (addRow) {
+        result.add(DataRow(
+            cells: _buildDataCells(dateIndex),
+            color: wh.getDaySchemaRowColor(dateIndex)));
+      }
     }
 
     return result;
   }
 
-  List<DataCell> _buildDataCells(DaySchema daySchema) {
+  List<DataCell> _buildDataCells(int dateIndex) {
     List<DataCell> result = [];
 
-    result.add(_buildDayDataCell(daySchema));
-    result.add(_buildRadioButtonDataCell(daySchema, 1, Colors.green));
-    result.add(_buildRadioButtonDataCell(daySchema, 0, Colors.red));
-    result.add(_buildRadioButtonDataCell(daySchema, 2, Colors.brown));
+    result.add(_buildDayDataCell(dateIndex));
+    result.add(_buildRadioButtonDataCell(dateIndex, 1, Colors.green));
+    result.add(_buildRadioButtonDataCell(dateIndex, 0, Colors.red));
+    result.add(_buildRadioButtonDataCell(dateIndex, 2, Colors.brown));
 
     return result;
   }
 
-  DataCell _buildDayDataCell(DaySchema daySchema) {
-    DateTime datetime =
-        DateTime(daySchema.year, daySchema.month, daySchema.day);
+  DataCell _buildDayDataCell(int dateIndex) {
+    DateTime datetime = AppData.instance.getActiveDates()[dateIndex];
     String label = AppHelper.instance.getSimpleDayString(datetime);
     return DataCell(Center(child: Text(label)));
   }
 
-  DataCell _buildRadioButtonDataCell(
-      DaySchema daySchema, int value, Color color) {
-    return DataCell(RadioButtonWidget(
-        key: UniqueKey(), daySchema: daySchema, rbValue: value, color: color));
+  DataCell _buildRadioButtonDataCell(int dateIndex, int value, Color color) {
+    int avail = _availableList[dateIndex];
+    return DataCell(RadioButtonWidget.forAvailability(
+        key: UniqueKey(),
+        dateIndex: dateIndex,
+        available: avail,
+        rbValue: value,
+        color: color));
   }
 
   Widget? _getFab() {

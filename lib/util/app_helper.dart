@@ -21,6 +21,16 @@ class AppHelper with AppMixin {
     return '$weekday $day';
   }
 
+  ///---------------------------------------
+  int getActiveDateIndex(DateTime dateTime) {
+    for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
+      if (dateTime == AppData.instance.getActiveDates()[i]) {
+        return i;
+      }
+    }
+    return -1; //this should not be possible
+  }
+
   ///----------------------------------------
   // return something like "din1", hence the first occurence
   String getDateStringForSpreadsheet(DateTime dateTime) {
@@ -61,98 +71,21 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------
-  /// build list of DaySchema's from single TrainerSchemas object
-  List<DaySchema> buildFromTrainerSchemas(TrainerSchema trainerSchema) {
-    if (trainerSchema.isEmpty()) {
-      return [];
-    }
-
-    List<DaySchema> daySchemaList = [];
-    String id = trainerSchema.id;
-    int year = _getYearFromSchemaId(id);
-    int month = _getMonthFromSchemaId(id);
-
-    Map<dynamic, dynamic> map = trainerSchema.toMap();
-
-    int tueOcc = 1;
-    int thuOcc = 1;
-    int satOcc = 1;
-
-    for (DateTime dt in AppData.instance.getActiveDates()) {
-      if (dt.weekday == DateTime.tuesday) {
-        String mapName = 'din$tueOcc';
-        _handleThisDay(map, mapName, year, month, dt, daySchemaList);
-        tueOcc++;
-      } else if (dt.weekday == DateTime.thursday) {
-        String mapName = 'don$thuOcc';
-        _handleThisDay(map, mapName, year, month, dt, daySchemaList);
-        thuOcc++;
-      } else if (dt.weekday == DateTime.saturday &&
-          AppData.instance.isZamoTrainer(trainerSchema.trainerPk)) {
-        String mapName = 'zat$satOcc';
-        _handleThisDay(map, mapName, year, month, dt, daySchemaList);
-        satOcc++;
-      }
-    }
-
-    return daySchemaList;
-  }
-
-  ///----------------------------------------
-  TrainerSchema buildFromDaySchemas(List<DaySchema> daySchemas) {
-    int tueOcc = 1;
-    int thuOcc = 1;
-    int satOcc = 1;
-
-    TrainerSchema schema = TrainerSchema.empty();
-    Map<String, dynamic> schemaMap = schema.toMap();
-
-    for (DaySchema daySchema in daySchemas) {
-      DateTime dt = DateTime(daySchema.year, daySchema.month, daySchema.day);
-      if (dt.weekday == DateTime.tuesday) {
-        String mapName = 'din$tueOcc';
-        tueOcc++;
-        schemaMap[mapName] = daySchema.available;
-      } else if (dt.weekday == DateTime.thursday) {
-        String mapName = 'don$thuOcc';
-        thuOcc++;
-        schemaMap[mapName] = daySchema.available;
-      } else if (dt.weekday == DateTime.saturday) {
-        String mapName = 'zat$satOcc';
-        satOcc++;
-        schemaMap[mapName] = daySchema.available;
-      } else {
-        lp('dit kan niet');
-      }
-    }
-
-    schemaMap['id'] =
-        AppHelper.instance.buildTrainerSchemaId(AppData.instance.getTrainer());
-    schemaMap['modified'] = DateTime.now();
-    TrainerSchema result = TrainerSchema.fromMap(schemaMap);
-    return result;
-  }
-
-  ///----------------------------------------
   TrainerSchema buildNewSchemaForTrainer(Trainer trainer) {
-    int din = trainer.dinsdag;
-    int don = trainer.donderdag;
-    int zat = trainer.zaterdag;
+    TrainerSchema result = TrainerSchema.ofTrainer(trainer: trainer);
 
-    Map<String, dynamic> map = {};
-    for (int i = 1; i < 6; i++) {
-      map['din$i'] = din;
-      map['don$i'] = don;
-      map['zat$i'] = zat;
+    for (DateTime dateTime in AppData.instance.getActiveDates()) {
+      int avail = 0;
+      if (dateTime.weekday == DateTime.tuesday) {
+        avail = trainer.dinsdag;
+      } else if (dateTime.weekday == DateTime.thursday) {
+        avail = trainer.donderdag;
+      } else if (dateTime.weekday == DateTime.saturday) {
+        avail = trainer.zaterdag;
+      }
+
+      result.availableList.add(avail);
     }
-
-    map['id'] = AppHelper.instance.buildTrainerSchemaId(trainer);
-    map['trainerPk'] = trainer.pk;
-    map['year'] = AppData.instance.getActiveYear();
-    map['month'] = AppData.instance.getActiveMonth();
-    map['created'] = DateTime.now();
-
-    TrainerSchema result = TrainerSchema.fromMap(map);
     return result;
   }
 
@@ -257,42 +190,8 @@ class AppHelper with AppMixin {
 
   /// -------- private methods --------------------------------
 
-  void _handleThisDay(Map<dynamic, dynamic> trainerSchemasMap, String mapName,
-      int year, int month, DateTime dt, List<DaySchema> daySchemaList) {
-    int available = trainerSchemasMap[mapName];
-
-    DaySchema daySchema = DaySchema(
-      year: year,
-      month: month,
-      day: dt.day,
-      available: available,
-    );
-
-    daySchemaList.add(daySchema);
-  }
-
   String _getShortWeekDay(DateTime dateTime) {
     String dag = dayAsString(dateTime);
     return dag.substring(0, 3);
-  }
-
-  int _getYearFromSchemaId(String trainerSchemaId) {
-    List<String> tokens = trainerSchemaId.split('_');
-    if (tokens.length < 2) {
-      lp("!! dit kan niet _getYearFromSchemaId $trainerSchemaId");
-      return 2024;
-    } else {
-      return int.parse(tokens[1]);
-    }
-  }
-
-  int _getMonthFromSchemaId(String trainerSchemaId) {
-    List<String> tokens = trainerSchemaId.split('_');
-    if (tokens.length < 3) {
-      lp("!! dit kan niet _getMonthFromSchemaId $trainerSchemaId");
-      return 1;
-    } else {
-      return int.parse(tokens[2]);
-    }
   }
 }

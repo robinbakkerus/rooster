@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rooster/model/app_models.dart';
+import 'package:rooster/data/app_data.dart';
 import 'package:rooster/util/app_constants.dart';
 
 class WidgetHelper {
@@ -56,11 +56,11 @@ class WidgetHelper {
   }
 
   ///-----------------------------
-  MaterialStateColor getDaySchemaRowColor(DaySchema daySchema) {
+  MaterialStateColor getDaySchemaRowColor(int dateIndex) {
     MaterialStateColor col =
         MaterialStateColor.resolveWith((states) => Colors.white);
 
-    DateTime date = DateTime(daySchema.year, daySchema.month, daySchema.day);
+    DateTime date = AppData.instance.getActiveDates()[dateIndex];
 
     if (date.weekday == DateTime.tuesday) {
       col = MaterialStateColor.resolveWith((states) => c.lightGeen);

@@ -87,37 +87,44 @@ class _AllEnteredSchemasState extends State<AllEnteredSchemas> with AppMixin {
   List<DataRow> _buildDataRows() {
     List<DataRow> result = [];
 
-    for (DaySchema daySchema in _selectedTrainerData.oldSchemas) {
-      result.add(DataRow(cells: _buildDataCells(daySchema)));
+    for (int dateIndex = 0;
+        dateIndex < AppData.instance.getActiveDates().length;
+        dateIndex++) {
+      result.add(DataRow(cells: _buildDataCells(dateIndex)));
     }
 
     return result;
   }
 
-  List<DataCell> _buildDataCells(DaySchema daySchema) {
+  List<DataCell> _buildDataCells(int dateIndex) {
     List<DataCell> result = [];
 
-    result.add(_buildDateDataCell(daySchema));
-    result.add(_buildAvailableDataCell(daySchema));
+    result.add(_buildDateDataCell(dateIndex));
+    result.add(_buildAvailableDataCell(dateIndex));
 
     return result;
   }
 
-  DataCell _buildDateDataCell(DaySchema daySchema) {
-    DateTime dt = DateTime(daySchema.year, daySchema.month, daySchema.day);
-    String label = AppHelper.instance.getSimpleDayString(dt);
+  DataCell _buildDateDataCell(int dateIndex) {
+    DateTime dateTime = AppData.instance.getActiveDates()[dateIndex];
+    String label = AppHelper.instance.getSimpleDayString(dateTime);
     return DataCell(Text(label));
   }
 
-  DataCell _buildAvailableDataCell(DaySchema daySchema) {
+  DataCell _buildAvailableDataCell(int dateIndex) {
     Icon icon = const Icon(Icons.done, color: Colors.green);
 
-    if (daySchema.available == 0) {
+    int avail = AppData.instance
+        .getTrainerData()
+        .trainerSchemas
+        .availableList[dateIndex];
+    if (avail == 0) {
       icon = const Icon(Icons.block, color: Colors.red);
-    } else if (daySchema.available == 2) {
+    } else if (avail == 2) {
       icon = const Icon(
         Icons.change_history,
         color: Colors.brown,
+        // weight: 5,
       );
     }
 

@@ -4,21 +4,53 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 
 class RadioButtonWidget extends StatefulWidget {
-  final DaySchema? daySchema;
   final Trainer? trainer;
   final String paramName;
+  final int dateIndex;
+  final int available;
   final int rbValue;
   final Color color;
 
+  // you have to provide eithe dateIndex && value or trainer && paramName
   const RadioButtonWidget({
     required Key key,
     required this.rbValue,
     required this.color,
-    this.daySchema,
-    this.trainer,
+    this.dateIndex = -1,
+    this.available = 0,
     this.paramName = '',
+    this.trainer,
   }) : super(key: key);
 
+  factory RadioButtonWidget.forAvailability({
+    required Key key,
+    required int rbValue,
+    required Color color,
+    required int dateIndex,
+    required int available,
+  }) {
+    return RadioButtonWidget(
+        key: key,
+        rbValue: rbValue,
+        color: color,
+        dateIndex: dateIndex,
+        available: available);
+  }
+
+  factory RadioButtonWidget.forPreference({
+    required Key key,
+    required int rbValue,
+    required Color color,
+    required Trainer trainer,
+    required String paramName,
+  }) {
+    return RadioButtonWidget(
+        key: key,
+        rbValue: rbValue,
+        color: color,
+        trainer: trainer,
+        paramName: paramName);
+  }
   @override
   State<RadioButtonWidget> createState() => _RadioButtonWidgetState();
 }
@@ -34,9 +66,9 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
 
   Widget _radioButton() {
     int value = 0;
-    if (widget.daySchema != null) {
-      value = widget.daySchema!.available;
-    } else if (widget.paramName.isNotEmpty && widget.trainer != null) {
+    if (widget.trainer == null) {
+      value = widget.available;
+    } else {
       value = _getValueFromParamName(widget.trainer!);
     }
 
@@ -58,8 +90,9 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
 
   void onChangeValue(int? value) {
     setState(() {
-      if (widget.daySchema != null) {
-        AppData.instance.updateAvailability(widget.daySchema!, widget.rbValue);
+      if (widget.trainer == null) {
+        AppData.instance.updateAvailability(
+            dateIndex: widget.dateIndex, newValue: widget.rbValue);
         AppEvents.fireSchemaUpdated();
       } else {
         if (widget.paramName.isNotEmpty) {

@@ -71,28 +71,11 @@ class AppController {
     AppData.instance.trainerItems = trainerItems;
   }
 
-  /// get TrainerData for all trainers
-  Future<List<TrainerData>> _getAllTrainerData() async {
-    List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();
-
-    List<TrainerData> allTrainerData = [];
-    for (Trainer trainer in allTrainers) {
-      TrainerData trainerData =
-          await _getTheTrainerData(trainer: trainer, forAllTrainers: true);
-      allTrainerData.add(trainerData);
-    }
-
-    AppData.instance.setAllTrainerData(allTrainerData);
-    AppEvents.fireAllTrainerDataReady();
-
-    return allTrainerData;
-  }
-
   /// update all modified DaySchema's
   void updateTrainerSchemas() {
-    List<DaySchema> daySchemas = AppData.instance.getNewSchemas();
     TrainerSchema trainerSchemas =
-        AppHelper.instance.buildFromDaySchemas(daySchemas);
+        AppData.instance.getTrainerData().trainerSchemas;
+    trainerSchemas.availableList = AppData.instance.newAvailaibleList;
     FirestoreHelper.instance.createOrUpdateTrainerSchemas(trainerSchemas, true);
     getTrainerData(trainer: AppData.instance.getTrainer());
   }
@@ -112,14 +95,13 @@ class AppController {
   }
 
   Future<SpreadSheet> generateSpreadsheet() async {
-    List<TrainerData> trainerData = await _getAllTrainerData();
+    await _getAllTrainerData();
 
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
         .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
 
-    AppData.instance.setAllTrainerData(trainerData);
     AppData.instance.setSpreadsheet(spreadSheet);
     AppEvents.fireAllTrainerDataReady();
 
@@ -191,6 +173,24 @@ class AppController {
     return result;
   }
 
+  /// ---------- get TrainerData for all trainers
+  Future<List<TrainerData>> _getAllTrainerData() async {
+    List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();
+
+    List<TrainerData> allTrainerData = [];
+    for (Trainer trainer in allTrainers) {
+      TrainerData trainerData =
+          await _getTheTrainerData(trainer: trainer, forAllTrainers: true);
+      allTrainerData.add(trainerData);
+    }
+
+    AppData.instance.setAllTrainerData(allTrainerData);
+    AppEvents.fireAllTrainerDataReady();
+
+    return allTrainerData;
+  }
+
+  ///------------------------------------------------
   Future<void> _createNewTrainerSchema(
       Trainer useTrainer, TrainerData result) async {
     TrainerSchema newTrainerSchemas =

@@ -1,8 +1,4 @@
-import 'dart:developer';
-
 import 'package:rooster/model/app_models.dart';
-// ignore: depend_on_referenced_packages
-import 'package:collection/collection.dart';
 import 'package:rooster/util/app_helper.dart';
 
 class AppData {
@@ -42,6 +38,7 @@ class AppData {
   bool rebuildSpreadsheet = true;
 
   TrainerData _trainerData = TrainerData.empty();
+  List<int> newAvailaibleList = [];
   List<TrainerData> _allTrainerData = [];
 
   TrainerData getTrainerData() {
@@ -56,8 +53,8 @@ class AppData {
     return _allTrainerData;
   }
 
-  void setAllTrainerData(List<TrainerData> allTrainerData) {
-    _setAllTrainerData(allTrainerData);
+  void setAllTrainerData(List<TrainerData> allTrainerDataList) {
+    _allTrainerData = allTrainerDataList;
   }
 
   List<Trainer> getAllTrainers() {
@@ -74,14 +71,6 @@ class AppData {
 
   void setTrainer(Trainer trainer) {
     _trainerData.trainer = trainer;
-  }
-
-  List<DaySchema> getOldSchemas() {
-    return _trainerData.oldSchemas;
-  }
-
-  List<DaySchema> getNewSchemas() {
-    return _trainerData.newSchemas;
   }
 
   List<DateTime> _activeDates = [];
@@ -125,16 +114,9 @@ class AppData {
     return maanden[getActiveMonth() - 1];
   }
 
-  ///--- update the avavailability in the newSchemas list
-  void updateAvailability(DaySchema daySchema, int newValue) {
-    DaySchema? ds = _trainerData.newSchemas
-        .firstWhereOrNull((elem) => elem.day == daySchema.day);
-
-    if (ds != null) {
-      ds.available = newValue;
-    } else {
-      log('!!! dit kan niet (updateAvailability)');
-    }
+  ///--- update the avavailability in the newAvailabilities list
+  void updateAvailability({required int dateIndex, required int newValue}) {
+    newAvailaibleList[dateIndex] = newValue;
   }
 
   void updateTrainerPref(String paramName, int newValue) {
@@ -145,10 +127,11 @@ class AppData {
 
   ///-----------------------------------
   bool isSchemaDirty() {
-    for (int i = 0; i < getOldSchemas().length; i++) {
-      DaySchema oldS = getOldSchemas()[i];
-      DaySchema newS = getNewSchemas()[i];
-      if (oldS.available != newS.available) {
+    for (int i = 0; i < AppData.instance.newAvailaibleList.length; i++) {
+      int oldAvail =
+          AppData.instance.getTrainerData().trainerSchemas.availableList[i];
+      int newAvail = AppData.instance.newAvailaibleList[i];
+      if (oldAvail != newAvail) {
         return true;
       }
     }
@@ -178,40 +161,11 @@ class AppData {
 
   void _setTrainerData(TrainerData trainerData) {
     _trainerData = trainerData;
-    List<List<DaySchema>> oldAndNewDaySchemas =
-        _buildOldAndNewDaySchemaList(trainerData.trainerSchemas);
 
-    _trainerData.oldSchemas = oldAndNewDaySchemas[0];
-    _trainerData.newSchemas = oldAndNewDaySchemas[1];
-  }
-
-  void _setAllTrainerData(List<TrainerData> trainerDataList) {
-    _allTrainerData = trainerDataList;
-
-    for (TrainerData trainerData in _allTrainerData) {
-      List<List<DaySchema>> oldAndNewDaySchemas =
-          _buildOldAndNewDaySchemaList(trainerData.trainerSchemas);
-
-      trainerData.oldSchemas = oldAndNewDaySchemas[0];
-      trainerData.newSchemas = oldAndNewDaySchemas[1];
+    newAvailaibleList = [];
+    for (int avail
+        in AppData.instance.getTrainerData().trainerSchemas.availableList) {
+      newAvailaibleList.add(avail);
     }
-  }
-
-  List<List<DaySchema>> _buildOldAndNewDaySchemaList(
-      TrainerSchema trainerSchemas) {
-    List<List<DaySchema>> result = [];
-
-    List<DaySchema> oldSchemas =
-        AppHelper.instance.buildFromTrainerSchemas(trainerSchemas);
-    oldSchemas.sort((a, b) => a.day.compareTo(b.day));
-    result.add(oldSchemas);
-
-    List<DaySchema> newSchemas = [];
-    for (DaySchema daySchema in oldSchemas) {
-      newSchemas.add(daySchema.copyWith());
-    }
-    result.add(newSchemas);
-
-    return result;
   }
 }

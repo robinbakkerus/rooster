@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:flutter/foundation.dart';
+import 'package:rooster/data/app_data.dart';
 
 import 'package:rooster/util/app_helper.dart';
 
@@ -217,75 +218,6 @@ class Trainer {
   }
 }
 
-//----------- DaySchema -------------
-
-class DaySchema {
-  final int year;
-  final int month;
-  final int day;
-  int available = 1;
-
-  DaySchema({
-    required this.year,
-    required this.month,
-    required this.day,
-    required this.available,
-  });
-
-  DaySchema copyWith({
-    int? year,
-    int? month,
-    int? day,
-    int? available,
-  }) {
-    return DaySchema(
-      year: year ?? this.year,
-      month: month ?? this.month,
-      day: day ?? this.day,
-      available: available ?? this.available,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'year': year,
-      'month': month,
-      'day': day,
-      'available': available,
-    };
-  }
-
-  factory DaySchema.fromMap(Map<String, dynamic> map) {
-    return DaySchema(
-      year: map['year'],
-      month: map['month'],
-      day: map['day'],
-      available: map['available'],
-    );
-  }
-
-  @override
-  String toString() {
-    return 'DS(y: $year, m: $month, d: $day, avail: $available)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is DaySchema &&
-        other.year == year &&
-        other.month == month &&
-        other.day == day &&
-        other.available == available;
-  }
-
-  @override
-  int get hashCode {
-    return year.hashCode ^ month.hashCode ^ day.hashCode ^ available.hashCode;
-  }
-}
-
 /// ----- TrainerSchemas ------------------------------
 ///
 
@@ -294,21 +226,7 @@ class TrainerSchema {
   final String trainerPk;
   final int year;
   final int month;
-  final int din1;
-  final int din2;
-  final int din3;
-  final int din4;
-  final int din5;
-  final int don1;
-  final int don2;
-  final int don3;
-  final int don4;
-  final int don5;
-  final int zat1;
-  final int zat2;
-  final int zat3;
-  final int zat4;
-  final int zat5;
+  List<int> availableList = [];
   bool? isNew = true;
   DateTime? created;
   DateTime? modified;
@@ -322,74 +240,11 @@ class TrainerSchema {
     required this.trainerPk,
     required this.year,
     required this.month,
-    required this.din1,
-    required this.din2,
-    required this.din3,
-    required this.din4,
-    required this.din5,
-    required this.don1,
-    required this.don2,
-    required this.don3,
-    required this.don4,
-    required this.don5,
-    required this.zat1,
-    required this.zat2,
-    required this.zat3,
-    required this.zat4,
-    required this.zat5,
+    required this.availableList,
     this.isNew,
     this.created,
     this.modified,
   });
-  TrainerSchema copyWith({
-    String? id,
-    String? trainerPk,
-    int? year,
-    int? month,
-    int? din1,
-    int? din2,
-    int? din3,
-    int? din4,
-    int? din5,
-    int? don1,
-    int? don2,
-    int? don3,
-    int? don4,
-    int? don5,
-    int? zat1,
-    int? zat2,
-    int? zat3,
-    int? zat4,
-    int? zat5,
-    bool? isNew,
-    DateTime? created,
-    DateTime? modified,
-  }) {
-    return TrainerSchema(
-      id: id ?? this.id,
-      trainerPk: trainerPk ?? this.trainerPk,
-      year: year ?? this.year,
-      month: month ?? this.month,
-      din1: din1 ?? this.din1,
-      din2: din2 ?? this.din2,
-      din3: din3 ?? this.din3,
-      din4: din4 ?? this.din4,
-      din5: din5 ?? this.din5,
-      don1: don1 ?? this.don1,
-      don2: don2 ?? this.don2,
-      don3: don3 ?? this.don3,
-      don4: don4 ?? this.don4,
-      don5: don5 ?? this.don5,
-      zat1: zat1 ?? this.zat1,
-      zat2: zat2 ?? this.zat2,
-      zat3: zat3 ?? this.zat3,
-      zat4: zat4 ?? this.zat4,
-      zat5: zat5 ?? this.zat5,
-      isNew: isNew ?? this.isNew,
-      created: created ?? this.created,
-      modified: modified ?? this.modified,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -397,24 +252,10 @@ class TrainerSchema {
       'trainerPk': trainerPk,
       'year': year,
       'month': month,
-      'din1': din1,
-      'din2': din2,
-      'din3': din3,
-      'din4': din4,
-      'din5': din5,
-      'don1': don1,
-      'don2': don2,
-      'don3': don3,
-      'don4': don4,
-      'don5': don5,
-      'zat1': zat1,
-      'zat2': zat2,
-      'zat3': zat3,
-      'zat4': zat4,
-      'zat5': zat5,
+      'availabilities': availableList,
       'isNew': isNew,
-      'created': created,
-      'modified': modified,
+      'created': created?.millisecondsSinceEpoch,
+      'modified': modified?.millisecondsSinceEpoch,
     };
   }
 
@@ -424,21 +265,7 @@ class TrainerSchema {
         trainerPk: map['trainerPk'],
         year: map['year'],
         month: map['month'],
-        din1: map['din1'],
-        din2: map['din2'],
-        din3: map['din3'],
-        din4: map['din4'],
-        din5: map['din5'],
-        don1: map['don1'],
-        don2: map['don2'],
-        don3: map['don3'],
-        don4: map['don4'],
-        don5: map['don5'],
-        zat1: map['zat1'],
-        zat2: map['zat2'],
-        zat3: map['zat3'],
-        zat4: map['zat4'],
-        zat5: map['zat5'],
+        availableList: List<int>.from(map['availabilities']),
         isNew: map['isNew'],
         created: AppHelper.instance.parseDateTime(map['created']),
         modified: AppHelper.instance.parseDateTime(map['modified']));
@@ -462,23 +289,27 @@ class TrainerSchema {
         trainerPk: '',
         year: 2024,
         month: 1,
-        din1: 1,
-        din2: 1,
-        din3: 1,
-        din4: 1,
-        din5: 1,
-        don1: 1,
-        don2: 1,
-        don3: 1,
-        don4: 1,
-        don5: 1,
-        zat1: 1,
-        zat2: 1,
-        zat3: 1,
-        zat4: 1,
-        zat5: 1,
+        availableList: [],
         isNew: true,
         modified: null);
+  }
+
+  factory TrainerSchema.ofTrainer({required Trainer trainer}) {
+    String id = AppHelper.instance.buildTrainerSchemaId(trainer);
+    return TrainerSchema(
+        id: id,
+        trainerPk: trainer.pk,
+        year: AppData.instance.getActiveYear(),
+        month: AppData.instance.getActiveMonth(),
+        availableList: [],
+        isNew: true,
+        modified: null,
+        created: DateTime.now());
+  }
+
+  @override
+  String toString() {
+    return 'TrainerSchema(id: $id, trainerPk: $trainerPk, year: $year, month: $month, isNew: $isNew, created: $created, modified: $modified)';
   }
 }
 
@@ -487,8 +318,6 @@ class TrainerSchema {
 class TrainerData {
   Trainer trainer = Trainer.empty();
   TrainerSchema trainerSchemas = TrainerSchema.empty();
-  List<DaySchema> oldSchemas = [];
-  List<DaySchema> newSchemas = [];
 
   bool isEmpty() {
     return trainer.accessCode.isEmpty;
