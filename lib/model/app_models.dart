@@ -286,49 +286,6 @@ class DaySchema {
   }
 }
 
-// ----------- TrainerAccess ---------------
-
-class TrainerAccess {
-  final Trainer trainer;
-  DateTime datetime = DateTime(2024, 1, 1);
-
-  TrainerAccess({
-    required this.trainer,
-  });
-  TrainerAccess copyWith({
-    Trainer? trainer,
-  }) {
-    return TrainerAccess(
-      trainer: trainer ?? this.trainer,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'trainer': trainer.toMap(),
-    };
-  }
-
-  factory TrainerAccess.fromMap(Map<String, dynamic> map) {
-    return TrainerAccess(
-      trainer: Trainer.fromMap(map['trainer']),
-    );
-  }
-
-  @override
-  String toString() => 'TrainerAccess(trainer: $trainer)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TrainerAccess && other.trainer == trainer;
-  }
-
-  @override
-  int get hashCode => trainer.hashCode;
-}
-
 /// ----- TrainerSchemas ------------------------------
 ///
 
