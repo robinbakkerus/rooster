@@ -90,9 +90,14 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   void _deleteOldLogs() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference logRef = firestore.collection('logs');
+    bool firstOne =
+        true; // dont remove all logs becauce then de whole table is gone
     await logRef.get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
-        doc.reference.delete();
+        if (!firstOne) {
+          doc.reference.delete();
+        }
+        firstOne = false;
       }
     });
   }
