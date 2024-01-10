@@ -1,47 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
-// ignore: depend_on_referenced_packages
-import 'package:collection/collection.dart';
 
-class AllEnteredSchemas extends StatefulWidget {
-  const AllEnteredSchemas({super.key});
+class ShowAvailabilityWidget extends StatefulWidget {
+  final Trainer trainer;
+  const ShowAvailabilityWidget({super.key, required this.trainer});
 
   @override
-  State<AllEnteredSchemas> createState() => _AllEnteredSchemasState();
+  State<ShowAvailabilityWidget> createState() => _ShowAvailabilityWidgetState();
 }
 
 //---------------------------
-class _AllEnteredSchemasState extends State<AllEnteredSchemas> with AppMixin {
-  List<TrainerData> _allTrainerData = [];
-  TrainerData _selectedTrainerData = TrainerData.empty();
-
-  @override
-  void initState() {
-    AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
-    _allTrainerData = AppData.instance.getAllTrainerData();
-    super.initState();
-  }
-
+class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
+    with AppMixin {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _buildDropdown(),
-              wh.horSpace(20),
-              Text(_selectedTrainerData.trainer.firstName()),
-            ],
+          Text(
+            widget.trainer.firstName(),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
           ),
+          _buildWhenEntered(),
           wh.verSpace(10),
           _buildGrid(),
         ],
@@ -90,7 +78,13 @@ class _AllEnteredSchemasState extends State<AllEnteredSchemas> with AppMixin {
     for (int dateIndex = 0;
         dateIndex < AppData.instance.getActiveDates().length;
         dateIndex++) {
-      result.add(DataRow(cells: _buildDataCells(dateIndex)));
+      DateTime date = AppData.instance.getActiveDates()[dateIndex];
+      bool addRow = date.weekday != DateTime.saturday ||
+          date.weekday == DateTime.saturday &&
+              AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk);
+      if (addRow) {
+        result.add(DataRow(cells: _buildDataCells(dateIndex)));
+      }
     }
 
     return result;
@@ -112,12 +106,14 @@ class _AllEnteredSchemasState extends State<AllEnteredSchemas> with AppMixin {
   }
 
   DataCell _buildAvailableDataCell(int dateIndex) {
-    Icon icon = const Icon(Icons.done, color: Colors.green);
+    int avail = 0;
+    if (_isSchemaEntered()) {
+      avail = _getTrainerData().trainerSchemas.availableList[dateIndex];
+    } else {
+      avail = 1;
+    }
 
-    int avail = AppData.instance
-        .getTrainerData()
-        .trainerSchemas
-        .availableList[dateIndex];
+    Icon icon = const Icon(Icons.done, color: Colors.green);
     if (avail == 0) {
       icon = const Icon(Icons.block, color: Colors.red);
     } else if (avail == 2) {
@@ -131,49 +127,24 @@ class _AllEnteredSchemasState extends State<AllEnteredSchemas> with AppMixin {
     return DataCell(Center(child: icon));
   }
 
-  Widget _buildDropdown() {
-    List<TrainerData> schemasEntered =
-        _allTrainerData.where((e) => !e.trainerSchemas.isEmpty()).toList();
-
-    const topVal = 'Trainers ...';
-    List<String> trainerList = [topVal];
-    trainerList
-        .addAll(schemasEntered.map((e) => e.trainer.firstName()).toList());
-
-    var items = trainerList.map((item) {
-      return DropdownMenuItem(
-        value: item,
-        child: Text(item),
-      );
-    }).toList();
-
-    return DropdownButton(
-      menuMaxHeight: AppData.instance.screenHeight * 0.75,
-      isDense: true,
-      value: topVal,
-      items: items,
-      onChanged: _onDropdownSelected,
-    );
+  TrainerData _getTrainerData() {
+    return AppData.instance.getTrainerDataForTrainer(widget.trainer);
   }
 
-  void _onDropdownSelected(Object? value) {
-    TrainerData? trainerData =
-        _allTrainerData.firstWhereOrNull((e) => e.trainer.firstName() == value);
-    if (trainerData != null) {
-      setState(() {
-        _selectedTrainerData = trainerData;
-      });
+  bool _isSchemaEntered() {
+    return !_getTrainerData().trainerSchemas.isEmpty();
+  }
+
+  Widget _buildWhenEntered() {
+    if (_isSchemaEntered()) {
+      var formatter = DateFormat('dd-MM-yyyy');
+      DateTime dateTime = _getTrainerData().trainerSchemas.modified != null
+          ? _getTrainerData().trainerSchemas.modified!
+          : _getTrainerData().trainerSchemas.created!;
+      String dateStr = formatter.format(dateTime);
+      return Text('Op $dateStr');
     } else {
-      wh.showSnackbar('Kan trainerdata niet vinden');
-    }
-  }
-
-  void _onReady(AllTrainersDataReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        _allTrainerData = AppData.instance.getAllTrainerData();
-        _selectedTrainerData = TrainerData.empty();
-      });
+      return const Text('Nog niet ingevuld');
     }
   }
 }

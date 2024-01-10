@@ -1,6 +1,7 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/widget/show_availability_widget.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
@@ -60,7 +61,7 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
   List<DataColumn> _buildHeader() {
     List<DataColumn> result = [];
 
-    var headerLabels = ['Naam', 'Ingevuld?'];
+    var headerLabels = ['Naam', 'Ingevuld?', 'x'];
     for (String label in headerLabels) {
       result.add(DataColumn(
           label: Text(label,
@@ -84,6 +85,7 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
 
     result.add(_buildTrainerDataCell(trainer));
     result.add(_buildEnteredDataCell(trainer));
+    result.add(_buildShowButtonDataCell(trainer));
 
     return result;
   }
@@ -94,6 +96,10 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
 
   DataCell _buildEnteredDataCell(Trainer trainer) {
     return DataCell(_buildEnteredWidget(trainer));
+  }
+
+  DataCell _buildShowButtonDataCell(Trainer trainer) {
+    return DataCell(_buildShowButtonWidget(trainer));
   }
 
   Widget _buildEnteredWidget(Trainer trainer) {
@@ -108,11 +114,55 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
     return icon;
   }
 
+  Widget _buildShowButtonWidget(Trainer trainer) {
+    TrainerSchema trainerSchemas =
+        SpreadsheetGenerator.instance.getSchemaFromAllTrainerData(trainer);
+
+    Color col = trainerSchemas.isEmpty() ? Colors.red : Colors.green;
+    return InkWell(
+      onTap: () => _dialogBuilder(context, trainer),
+      child: Icon(
+        Icons.info_sharp,
+        color: col,
+        size: 24,
+      ),
+    );
+  }
+
   void _onReady(AllTrainersDataReadyEvent event) {
     if (mounted) {
       setState(() {
         _allTrainers = AppData.instance.getAllTrainers();
       });
     }
+  }
+
+  Future<void> _dialogBuilder(BuildContext context, Trainer trainer) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: SizedBox(
+            height: AppData.instance.screenHeight * 0.8,
+            width: 400,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ShowAvailabilityWidget(trainer: trainer),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(),
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Sluit"))
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

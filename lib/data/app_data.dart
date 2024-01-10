@@ -1,5 +1,7 @@
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 
 class AppData {
   AppData._() {
@@ -55,6 +57,13 @@ class AppData {
 
   void setAllTrainerData(List<TrainerData> allTrainerDataList) {
     _allTrainerData = allTrainerDataList;
+  }
+
+  TrainerData getTrainerDataForTrainer(Trainer trainer) {
+    TrainerData? trainerData =
+        getAllTrainerData().firstWhereOrNull((e) => e.trainer == trainer);
+
+    return trainerData ?? TrainerData.empty();
   }
 
   List<Trainer> getAllTrainers() {

@@ -5,15 +5,17 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 
-class AvailabilityPage extends StatefulWidget {
-  const AvailabilityPage({super.key});
+class OverallAvailabilityPage extends StatefulWidget {
+  const OverallAvailabilityPage({super.key});
 
   @override
-  State<AvailabilityPage> createState() => _AvailabilityPageState();
+  State<OverallAvailabilityPage> createState() =>
+      _OverallAvailabilityPageState();
 }
 
-class _AvailabilityPageState extends State<AvailabilityPage> with AppMixin {
-  _AvailabilityPageState() {
+class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
+    with AppMixin {
+  _OverallAvailabilityPageState() {
     AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
   }
 

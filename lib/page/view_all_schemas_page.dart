@@ -1,9 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/page/all_entered_schemas.dart';
-import 'package:rooster/page/availability_page.dart';
+import 'package:rooster/page/overall_availability_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
-import 'package:flutter/material.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class ViewAllSchemasPage extends StatefulWidget {
@@ -22,7 +21,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 1,
@@ -34,7 +33,6 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
               _tab1(),
               _tab2(),
               _tab3(),
-              _tab4(),
             ],
           ),
         ),
@@ -42,8 +40,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
           children: [
             SpreadsheetPage(),
             TrainerProgressPage(),
-            AllEnteredSchemas(),
-            AvailabilityPage(),
+            OverallAvailabilityPage(),
           ],
         ),
       ),
@@ -92,25 +89,10 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
       SizedBox(
         width: c.w2,
         child: const Text(
-          'Ingevulde schemas',
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ]));
-  }
-
-  Tab _tab4() {
-    return Tab(
-        child: Row(children: [
-      SizedBox(
-        width: c.w2,
-        child: const Text(
           'Beschikbaarheid',
           overflow: TextOverflow.ellipsis,
         ),
       ),
     ]));
   }
-
-  // widget for the content
 }
