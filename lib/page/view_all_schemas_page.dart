@@ -40,10 +40,10 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
         ),
         body: const TabBarView(
           children: [
+            SpreadsheetPage(),
             TrainerProgressPage(),
             AllEnteredSchemas(),
             AvailabilityPage(),
-            SpreadsheetPage(),
           ],
         ),
       ),
@@ -66,7 +66,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
       SizedBox(
         width: c.w2,
         child: const Text(
-          'Voortgang',
+          'Schema',
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -79,7 +79,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
       SizedBox(
         width: c.w2,
         child: const Text(
-          'Ingevulde schemas',
+          'Voortgang',
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -92,7 +92,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
       SizedBox(
         width: c.w2,
         child: const Text(
-          'Beschikbaarheid',
+          'Ingevulde schemas',
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -105,7 +105,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
       SizedBox(
         width: c.w2,
         child: const Text(
-          'Schema',
+          'Beschikbaarheid',
           overflow: TextOverflow.ellipsis,
         ),
       ),
