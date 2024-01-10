@@ -172,11 +172,24 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   Widget _buildSupervisorButtons() {
     return Row(
       children: [
+        wh.horSpace(10),
+        InkWell(
+            onTap: _onShowSpreadsheetInfo,
+            child: const Icon(
+              Icons.info_outline,
+              size: 32,
+              color: Colors.grey,
+            )),
+        wh.horSpace(20),
         OutlinedButton(
             onPressed: _onConfirmFinalizeRoster,
             child: const Text('Maak schema defintief'))
       ],
     );
+  }
+
+  void _onShowSpreadsheetInfo() {
+    _buildDialogSpreadsheetInfo(context);
   }
 
   void _onConfirmFinalizeRoster() {
@@ -186,6 +199,60 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   void _doFinalizeRoster(BuildContext context) async {
     AppController.instance.finalizeRoster(_spreadSheet);
     wh.showSnackbar('Training schema is nu definitief!');
+  }
+
+  void _buildDialogSpreadsheetInfo(BuildContext context) {
+    Widget closeButton = TextButton(
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(); // dismisses only the dialog and returns nothing
+      },
+      child: const Text("CLose"),
+    ); // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Trainer inzet."),
+      content: Text(_getTrainerDeployed()),
+      actions: [
+        closeButton,
+      ],
+    ); // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  String _getTrainerDeployed() {
+    Map<String, int> counts = {};
+
+    for (SheetRow row in _spreadSheet.rows) {
+      for (RowCell cell in row.rowCells) {
+        String txt = cell.text.replaceAll(' ', '');
+        if (txt.isNotEmpty && !txt.startsWith('(')) {
+          if (counts.containsKey(txt)) {
+            int n = counts[txt]!;
+            counts[txt] = n + 1;
+          } else {
+            counts[txt] = 1;
+          }
+        }
+      }
+    }
+
+    List<Map<String, int>> list = [];
+    for (String key in counts.keys) {
+      list.add({key: counts[key]!});
+    }
+    list.sort((a, b) => b.values.first.compareTo(a.values.first));
+
+    String result = '';
+    for (Map<String, int> map in list) {
+      result += '\n ${map.keys.first} \t ${map[map.keys.first]}';
+    }
+
+    return result;
   }
 
   void _buildDialogConfirm(BuildContext context, bool allProgramFieldSet) {
@@ -211,7 +278,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       child: const Text("Continue"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("AlertDialog"),
+      title: const Text("Schema definitief maken"),
       content: Text(msg),
       actions: [
         cancelButton,
