@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'package:flutter/foundation.dart';
-import 'package:rooster/data/app_data.dart';
+import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
+
+import 'package:rooster/data/app_data.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 
 //------------------ enum ----------------------
@@ -36,6 +39,62 @@ enum PageEnum {
   final int code;
 }
 
+enum DayPrefEnum {
+  tuesday,
+  thursday,
+  saturday;
+}
+
+///-----------------------------------------
+class TrainerPref {
+  final String paramName;
+  int value;
+
+  TrainerPref({
+    required this.paramName,
+    required this.value,
+  });
+
+  TrainerPref copyWith({
+    String? paramName,
+    int? value,
+  }) {
+    return TrainerPref(
+      paramName: paramName ?? this.paramName,
+      value: value ?? this.value,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'paramName': paramName,
+      'value': value,
+    };
+  }
+
+  factory TrainerPref.fromMap(Map<String, dynamic> map) {
+    return TrainerPref(
+      paramName: map['paramName'],
+      value: map['value'],
+    );
+  }
+
+  @override
+  String toString() => 'TrainerPref(paramName: $paramName, value: $value)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TrainerPref &&
+        other.paramName == paramName &&
+        other.value == value;
+  }
+
+  @override
+  int get hashCode => paramName.hashCode ^ value.hashCode;
+}
+
 ///------------------------------------------
 
 class Trainer {
@@ -43,14 +102,8 @@ class Trainer {
   final String pk; // this is also the firestore dbs ID
   final String fullname;
   String email;
-  final int dinsdag;
-  final int donderdag;
-  final int zaterdag;
-  final int pr;
-  final int r1;
-  final int r2;
-  final int r3;
-  final int zamo;
+  List<TrainerPref> dayPrefs;
+  List<TrainerPref> groupPrefs;
   final String roles;
 
   Trainer({
@@ -58,14 +111,8 @@ class Trainer {
     required this.pk,
     required this.fullname,
     required this.email,
-    required this.dinsdag,
-    required this.donderdag,
-    required this.zaterdag,
-    required this.pr,
-    required this.r1,
-    required this.r2,
-    required this.r3,
-    required this.zamo,
+    required this.dayPrefs,
+    required this.groupPrefs,
     required this.roles,
   });
 
@@ -74,14 +121,8 @@ class Trainer {
     String? pk,
     String? fullname,
     String? email,
-    int? dinsdag,
-    int? donderdag,
-    int? zaterdag,
-    int? pr,
-    int? r1,
-    int? r2,
-    int? r3,
-    int? zamo,
+    List<TrainerPref>? dayPrefs,
+    List<TrainerPref>? groupPrefs,
     String? roles,
   }) {
     return Trainer(
@@ -89,14 +130,9 @@ class Trainer {
       pk: pk ?? this.pk,
       fullname: fullname ?? this.fullname,
       email: email ?? this.email,
-      dinsdag: dinsdag ?? this.dinsdag,
-      donderdag: donderdag ?? this.donderdag,
-      zaterdag: zaterdag ?? this.zaterdag,
-      pr: pr ?? this.pr,
-      r1: r1 ?? this.r1,
-      r2: r2 ?? this.r2,
-      r3: r3 ?? this.r3,
-      zamo: zamo ?? this.zamo,
+      dayPrefs: dayPrefs ?? this.dayPrefs.map((e) => e.copyWith()).toList(),
+      groupPrefs:
+          groupPrefs ?? this.groupPrefs.map((e) => e.copyWith()).toList(),
       roles: roles ?? this.roles,
     );
   }
@@ -107,14 +143,8 @@ class Trainer {
       'pk': pk,
       'fullname': fullname,
       'email': email,
-      'dinsdag': dinsdag,
-      'donderdag': donderdag,
-      'zaterdag': zaterdag,
-      'pr': pr,
-      'r1': r1,
-      'r2': r2,
-      'r3': r3,
-      'zamo': zamo,
+      'dayPrefs': dayPrefs.map((x) => x.toMap()).toList(),
+      'groupPrefs': groupPrefs.map((x) => x.toMap()).toList(),
       'roles': roles,
     };
   }
@@ -125,39 +155,30 @@ class Trainer {
       pk: map['pk'],
       fullname: map['fullname'],
       email: map['email'],
-      dinsdag: map['dinsdag'],
-      donderdag: map['donderdag'],
-      zaterdag: map['zaterdag'],
-      pr: map['pr'],
-      r1: map['r1'],
-      r2: map['r2'],
-      r3: map['r3'],
-      zamo: map['zamo'],
+      dayPrefs: List<TrainerPref>.from(
+          map['dayPrefs']?.map((x) => TrainerPref.fromMap(x))),
+      groupPrefs: List<TrainerPref>.from(
+          map['groupPrefs']?.map((x) => TrainerPref.fromMap(x))),
       roles: map['roles'],
     );
   }
 
   @override
   String toString() {
-    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, dinsdag: $dinsdag, donderdag: $donderdag, zaterdag: $zaterdag, pr: $pr, r1: $r1, r2: $r2, r3: $r3, zamo: $zamo, roles: $roles)';
+    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, dayPrefs: $dayPrefs, groupPrefs: $groupPrefs, roles: $roles)';
   }
 
   @override
-  bool operator ==(covariant Trainer other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other.accessCode == accessCode &&
+    return other is Trainer &&
+        other.accessCode == accessCode &&
         other.pk == pk &&
         other.fullname == fullname &&
         other.email == email &&
-        other.dinsdag == dinsdag &&
-        other.donderdag == donderdag &&
-        other.zaterdag == zaterdag &&
-        other.pr == pr &&
-        other.r1 == r1 &&
-        other.r2 == r2 &&
-        other.r3 == r3 &&
-        other.zamo == zamo &&
+        listEquals(other.dayPrefs, dayPrefs) &&
+        listEquals(other.groupPrefs, groupPrefs) &&
         other.roles == roles;
   }
 
@@ -167,31 +188,20 @@ class Trainer {
         pk.hashCode ^
         fullname.hashCode ^
         email.hashCode ^
-        dinsdag.hashCode ^
-        donderdag.hashCode ^
-        zaterdag.hashCode ^
-        pr.hashCode ^
-        r1.hashCode ^
-        r2.hashCode ^
-        r3.hashCode ^
-        zamo.hashCode ^
+        dayPrefs.hashCode ^
+        groupPrefs.hashCode ^
         roles.hashCode;
   }
 
+  /// ---- extra methods -------------
   factory Trainer.empty() {
     return Trainer(
         accessCode: '',
         pk: '',
         fullname: '',
-        dinsdag: 0,
-        donderdag: 0,
-        zaterdag: 0,
         email: '',
-        pr: 0,
-        r1: 0,
-        r2: 0,
-        r3: 0,
-        zamo: 0,
+        dayPrefs: [],
+        groupPrefs: [],
         roles: '');
   }
 
@@ -215,6 +225,60 @@ class Trainer {
 
   bool isAdmin() {
     return roles.contains(RegExp('A'));
+  }
+
+  int getPrefValue({required String paramName}) {
+    for (TrainerPref pref in groupPrefs) {
+      if (pref.paramName == paramName) {
+        return pref.value;
+      }
+    }
+    for (TrainerPref pref in dayPrefs) {
+      if (pref.paramName == paramName) {
+        return pref.value;
+      }
+    }
+    return -1;
+  }
+
+  int getDayPrefValue({required int weekday}) {
+    int result = -1;
+
+    for (TrainerPref pref in dayPrefs) {
+      String weekDayStr = AppHelper.instance.weekDayStringFromWeekday(
+          weekday: weekday, locale: AppConstants().localUK);
+      if (pref.paramName == weekDayStr) {
+        return pref.value;
+      }
+    }
+    return result;
+  }
+
+  int getGroupPrefValue(Groep groep) {
+    int result = -1;
+
+    for (TrainerPref pref in groupPrefs) {
+      if (pref.paramName == groep.name) {
+        return pref.value;
+      }
+    }
+    return result;
+  }
+
+  void setPrefValue(String paramName, int value) {
+    log('setpref ${identityHashCode(this)}');
+    for (TrainerPref pref in groupPrefs) {
+      if (pref.paramName == paramName) {
+        pref.value = value;
+        return;
+      }
+    }
+    for (TrainerPref pref in dayPrefs) {
+      if (pref.paramName == paramName) {
+        pref.value = value;
+        return;
+      }
+    }
   }
 }
 

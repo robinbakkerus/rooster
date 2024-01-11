@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class AppHelper with AppMixin {
@@ -75,15 +76,7 @@ class AppHelper with AppMixin {
     TrainerSchema result = TrainerSchema.ofTrainer(trainer: trainer);
 
     for (DateTime dateTime in AppData.instance.getActiveDates()) {
-      int avail = 0;
-      if (dateTime.weekday == DateTime.tuesday) {
-        avail = trainer.dinsdag;
-      } else if (dateTime.weekday == DateTime.thursday) {
-        avail = trainer.donderdag;
-      } else if (dateTime.weekday == DateTime.saturday) {
-        avail = trainer.zaterdag;
-      }
-
+      int avail = trainer.getDayPrefValue(weekday: dateTime.weekday);
       result.availableList.add(avail);
     }
     return result;
@@ -132,11 +125,58 @@ class AppHelper with AppMixin {
   }
 
   ///-----------------
-  /// return something like: 'woensdag'
-  String dayAsString(DateTime date) {
-    String dag = DateFormat.EEEE('nl_NL').format(date).substring(0, 3);
-    dag += ' ${date.day}';
-    return dag;
+  /// return something like: 'din 1'
+  String weekDayStringFromDate(
+      {required DateTime date, required String locale, int length = -1}) {
+    String weekdayStr = DateFormat.EEEE(locale).format(date);
+    if (length > 0) {
+      weekdayStr = weekdayStr.substring(0, length);
+    }
+    weekdayStr += ' ${date.day}';
+    return weekdayStr;
+  }
+
+  /// ------------------------
+  String weekDayStringFromWeekday(
+      {required int weekday, required String locale}) {
+    if (locale == AppConstants().localUK) {
+      if (weekday == DateTime.monday) {
+        return 'monday';
+      } else if (weekday == DateTime.tuesday) {
+        return 'tuesday';
+      } else if (weekday == DateTime.tuesday) {
+        return 'tuesday';
+      } else if (weekday == DateTime.wednesday) {
+        return 'wednesday';
+      } else if (weekday == DateTime.thursday) {
+        return 'thursday';
+      } else if (weekday == DateTime.friday) {
+        return 'friday';
+      } else if (weekday == DateTime.saturday) {
+        return 'saturday';
+      } else if (weekday == DateTime.sunday) {
+        return 'sunday';
+      }
+    } else {
+      if (weekday == DateTime.monday) {
+        return 'maandag';
+      } else if (weekday == DateTime.tuesday) {
+        return 'dinsdag';
+      } else if (weekday == DateTime.tuesday) {
+        return 'woensdag';
+      } else if (weekday == DateTime.wednesday) {
+        return 'woensdag';
+      } else if (weekday == DateTime.thursday) {
+        return 'donderdag';
+      } else if (weekday == DateTime.friday) {
+        return 'vrijdag';
+      } else if (weekday == DateTime.saturday) {
+        return 'zaterdag';
+      } else if (weekday == DateTime.sunday) {
+        return 'zondag';
+      }
+    }
+    return '???';
   }
 
   ///-----------------
@@ -144,7 +184,6 @@ class AppHelper with AppMixin {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final deviceInfo = await deviceInfoPlugin.deviceInfo;
     final allInfo = deviceInfo.data;
-    lp(allInfo.toString());
   }
 
   ///--------------------
@@ -191,7 +230,8 @@ class AppHelper with AppMixin {
   /// -------- private methods --------------------------------
 
   String _getShortWeekDay(DateTime dateTime) {
-    String dag = dayAsString(dateTime);
+    String dag =
+        weekDayStringFromDate(date: dateTime, locale: c.localNL, length: 3);
     return dag.substring(0, 3);
   }
 }

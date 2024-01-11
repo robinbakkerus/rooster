@@ -16,4 +16,7 @@ class AppConstants {
   final double w25 = 0.25 * AppData.instance.screenWidth;
 
   final String removeExtraSpreadsheetRow = 'REMOVE EXTRA ROW';
+
+  final String localNL = 'nl_NL';
+  final String localUK = 'en_US';
 }

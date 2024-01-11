@@ -1,21 +1,9 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
-Trainer trainerRobin = Trainer(
-    accessCode: 'ROMA',
-    pk: 'RB',
-    fullname: 'Robin Bakkerus',
-    email: 'robin.bakkerus@gmail.com',
-    dinsdag: 1,
-    donderdag: 1,
-    zaterdag: 0,
-    pr: 0,
-    r1: 1,
-    r2: 2,
-    r3: 2,
-    zamo: 0,
-    roles: 'A,S,T');
-
+Trainer trainerRobin = _buildTrainer(
+    'RB', 'Robin Bakkerus', 'ROMA', 'robin.bakkerus@gmail.com', 0, 1, 2, 0, 0,
+    roles: 'T,A,S');
 Trainer trainerPaula = _buildTrainer(
     'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0);
 Trainer trainerOlav = _buildTrainer(
@@ -25,10 +13,10 @@ Trainer trainerFried = _buildTrainer(
 Trainer trainerMaria = _buildTrainer(
     'MvH', 'Maria van Hout', 'METS', 'maria.vanhout@onsnet.nu', 0, 0, 1, 1, 0);
 Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
-    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 0);
+    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 0,
+    roles: 'T,S');
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
-        'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0)
-    .copyWith(dinsdag: 0, donderdag: 0);
+    'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0);
 Trainer trainerPauline = _buildTrainer(
     'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 1, 1, 1);
 Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
@@ -42,22 +30,27 @@ Trainer trainerCyriel = _buildTrainer(
 
 // _buildTRainer
 Trainer _buildTrainer(String pk, String fullname, String accesscode,
-    String email, int pr, int r1, int r2, int r3, int zaterdag) {
+    String email, int pr, int r1, int r2, int r3, int zaterdag,
+    {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
   return Trainer(
       accessCode: accesscode,
       pk: pk,
       fullname: fullname,
       email: email,
-      dinsdag: 1,
-      donderdag: 1,
-      zaterdag: zaterdag,
-      pr: pr,
-      r1: r1,
-      r2: r2,
-      r3: r3,
-      zamo: zamo,
-      roles: 'T');
+      dayPrefs: [
+        TrainerPref(paramName: DayPrefEnum.tuesday.name, value: 1),
+        TrainerPref(paramName: DayPrefEnum.thursday.name, value: 1),
+        TrainerPref(paramName: DayPrefEnum.saturday.name, value: zamo)
+      ],
+      groupPrefs: [
+        TrainerPref(paramName: Groep.pr.name, value: pr),
+        TrainerPref(paramName: Groep.r1.name, value: r1),
+        TrainerPref(paramName: Groep.r2.name, value: r2),
+        TrainerPref(paramName: Groep.r3.name, value: r3),
+        TrainerPref(paramName: Groep.zamo.name, value: zamo)
+      ],
+      roles: roles);
 }
 
 List<TrainerSchema> allSchemas = [
@@ -85,18 +78,10 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
 
   result = TrainerSchema.fromMap(map);
 
-  for (DateTime dateTime in AppData.instance.getActiveDates()) {
-    int avail = 0;
-    if (dateTime.weekday == DateTime.tuesday) {
-      avail = trainer.dinsdag;
-    } else if (dateTime.weekday == DateTime.thursday) {
-      avail = trainer.donderdag;
-    } else if (dateTime.weekday == DateTime.saturday) {
-      avail = trainer.zaterdag;
-    }
-
-    result.availableList.add(avail);
-  }
+  int avail = trainer.getDayPrefValue(weekday: DateTime.tuesday);
+  avail = trainer.getDayPrefValue(weekday: DateTime.thursday);
+  avail = trainer.getDayPrefValue(weekday: DateTime.saturday);
+  result.availableList.add(avail);
 
   return result;
 }

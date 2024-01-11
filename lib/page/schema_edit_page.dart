@@ -125,7 +125,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     return DataCell(RadioButtonWidget.forAvailability(
         key: UniqueKey(),
         dateIndex: dateIndex,
-        available: avail,
+        value: avail,
         rbValue: value,
         color: color));
   }

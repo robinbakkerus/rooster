@@ -25,6 +25,7 @@ class FirestoreHelper with AppMixin {
         var map = Map<String, dynamic>.from(
             querySnapshot.docs[0].data() as Map<dynamic, dynamic>);
         trainer = Trainer.fromMap(map);
+        lp(trainer.toString());
       }
     });
 

@@ -194,10 +194,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   List<DataRow> _buildDataRows1() {
     List<DataRow> result = [];
 
-    var days = ['dinsdag', 'donderdag', 'zaterdag'];
+    var days = DayPrefEnum.values;
 
-    for (String dag in days) {
-      result.add(DataRow(cells: _buildDataCells1(dag)));
+    for (DayPrefEnum dayEnum in days) {
+      result.add(DataRow(cells: _buildDataCells(dayEnum.name)));
     }
 
     return result;
@@ -207,13 +207,13 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     List<DataRow> result = [];
 
     for (Groep groep in Groep.values) {
-      result.add(DataRow(cells: _buildDataCells1(groep.name)));
+      result.add(DataRow(cells: _buildDataCells(groep.name)));
     }
 
     return result;
   }
 
-  List<DataCell> _buildDataCells1(String paramName) {
+  List<DataCell> _buildDataCells(String paramName) {
     List<DataCell> result = [];
 
     result.add(DataCell(Text(paramName)));
@@ -224,13 +224,15 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return result;
   }
 
-  DataCell _buildRadioButtonDataCell(String paramName, int value, Color color) {
-    return DataCell(RadioButtonWidget(
+  DataCell _buildRadioButtonDataCell(
+      String paramName, int rbValue, Color color) {
+    int value = _updateTrainer.getPrefValue(paramName: paramName);
+    return DataCell(RadioButtonWidget.forPreference(
         key: UniqueKey(),
+        rbValue: rbValue,
+        color: color,
         paramName: paramName,
-        trainer: _updateTrainer,
-        rbValue: value,
-        color: color));
+        value: value));
   }
 
   Widget? _getFab() {
@@ -256,7 +258,8 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         : 'Fout tijdens aanpassen voorkeuren';
     wh.showSnackbar(msg, color: Colors.lightGreen);
     setState(() {
-      _trainer = _updateTrainer;
+      _trainer = _updateTrainer.copyWith();
+      _fab = _getFab();
     });
   }
 
@@ -265,6 +268,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = _trainer.copyWith();
+        _textCtrl.text = _trainer.email;
         _textCtrl.text = _trainer.email;
         _fab = _getFab();
       });
@@ -275,7 +279,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     if (mounted) {
       setState(() {
         _trainer = AppData.instance.getTrainer();
-        _updateTrainer = event.trainer;
+        _updateTrainer = event.trainer.copyWith();
         _fab = _getFab();
       });
     }
@@ -284,96 +288,9 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   void _onTrainerPrefUpdated(TrainerPrefUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        _trainer = AppData.instance.getTrainer();
-        Map<String, dynamic> map = _updateTrainer.toMap();
-        map[event.paramName] = event.newValue;
-        _updateTrainer = Trainer.fromMap(map);
+        _updateTrainer.setPrefValue(event.paramName, event.newValue);
         _fab = _getFab();
       });
     }
   }
 }
-
-///----------------
-
-class VoorkeurWidget extends StatefulWidget {
-  final String mapName;
-  final Trainer trainer;
-  const VoorkeurWidget(
-      {required Key? key, required this.mapName, required this.trainer})
-      : super(key: key);
-
-  @override
-  State<VoorkeurWidget> createState() => _VoorkeurWidgetState();
-}
-
-//--
-class _VoorkeurWidgetState extends State<VoorkeurWidget> with AppMixin {
-  int _selectedValue = 0;
-
-  @override
-  void initState() {
-    _selectedValue = _getVoorkeurValue();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _dayLabel(),
-        _radioButton(1, Colors.green),
-        _radioButton(0, Colors.red),
-        _radioButton(2, Colors.brown),
-      ],
-    );
-  }
-
-  Widget _dayLabel() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 1, 4, 1),
-      child: SizedBox(
-        width: c.w2,
-        child: Text(
-          widget.mapName,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
-  }
-
-  Widget _radioButton(int currentValue, Color color) {
-    return Padding(
-      padding: const EdgeInsets.all(1.0),
-      child: SizedBox(
-        width: c.w15,
-        child: Radio<int>(
-          activeColor: color,
-          value: currentValue,
-          groupValue: _selectedValue,
-          onChanged: (val) => onChangeValue(val),
-        ),
-      ),
-    );
-  }
-
-  int _getVoorkeurValue() {
-    Map<String, dynamic> map = widget.trainer.toMap();
-    return map[widget.mapName];
-  }
-
-  void onChangeValue(int? value) {
-    setState(() {
-      _selectedValue = value!;
-      Map<String, dynamic> map = widget.trainer.toMap();
-      map[widget.mapName] = _selectedValue;
-      Trainer updatedTrainer = Trainer.fromMap(map);
-      AppEvents.fireTrainerUpdated(updatedTrainer);
-    });
-  }
-}
-
-///----------------
-
-
