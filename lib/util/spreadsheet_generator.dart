@@ -4,11 +4,12 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/util/app_mixin.dart';
 
-class SpreadsheetGenerator {
+class SpreadsheetGenerator with AppMixin {
   SpreadSheet _spreadSheet = SpreadSheet(
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
@@ -44,8 +45,9 @@ class SpreadsheetGenerator {
   List<Available> generateAvailableTrainersCounts() {
     List<Available> result = [];
 
-    for (DateTime dateTime in AppData.instance.getActiveDates()) {
-      result.add(_genCountProcessDate(dateTime));
+    for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
+      DateTime date = AppData.instance.getActiveDates()[i];
+      result.add(_genCountProcessDate(i, date));
     }
 
     return result;
@@ -67,7 +69,7 @@ class SpreadsheetGenerator {
       }
     }
 
-    _postProcessSpreadsheet();
+    postProcessSpreadsheet();
     return _spreadSheet;
   }
 
@@ -118,21 +120,19 @@ class SpreadsheetGenerator {
     }
   }
 
-  Available _genCountProcessDate(DateTime date) {
+  Available _genCountProcessDate(int dateIndex, DateTime date) {
     Available available = Available(date: date);
-    String mapDateStr = AppHelper.instance.getDateStringForSpreadsheet(date);
 
     for (Groep groep in Groep.values) {
       AvailableCounts availableCounts = AvailableCounts();
 
       for (Trainer trainer in _getTrainersForGroup(groep)) {
         TrainerSchema schemas = getSchemaFromAllTrainerData(trainer);
-        Map<String, dynamic> schemaMap = schemas.toMap();
         if (schemas.isEmpty()) {
           availableCounts.notEnteredYet.add(trainer);
-        } else if (schemaMap[mapDateStr] == 1) {
+        } else if (schemas.availableList[dateIndex] == 1) {
           availableCounts.confirmed.add(trainer);
-        } else if (schemaMap[mapDateStr] == 2) {
+        } else if (schemas.availableList[dateIndex] == 2) {
           availableCounts.ifNeeded.add(trainer);
         }
       }
@@ -149,10 +149,16 @@ class SpreadsheetGenerator {
         _spreadSheet.rows[rowNr].rowCells[groepNr].availableCounts;
 
     List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
+
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
-    if (!_isThursdayAndPR(rowNr, groepNr) ||
-        _isSaturdayAndZamo(rowNr, groepNr)) {
+    bool setTrainer = true; //assume
+    if (_isThursdayAndPR(rowNr, groepNr) ||
+        (_isSaturday(rowNr) && !_isSaturdayAndZamo(rowNr, groepNr))) {
+      setTrainer = false;
+    }
+
+    if (setTrainer) {
       Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
           rowNr: rowNr, groepNr: groepNr);
       _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
@@ -201,8 +207,7 @@ class SpreadsheetGenerator {
 
   Trainer _getTrainerFromPossibleList(List<TrainerWeight> possibleTrainers,
       {required int rowNr, required int groepNr}) {
-    possibleTrainers = _removeAlreadyScheduled(possibleTrainers,
-        rowNr: rowNr, groepNr: groepNr);
+    possibleTrainers = _removeAlreadyScheduled(possibleTrainers, rowNr: rowNr);
     if (possibleTrainers.length == 1) {
       return possibleTrainers.last.trainer;
     } else if (possibleTrainers.length > 1) {
@@ -223,8 +228,7 @@ class SpreadsheetGenerator {
 
   List<TrainerWeight> _removeAlreadyScheduled(
       List<TrainerWeight> possibleTrainers,
-      {required int rowNr,
-      required int groepNr}) {
+      {required int rowNr}) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     List<TrainerWeight> result = [];
 
@@ -295,6 +299,11 @@ class SpreadsheetGenerator {
     }
   }
 
+  String _getWeekdaStr(int rowNr) {
+    SheetRow sheetRow = _spreadSheet.rows[rowNr];
+    return DateFormat.EEEE(c.localNL).format(sheetRow.date);
+  }
+
   bool _isSaturday(int rowNr) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     return sheetRow.date.weekday == DateTime.saturday;
@@ -338,29 +347,42 @@ class SpreadsheetGenerator {
       {required int rowNr, required int groepNr}) {
     double result = 0.0;
 
+    if (_isSaturday(rowNr)) {
+      return result;
+    }
+
+    if (trainer.pk == 'RV' && rowNr == 12) {
+      lp('$rowNr ${_getWeekdaStr(rowNr)} $result');
+    }
+
     int countDays = 1;
     List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
-    for (int i = rowNr - 1; i >= 0; i--) {
-      for (RowCell rowCell in _spreadSheet.rows[i].rowCells) {
-        Trainer schedTrainer = rowCell.getTrainer();
-        if (schedTrainer == trainer) {
-          int idx = countDays > values.length - 1 ? 0 : countDays;
-          double w = values[idx];
-          result += w;
+    for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
+      for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
+        if (!_isSaturday(prevRowNr) && !_isThursdayAndPR(prevRowNr, groepNr)) {
+          Trainer schedTrainer = rowCell.getTrainer();
+          if (schedTrainer == trainer) {
+            int idx = countDays > values.length - 1 ? 0 : countDays;
+            double w = values[idx];
+            result += w;
+          }
         }
       }
       countDays++;
     }
 
+    if (trainer.pk == 'RB') {
+      lp('$rowNr ${_getWeekdaStr(rowNr)} $result');
+    }
     return result;
   }
 
-  void _postProcessSpreadsheet() {
-    _postProcessZamo();
-    _postProcessThursdayPR();
+  void postProcessSpreadsheet() {
+    postProcessZamo();
+    postProcessThursdayPR();
   }
 
-  void _postProcessZamo() {
+  void postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
         sheetRow.trainingText = 'ZaMo';
@@ -375,7 +397,7 @@ class SpreadsheetGenerator {
     }
   }
 
-  void _postProcessThursdayPR() {
+  void postProcessThursdayPR() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.thursday) {
         sheetRow.rowCells[Groep.pr.index].text = '(met R1)';
