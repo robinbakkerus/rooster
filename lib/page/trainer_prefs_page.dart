@@ -29,8 +29,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   @override
   void initState() {
     _trainer = AppData.instance.getTrainer();
-    _updateTrainer = _trainer.copyWith();
-    _fab = _getFab();
+    if (!_trainer.isEmpty()) {
+      _updateTrainer = _trainer.copyWith();
+      _fab = _getFab();
+    }
     super.initState();
   }
 

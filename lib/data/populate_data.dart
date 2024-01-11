@@ -38,12 +38,10 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
       pk: pk,
       fullname: fullname,
       email: email,
-      dayPrefs: [
+      prefValues: [
         TrainerPref(paramName: DayPrefEnum.tuesday.name, value: 1),
         TrainerPref(paramName: DayPrefEnum.thursday.name, value: 1),
-        TrainerPref(paramName: DayPrefEnum.saturday.name, value: zamo)
-      ],
-      groupPrefs: [
+        TrainerPref(paramName: DayPrefEnum.saturday.name, value: zamo),
         TrainerPref(paramName: Groep.pr.name, value: pr),
         TrainerPref(paramName: Groep.r1.name, value: r1),
         TrainerPref(paramName: Groep.r2.name, value: r2),

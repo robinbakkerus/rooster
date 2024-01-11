@@ -37,9 +37,7 @@ class SpreadsheetGenerator {
   }
 
   bool _availableForGroep(Trainer trainer, Groep groep) {
-    Map<String, dynamic> map = trainer.toMap();
-    int avail = map[groep.name];
-    return avail > 0;
+    return trainer.getPrefValue(paramName: groep.name) > 0;
   }
 
   //-------------------------------
@@ -269,9 +267,7 @@ class SpreadsheetGenerator {
   }
 
   bool _isOnlyIfNeeded(Trainer trainer, int groepNr) {
-    Map<String, dynamic> map = trainer.toMap();
-    int value = map[Groep.values[groepNr].name];
-    return value == 2;
+    return trainer.getPrefValue(paramName: Groep.values[groepNr].name) == 2;
   }
 
   // if trainer is not available future days its score goes up

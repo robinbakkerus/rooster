@@ -1,7 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 
 import 'package:rooster/data/app_data.dart';
@@ -102,8 +100,7 @@ class Trainer {
   final String pk; // this is also the firestore dbs ID
   final String fullname;
   String email;
-  List<TrainerPref> dayPrefs;
-  List<TrainerPref> groupPrefs;
+  List<TrainerPref> prefValues = [];
   final String roles;
 
   Trainer({
@@ -111,8 +108,7 @@ class Trainer {
     required this.pk,
     required this.fullname,
     required this.email,
-    required this.dayPrefs,
-    required this.groupPrefs,
+    required this.prefValues,
     required this.roles,
   });
 
@@ -121,8 +117,7 @@ class Trainer {
     String? pk,
     String? fullname,
     String? email,
-    List<TrainerPref>? dayPrefs,
-    List<TrainerPref>? groupPrefs,
+    List<TrainerPref>? prefValues,
     String? roles,
   }) {
     return Trainer(
@@ -130,9 +125,8 @@ class Trainer {
       pk: pk ?? this.pk,
       fullname: fullname ?? this.fullname,
       email: email ?? this.email,
-      dayPrefs: dayPrefs ?? this.dayPrefs.map((e) => e.copyWith()).toList(),
-      groupPrefs:
-          groupPrefs ?? this.groupPrefs.map((e) => e.copyWith()).toList(),
+      prefValues:
+          prefValues ?? this.prefValues.map((e) => e.copyWith()).toList(),
       roles: roles ?? this.roles,
     );
   }
@@ -143,8 +137,7 @@ class Trainer {
       'pk': pk,
       'fullname': fullname,
       'email': email,
-      'dayPrefs': dayPrefs.map((x) => x.toMap()).toList(),
-      'groupPrefs': groupPrefs.map((x) => x.toMap()).toList(),
+      'prefValues': prefValues.map((x) => x.toMap()).toList(),
       'roles': roles,
     };
   }
@@ -155,17 +148,15 @@ class Trainer {
       pk: map['pk'],
       fullname: map['fullname'],
       email: map['email'],
-      dayPrefs: List<TrainerPref>.from(
-          map['dayPrefs']?.map((x) => TrainerPref.fromMap(x))),
-      groupPrefs: List<TrainerPref>.from(
-          map['groupPrefs']?.map((x) => TrainerPref.fromMap(x))),
+      prefValues: List<TrainerPref>.from(
+          map['prefValues']?.map((x) => TrainerPref.fromMap(x))),
       roles: map['roles'],
     );
   }
 
   @override
   String toString() {
-    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, dayPrefs: $dayPrefs, groupPrefs: $groupPrefs, roles: $roles)';
+    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, prefs: $prefValues, roles: $roles)';
   }
 
   @override
@@ -177,8 +168,7 @@ class Trainer {
         other.pk == pk &&
         other.fullname == fullname &&
         other.email == email &&
-        listEquals(other.dayPrefs, dayPrefs) &&
-        listEquals(other.groupPrefs, groupPrefs) &&
+        listEquals(other.prefValues, prefValues) &&
         other.roles == roles;
   }
 
@@ -188,8 +178,7 @@ class Trainer {
         pk.hashCode ^
         fullname.hashCode ^
         email.hashCode ^
-        dayPrefs.hashCode ^
-        groupPrefs.hashCode ^
+        prefValues.hashCode ^
         roles.hashCode;
   }
 
@@ -200,8 +189,7 @@ class Trainer {
         pk: '',
         fullname: '',
         email: '',
-        dayPrefs: [],
-        groupPrefs: [],
+        prefValues: [],
         roles: '');
   }
 
@@ -228,12 +216,7 @@ class Trainer {
   }
 
   int getPrefValue({required String paramName}) {
-    for (TrainerPref pref in groupPrefs) {
-      if (pref.paramName == paramName) {
-        return pref.value;
-      }
-    }
-    for (TrainerPref pref in dayPrefs) {
+    for (TrainerPref pref in prefValues) {
       if (pref.paramName == paramName) {
         return pref.value;
       }
@@ -244,7 +227,7 @@ class Trainer {
   int getDayPrefValue({required int weekday}) {
     int result = -1;
 
-    for (TrainerPref pref in dayPrefs) {
+    for (TrainerPref pref in prefValues) {
       String weekDayStr = AppHelper.instance.weekDayStringFromWeekday(
           weekday: weekday, locale: AppConstants().localUK);
       if (pref.paramName == weekDayStr) {
@@ -254,25 +237,8 @@ class Trainer {
     return result;
   }
 
-  int getGroupPrefValue(Groep groep) {
-    int result = -1;
-
-    for (TrainerPref pref in groupPrefs) {
-      if (pref.paramName == groep.name) {
-        return pref.value;
-      }
-    }
-    return result;
-  }
-
   void setPrefValue(String paramName, int value) {
-    for (TrainerPref pref in groupPrefs) {
-      if (pref.paramName == paramName) {
-        pref.value = value;
-        return;
-      }
-    }
-    for (TrainerPref pref in dayPrefs) {
+    for (TrainerPref pref in prefValues) {
       if (pref.paramName == paramName) {
         pref.value = value;
         return;

@@ -184,6 +184,7 @@ class AppHelper with AppMixin {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final deviceInfo = await deviceInfoPlugin.deviceInfo;
     final allInfo = deviceInfo.data;
+    lp(allInfo.toString());
   }
 
   ///--------------------
