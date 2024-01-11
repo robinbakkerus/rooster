@@ -4,7 +4,6 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:intl/intl.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_mixin.dart';
@@ -288,7 +287,7 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-// if trainer is already sceduled before its score goes down
+// if trainer is already scheduled before its score goes down
   void _applyAlreadyScheduled(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
     for (TrainerWeight tw in trainerWeightList) {
@@ -299,10 +298,10 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  String _getWeekdaStr(int rowNr) {
-    SheetRow sheetRow = _spreadSheet.rows[rowNr];
-    return DateFormat.EEEE(c.localNL).format(sheetRow.date);
-  }
+  // String _getWeekdayStr(int rowNr) {
+  //   SheetRow sheetRow = _spreadSheet.rows[rowNr];
+  //   return DateFormat.EEEE(c.localNL).format(sheetRow.date);
+  // }
 
   bool _isSaturday(int rowNr) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
@@ -342,17 +341,13 @@ class SpreadsheetGenerator with AppMixin {
     return result;
   }
 
-  // hoe vaak afwezig vanaf dateTime
+  // how often scheduled in the days before
   double _getApplyWeightForAlreadyScheduledDays(Trainer trainer,
       {required int rowNr, required int groepNr}) {
     double result = 0.0;
 
     if (_isSaturday(rowNr)) {
       return result;
-    }
-
-    if (trainer.pk == 'RV' && rowNr == 12) {
-      lp('$rowNr ${_getWeekdaStr(rowNr)} $result');
     }
 
     int countDays = 1;
@@ -371,9 +366,6 @@ class SpreadsheetGenerator with AppMixin {
       countDays++;
     }
 
-    if (trainer.pk == 'RB') {
-      lp('$rowNr ${_getWeekdaStr(rowNr)} $result');
-    }
     return result;
   }
 
