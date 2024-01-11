@@ -266,7 +266,6 @@ class Trainer {
   }
 
   void setPrefValue(String paramName, int value) {
-    log('setpref ${identityHashCode(this)}');
     for (TrainerPref pref in groupPrefs) {
       if (pref.paramName == paramName) {
         pref.value = value;

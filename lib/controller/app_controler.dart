@@ -231,7 +231,6 @@ class AppController {
           DateTime(lastRosterFinal.year, lastRosterFinal.month, 1);
       if (lrfDate.millisecondsSinceEpoch >
           lastActiveDate.millisecondsSinceEpoch) {
-        log('use lastRosterFinal to calc active date = ${lastRosterFinal.month}');
         lastActiveDate =
             DateTime(lastRosterFinal.year, lastRosterFinal.month, 1);
       }
