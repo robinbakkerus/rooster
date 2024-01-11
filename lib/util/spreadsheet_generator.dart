@@ -58,13 +58,20 @@ class SpreadsheetGenerator with AppMixin {
     _spreadSheet = SpreadSheet(
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
-    // first fill the spreadsheet with available trainer data
-    _fillAvailabilityInSpreadsheet(availableList);
 
-    // next find the best trainer
+    // first fill the spreadsheet with available trainer data
+    List<SheetRow> sheetRows = _getAvailabilityForSpreadsheet(availableList);
+    _spreadSheet.rows = sheetRows;
+
+    // next find the best trainer, first we skip zamo
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
-      for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
+      for (int groepNr = 0; groepNr < Groep.values.length - 1; groepNr++) {
         _findSuitableTrainer(rowNr: rowNr, groepNr: groepNr);
+      }
+    }
+    for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
+      if (_isSaturday(rowNr)) {
+        _findSuitableZamoTrainer(rowNr: rowNr);
       }
     }
 
@@ -103,7 +110,8 @@ class SpreadsheetGenerator with AppMixin {
   //---- private --
 
   //------------- first fill the spreadsheet with available trainer data
-  void _fillAvailabilityInSpreadsheet(List<Available> availableList) {
+  List<SheetRow> _getAvailabilityForSpreadsheet(List<Available> availableList) {
+    List<SheetRow> result = [];
     int rowIdx = 0;
     for (Available avail in availableList) {
       SheetRow sheetRow =
@@ -113,10 +121,12 @@ class SpreadsheetGenerator with AppMixin {
         rowCell.availableCounts = avail.counts[groepNr];
         sheetRow.rowCells.add(rowCell);
       }
-      _spreadSheet.addRow(sheetRow);
+      result.add(sheetRow);
 
       rowIdx++;
     }
+
+    return result;
   }
 
   Available _genCountProcessDate(int dateIndex, DateTime date) {
@@ -142,7 +152,7 @@ class SpreadsheetGenerator with AppMixin {
     return available;
   }
 
-//---------------
+  ///---------------
   void _findSuitableTrainer({required int rowNr, required int groepNr}) {
     AvailableCounts cnts =
         _spreadSheet.rows[rowNr].rowCells[groepNr].availableCounts;
@@ -162,6 +172,20 @@ class SpreadsheetGenerator with AppMixin {
           rowNr: rowNr, groepNr: groepNr);
       _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
     }
+  }
+
+  ///---------------
+  void _findSuitableZamoTrainer({required int rowNr}) {
+    AvailableCounts cnts =
+        _spreadSheet.rows[rowNr].rowCells[Groep.zamo.index].availableCounts;
+
+    List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
+
+    _applyZamoWeights(possibleTrainerWeights, rowNr: rowNr);
+
+    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
+        rowNr: rowNr, groepNr: Groep.zamo.index);
+    _spreadSheet.rows[rowNr].rowCells[Groep.zamo.index].setTrainer(trainer);
   }
 
 //-----------------------
@@ -258,6 +282,13 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
+  void _applyZamoWeights(List<TrainerWeight> trainerWeightList,
+      {required int rowNr}) {
+    _applyDaysNotAvailable(trainerWeightList,
+        rowNr: rowNr, groepNr: Groep.zamo.index);
+    _applyAlreadyZamoScheduled(trainerWeightList, rowNr: rowNr);
+  }
+
   // if trainer is not available future days its score goes up
   void _applyOnlyIfNeeded(List<TrainerWeight> trainerWeightList,
       {required int rowNr, required int groepNr}) {
@@ -295,6 +326,32 @@ class SpreadsheetGenerator with AppMixin {
       double applyWeight = _getApplyWeightForAlreadyScheduledDays(trainer,
           rowNr: rowNr, groepNr: groepNr);
       tw.weight += applyWeight;
+    }
+  }
+
+  void _applyAlreadyZamoScheduled(List<TrainerWeight> trainerWeightList,
+      {required int rowNr}) {
+    for (TrainerWeight tw in trainerWeightList) {
+      Trainer trainer = tw.trainer;
+
+      double result = 0.0;
+      int countDays = 1;
+      List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
+
+      for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
+        for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
+          if (_isSaturday(prevRowNr)) {
+            Trainer schedTrainer = rowCell.getTrainer();
+            if (schedTrainer == trainer) {
+              int idx = countDays > values.length - 1 ? 0 : countDays;
+              result += values[idx];
+            }
+          }
+        }
+        countDays++;
+      }
+
+      tw.weight += result;
     }
   }
 
