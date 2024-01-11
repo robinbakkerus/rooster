@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class AppHelper with AppMixin {
@@ -139,44 +138,17 @@ class AppHelper with AppMixin {
   /// ------------------------
   String weekDayStringFromWeekday(
       {required int weekday, required String locale}) {
-    if (locale == AppConstants().localUK) {
-      if (weekday == DateTime.monday) {
-        return 'monday';
-      } else if (weekday == DateTime.tuesday) {
-        return 'tuesday';
-      } else if (weekday == DateTime.tuesday) {
-        return 'tuesday';
-      } else if (weekday == DateTime.wednesday) {
-        return 'wednesday';
-      } else if (weekday == DateTime.thursday) {
-        return 'thursday';
-      } else if (weekday == DateTime.friday) {
-        return 'friday';
-      } else if (weekday == DateTime.saturday) {
-        return 'saturday';
-      } else if (weekday == DateTime.sunday) {
-        return 'sunday';
-      }
-    } else {
-      if (weekday == DateTime.monday) {
-        return 'maandag';
-      } else if (weekday == DateTime.tuesday) {
-        return 'dinsdag';
-      } else if (weekday == DateTime.tuesday) {
-        return 'woensdag';
-      } else if (weekday == DateTime.wednesday) {
-        return 'woensdag';
-      } else if (weekday == DateTime.thursday) {
-        return 'donderdag';
-      } else if (weekday == DateTime.friday) {
-        return 'vrijdag';
-      } else if (weekday == DateTime.saturday) {
-        return 'zaterdag';
-      } else if (weekday == DateTime.sunday) {
-        return 'zondag';
+    DateTime dateTime = DateTime.now();
+    for (int i = 0; i < 7; i++) {
+      DateTime dt = DateTime(AppData.instance.getActiveYear(),
+          AppData.instance.getActiveMonth(), i);
+      if (dt.weekday == weekday) {
+        dateTime = dt;
+        break;
       }
     }
-    return '???';
+
+    return DateFormat.EEEE(locale).format(dateTime);
   }
 
   ///-----------------
