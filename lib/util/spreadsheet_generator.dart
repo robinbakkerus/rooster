@@ -157,7 +157,8 @@ class SpreadsheetGenerator with AppMixin {
     AvailableCounts cnts =
         _spreadSheet.rows[rowNr].rowCells[groepNr].availableCounts;
 
-    List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
+    List<TrainerWeight> possibleTrainerWeights =
+        _getPossibleTrainers(cnts, isZamo: false);
 
     _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
 
@@ -179,7 +180,8 @@ class SpreadsheetGenerator with AppMixin {
     AvailableCounts cnts =
         _spreadSheet.rows[rowNr].rowCells[Groep.zamo.index].availableCounts;
 
-    List<TrainerWeight> possibleTrainerWeights = _getPossibleTrainers(cnts);
+    List<TrainerWeight> possibleTrainerWeights =
+        _getPossibleTrainers(cnts, isZamo: true);
 
     _applyZamoWeights(possibleTrainerWeights, rowNr: rowNr);
 
@@ -189,31 +191,35 @@ class SpreadsheetGenerator with AppMixin {
   }
 
 //-----------------------
-  List<TrainerWeight> _getPossibleTrainers(AvailableCounts cnts) {
+  List<TrainerWeight> _getPossibleTrainers(AvailableCounts cnts,
+      {required bool isZamo}) {
     List<TrainerWeight> result = [];
 
     for (Trainer trainer in cnts.confirmed) {
-      double weight = _getStartWeight(trainer);
+      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo);
       result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
     for (Trainer trainer in cnts.ifNeeded) {
-      double weight = _getStartWeight(trainer) +
+      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo) +
           AppData.instance.applyWeightValues.onlyIfNeeded;
       result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
     for (Trainer trainer in cnts.notEnteredYet) {
       //todo should we make this optional
-      double weight = _getStartWeight(trainer);
+      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo);
       result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
 
     return result;
   }
 
-  double _getStartWeight(Trainer trainer) {
-    ApplyWeightStartValue? startVal = AppData
-        .instance.applyWeightValues.startValues
-        .firstWhereOrNull((e) => e.trainerPk == trainer.pk);
+  double _getStartWeight({required Trainer trainer, required bool isZamo}) {
+    ApplyWeightStartValue? startVal = isZamo
+        ? AppData.instance.applyWeightValues.startValues
+            .firstWhereOrNull((e) => e.trainerPk == trainer.pk)
+        : AppData.instance.applyWeightValues.zamoStartValues
+            .firstWhereOrNull((e) => e.trainerPk == trainer.pk);
+
     if (startVal != null) {
       return startVal.value;
     } else {

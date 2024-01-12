@@ -427,12 +427,14 @@ class Available {
 
 class ApplyWeightValues {
   List<ApplyWeightStartValue> startValues = [];
+  List<ApplyWeightStartValue> zamoStartValues = [];
   double onlyIfNeeded = -15;
   // the first [0] value is the default value, the [1] value means 1 training day before etc
   List<double> alreadyScheduled = [];
 
   ApplyWeightValues({
     required this.startValues,
+    required this.zamoStartValues,
     required this.onlyIfNeeded,
     required this.alreadyScheduled,
   });
@@ -440,6 +442,7 @@ class ApplyWeightValues {
   Map<String, dynamic> toMap() {
     return {
       'startValues': startValues.map((x) => x.toMap()).toList(),
+      'zamoStartValues': zamoStartValues.map((x) => x.toMap()).toList(),
       'onlyIfNeeded': onlyIfNeeded,
       'alreadyScheduled': alreadyScheduled,
     };
@@ -449,27 +452,50 @@ class ApplyWeightValues {
     return ApplyWeightValues(
       startValues: List<ApplyWeightStartValue>.from(
           map['startValues']?.map((x) => ApplyWeightStartValue.fromMap(x))),
+      zamoStartValues: List<ApplyWeightStartValue>.from(
+          map['zamoStartValues']?.map((x) => ApplyWeightStartValue.fromMap(x))),
       onlyIfNeeded: map['onlyIfNeeded'],
       alreadyScheduled: List<double>.from(map['alreadyScheduled']),
     );
   }
 
   @override
-  String toString() =>
-      'ApplyWeightValues(startValues: $startValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
+  String toString() {
+    return 'ApplyWeightValues(startValues: $startValues, zamoStartValues: $zamoStartValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is ApplyWeightValues &&
         listEquals(other.startValues, startValues) &&
+        listEquals(other.zamoStartValues, zamoStartValues) &&
         other.onlyIfNeeded == onlyIfNeeded &&
         listEquals(other.alreadyScheduled, alreadyScheduled);
   }
 
   @override
-  int get hashCode =>
-      startValues.hashCode ^ onlyIfNeeded.hashCode ^ alreadyScheduled.hashCode;
+  int get hashCode {
+    return startValues.hashCode ^
+        zamoStartValues.hashCode ^
+        onlyIfNeeded.hashCode ^
+        alreadyScheduled.hashCode;
+  }
+
+  ApplyWeightValues copyWith({
+    List<ApplyWeightStartValue>? startValues,
+    List<ApplyWeightStartValue>? zamoStartValues,
+    double? onlyIfNeeded,
+    List<double>? alreadyScheduled,
+  }) {
+    return ApplyWeightValues(
+      startValues: startValues ?? this.startValues,
+      zamoStartValues: zamoStartValues ?? this.zamoStartValues,
+      onlyIfNeeded: onlyIfNeeded ?? this.onlyIfNeeded,
+      alreadyScheduled: alreadyScheduled ?? this.alreadyScheduled,
+    );
+  }
 }
 
 ///------------ ApplyWeightStartValue
