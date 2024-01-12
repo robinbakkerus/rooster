@@ -92,14 +92,12 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------//------------------
-  AvailableCounts getAvailableCounts(Groep group, DateTime dateTime) {
-    for (SheetRow sheetRow in AppData.instance.getSpreadsheet().rows) {
-      if (AppHelper.instance.isSameDate(sheetRow.date, dateTime)) {
-        return sheetRow.rowCells[group.index].availableCounts;
-      }
-    }
-
-    return AvailableCounts();
+  AvailableCounts getAvailableCounts(int rowIndex, Groep group) {
+    return AppData.instance
+        .getSpreadsheet()
+        .rows[rowIndex]
+        .rowCells[group.index]
+        .availableCounts;
   }
 
   ///-----------------
@@ -185,17 +183,13 @@ class AppHelper with AppMixin {
   }
 
   ///--------------------
-  int getAvailability(Trainer trainer, DateTime dateTime) {
+  int getAvailability(Trainer trainer, int rowIndex) {
     TrainerData? trainerData = AppData.instance
         .getAllTrainerData()
         .firstWhereOrNull((e) => e.trainer == trainer);
 
-    String mapName = getDateStringForSpreadsheet(dateTime);
-    if (trainerData != null) {
-      Map<String, dynamic> map = trainerData.trainerSchemas.toMap();
-      if (map[mapName] != null) {
-        return map[mapName];
-      }
+    if (trainerData != null && !trainerData.trainerSchemas.isEmpty()) {
+      return trainerData.trainerSchemas.availableList[rowIndex];
     }
     return 0;
   }

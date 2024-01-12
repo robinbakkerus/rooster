@@ -81,32 +81,35 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
   List<DataRow> _buildDataRows() {
     List<DataRow> result = [];
 
-    for (DateTime dateTime in AppData.instance.getActiveDates()) {
-      result.add(DataRow(cells: _buildDataCells(dateTime)));
+    for (int rowIndex = 0;
+        rowIndex < AppData.instance.getSpreadsheet().rows.length;
+        rowIndex++) {
+      result.add(DataRow(cells: _buildDataCells(rowIndex)));
     }
     return result;
   }
 
-  List<DataCell> _buildDataCells(DateTime dateTime) {
+  List<DataCell> _buildDataCells(int rowIndex) {
     List<DataCell> result = [];
 
-    result.add(_buildDayDataCell(dateTime));
+    result.add(_buildDayDataCell(rowIndex));
 
     for (Groep groep in Groep.values) {
-      result.add(_buildGroupDataCell(dateTime, groep));
+      result.add(_buildGroupDataCell(rowIndex, groep));
     }
 
     return result;
   }
 
-  DataCell _buildDayDataCell(DateTime dateTime) {
+  DataCell _buildDayDataCell(int rowIndex) {
+    DateTime dateTime = AppData.instance.getActiveDates()[rowIndex];
     String text = AppHelper.instance.getSimpleDayString(dateTime);
     return DataCell(Text(text));
   }
 
-  DataCell _buildGroupDataCell(DateTime dateTime, Groep groep) {
+  DataCell _buildGroupDataCell(int rowIndex, Groep groep) {
     AvailableCounts cnts =
-        AppHelper.instance.getAvailableCounts(groep, dateTime);
+        AppHelper.instance.getAvailableCounts(rowIndex, groep);
 
     String text =
         '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
@@ -122,7 +125,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
         ),
       ),
       onTap: () {
-        _dialogBuilder(context, groep, dateTime);
+        _dialogBuilder(context, rowIndex, groep);
       },
     ));
   }
@@ -138,8 +141,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return c.lightGeen;
   }
 
-  Future<void> _dialogBuilder(
-      BuildContext context, Groep group, DateTime dateTime) {
+  Future<void> _dialogBuilder(BuildContext context, int rowIndex, Groep group) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -155,7 +157,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: _buildAvailDetail(group, dateTime),
+                  child: _buildAvailDetail(rowIndex, group),
                 ),
                 ElevatedButton(
                     onPressed: () {
@@ -170,9 +172,9 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     );
   }
 
-  Widget _buildAvailDetail(Groep group, DateTime dateTime) {
+  Widget _buildAvailDetail(int rowIndex, Groep group) {
     AvailableCounts cnts =
-        AppHelper.instance.getAvailableCounts(group, dateTime);
+        AppHelper.instance.getAvailableCounts(rowIndex, group);
 
     List<Widget> colWidgets = [];
 
@@ -219,7 +221,8 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
         )));
     colWidgets.add(_horLine());
 
-    for (Trainer trainer in _getUnavailbeTrainers(dateTime)) {
+    for (Trainer trainer
+        in _getUnavailbeTrainers(rowIndex, group, cnts.notEnteredYet)) {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
@@ -236,13 +239,17 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     );
   }
 
-  List<Trainer> _getUnavailbeTrainers(DateTime dateTime) {
+  List<Trainer> _getUnavailbeTrainers(
+      int rowIndex, Groep groep, List<Trainer> notEnteredYet) {
     List<Trainer> result = [];
 
     for (Trainer trainer in AppData.instance.getAllTrainers()) {
-      int avail = AppHelper.instance.getAvailability(trainer, dateTime);
-      if (avail == 0) {
-        result.add(trainer);
+      if (!notEnteredYet.contains(trainer) &&
+          trainer.getPrefValue(paramName: groep.name) > 0) {
+        int avail = AppHelper.instance.getAvailability(trainer, rowIndex);
+        if (avail == 0) {
+          result.add(trainer);
+        }
       }
     }
 
