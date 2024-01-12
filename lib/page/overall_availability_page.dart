@@ -256,9 +256,3 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return result;
   }
 }
-
-final double w15 = 0.15 * AppData.instance.screenWidth;
-final double w2 = 0.2 * AppData.instance.screenWidth;
-const Color colLightYellow = Color(0xffF4E9CA);
-const Color colLightGreen = Color(0xffA6CD7A);
-const Color colLightRed = Color(0xffF6AB94);
