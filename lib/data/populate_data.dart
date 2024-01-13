@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
@@ -92,11 +90,6 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
   int availTuesday = trainer.getDayPrefValue(weekday: DateTime.tuesday);
   int availThursday = trainer.getDayPrefValue(weekday: DateTime.thursday);
   int availSaturday = trainer.getDayPrefValue(weekday: DateTime.saturday);
-
-  List<DateTime> dates = AppData.instance.getActiveDates();
-  for (DateTime dt in dates) {
-    log('${dt.day} ${dt.weekday}');
-  }
 
   for (DateTime date in AppData.instance.getActiveDates()) {
     if (date.weekday == DateTime.tuesday) {
