@@ -92,8 +92,9 @@ class AppData {
 
   // ---
   void setActiveDate(DateTime date) {
-    _activeDate = date;
-    List<DateTime> allDates = AppHelper.instance.getDaysInBetween(date);
+    DateTime useDate = DateTime(date.year, date.month, 1);
+    _activeDate = useDate;
+    List<DateTime> allDates = AppHelper.instance.getDaysInBetween(useDate);
     _activeDates = allDates
         .where((e) =>
             e.weekday == DateTime.tuesday ||

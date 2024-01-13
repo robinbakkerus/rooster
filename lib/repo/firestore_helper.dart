@@ -60,8 +60,8 @@ class FirestoreHelper with AppMixin {
   }
 
   /// update the available value of the given DaySchema
-  Future<bool> createOrUpdateTrainerSchemas(
-      TrainerSchema trainerSchemas, bool updateSchema) async {
+  Future<bool> createOrUpdateTrainerSchemas(TrainerSchema trainerSchemas,
+      {required bool updateSchema}) async {
     bool result = false;
 
     if (!AppData.instance.simulate) {

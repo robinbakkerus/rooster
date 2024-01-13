@@ -137,11 +137,14 @@ class SpreadsheetGenerator with AppMixin {
 
       for (Trainer trainer in _getTrainersForGroup(groep)) {
         TrainerSchema schemas = getSchemaFromAllTrainerData(trainer);
+
         if (schemas.isEmpty()) {
           availableCounts.notEnteredYet.add(trainer);
-        } else if (schemas.availableList[dateIndex] == 1) {
+        } else if (schemas.availableList.length >= dateIndex &&
+            schemas.availableList[dateIndex] == 1) {
           availableCounts.confirmed.add(trainer);
-        } else if (schemas.availableList[dateIndex] == 2) {
+        } else if (schemas.availableList.length >= dateIndex &&
+            schemas.availableList[dateIndex] == 2) {
           availableCounts.ifNeeded.add(trainer);
         }
       }

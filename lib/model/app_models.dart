@@ -228,8 +228,10 @@ class Trainer {
     int result = -1;
 
     for (TrainerPref pref in prefValues) {
-      String weekDayStr = AppHelper.instance.weekDayStringFromWeekday(
-          weekday: weekday, locale: AppConstants().localUK);
+      String weekDayStr = AppHelper.instance
+          .weekDayStringFromWeekday(
+              weekday: weekday, locale: AppConstants().localUK)
+          .toLowerCase();
       if (pref.paramName == weekDayStr) {
         return pref.value;
       }

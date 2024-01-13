@@ -77,7 +77,8 @@ class AppController {
     TrainerSchema trainerSchemas =
         AppData.instance.getTrainerData().trainerSchemas;
     trainerSchemas.availableList = AppData.instance.newAvailaibleList;
-    FirestoreHelper.instance.createOrUpdateTrainerSchemas(trainerSchemas, true);
+    FirestoreHelper.instance
+        .createOrUpdateTrainerSchemas(trainerSchemas, updateSchema: true);
     getTrainerData(trainer: AppData.instance.getTrainer());
   }
 
@@ -206,9 +207,8 @@ class AppController {
     TrainerSchema newTrainerSchemas =
         AppHelper.instance.buildNewSchemaForTrainer(useTrainer);
 
-    bool updateSchema = false;
     bool updateOkay = await FirestoreHelper.instance
-        .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema);
+        .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema: false);
     if (updateOkay) {
       result.trainerSchemas = newTrainerSchemas;
     }

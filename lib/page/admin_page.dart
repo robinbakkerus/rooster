@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rooster/util/app_mixin.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:rooster/controller/app_controler.dart';
-import 'package:rooster/data/app_data.dart';
-import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/firestore_helper.dart';
-import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/data/populate_data.dart' as p;
+import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/app_mixin.dart';
+import 'package:universal_html/html.dart' as html;
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -27,7 +24,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _removeCookie, child: const Text('Remove cookie')),
           OutlinedButton(
-              onPressed: _generateRoster, child: const Text('Maak rooster')),
+              onPressed: _addTrainerSchemas,
+              child: const Text('add trainer schemas')),
           OutlinedButton(
               onPressed: _saveFsSpreadsheet,
               child: const Text('Firestore spreadsheet')),
@@ -58,7 +56,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       p.trainerOlav,
       p.trainerPauline,
       p.trainerRonald,
-      p.trainerCyriel
+      p.trainerCyriel,
     ];
 
     for (Trainer trainer in trainers) {
@@ -70,20 +68,29 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     html.document.cookie = "ac=";
   }
 
-  void _generateRoster() async {
-    await FirestoreHelper.instance.findTrainerByAccessCode('ROME');
-    await AppController.instance.generateSpreadsheet();
+  void _addTrainerSchemas() async {
+    List<TrainerSchema> schemas = [
+      p.trainerSchemasAnne,
+      p.trainerSchemasCyriel,
+      p.trainerSchemasFried,
+      p.trainerSchemasHuib,
+      p.trainerSchemasJanneke,
+      p.trainerSchemasMaria,
+      p.trainerSchemasMaria,
+      p.trainerSchemasOlav,
+      p.trainerSchemasPaula,
+      p.trainerSchemasPauline,
+      p.trainerSchemasRonald,
+      p.trainerSchemasJeroen,
+    ];
 
-    List<Available> availableList =
-        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
-    SpreadSheet spreadSheet = SpreadsheetGenerator.instance
-        .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
-    lp(spreadSheet.toString());
+    for (TrainerSchema ts in schemas) {
+      FirestoreHelper.instance
+          .createOrUpdateTrainerSchemas(ts, updateSchema: false);
+    }
   }
 
   void _saveFsSpreadsheet() async {
-    // FsSpreadsheet fsSpreadsheet = p.spreadSheetJanuari();
-    // await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
     FsSpreadsheet fsSpreadsheet = p.spreadSheetFebruari();
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
@@ -33,6 +35,9 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
     String email, int pr, int r1, int r2, int r3, int zaterdag,
     {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
+
+  email = 'robin.bakkerus@gmail.com'; // todo
+
   return Trainer(
       accessCode: accesscode,
       pk: pk,
@@ -63,24 +68,47 @@ TrainerSchema trainerSchemasPaula = _buildTrainerSchema(trainerPaula);
 TrainerSchema trainerSchemasOlav = _buildTrainerSchema(trainerOlav);
 TrainerSchema trainerSchemasFried = _buildTrainerSchema(trainerFried);
 TrainerSchema trainerSchemasRonald = _buildTrainerSchema(trainerRonald);
+TrainerSchema trainerSchemasMaria = _buildTrainerSchema(trainerMaria);
+TrainerSchema trainerSchemasJanneke = _buildTrainerSchema(trainerJanneke);
+TrainerSchema trainerSchemasAnne = _buildTrainerSchema(trainerAnne);
+TrainerSchema trainerSchemasPauline = _buildTrainerSchema(trainerPauline);
+TrainerSchema trainerSchemasHuib = _buildTrainerSchema(trainerHuib);
+TrainerSchema trainerSchemasCyriel = _buildTrainerSchema(trainerCyriel);
+TrainerSchema trainerSchemasJeroen = _buildTrainerSchema(trainerJeroen);
 
+// build schema's for februari
 TrainerSchema _buildTrainerSchema(Trainer trainer) {
   TrainerSchema result = TrainerSchema.empty();
-  AppData.instance.setActiveDate(DateTime.now());
+  AppData.instance.setActiveDate(DateTime(2024, 2, 1));
 
   Map<String, dynamic> map = result.toMap();
-  map['id'] = '${trainer.pk}_2024_1';
+  map['id'] = '${trainer.pk}_2024_2'; //todo
   map['year'] = DateTime.now().year;
   map['month'] = DateTime.now().month;
   map['trainerPk'] = trainer.pk;
 
   result = TrainerSchema.fromMap(map);
 
-  int avail = trainer.getDayPrefValue(weekday: DateTime.tuesday);
-  avail = trainer.getDayPrefValue(weekday: DateTime.thursday);
-  avail = trainer.getDayPrefValue(weekday: DateTime.saturday);
-  result.availableList.add(avail);
+  int availTuesday = trainer.getDayPrefValue(weekday: DateTime.tuesday);
+  int availThursday = trainer.getDayPrefValue(weekday: DateTime.thursday);
+  int availSaturday = trainer.getDayPrefValue(weekday: DateTime.saturday);
 
+  List<DateTime> dates = AppData.instance.getActiveDates();
+  for (DateTime dt in dates) {
+    log('${dt.day} ${dt.weekday}');
+  }
+
+  for (DateTime date in AppData.instance.getActiveDates()) {
+    if (date.weekday == DateTime.tuesday) {
+      result.availableList.add(availTuesday);
+    } else if (date.weekday == DateTime.thursday) {
+      result.availableList.add(availThursday);
+    } else if (date.weekday == DateTime.saturday) {
+      result.availableList.add(availSaturday);
+    }
+  }
+
+  result.created = DateTime.now();
   return result;
 }
 
