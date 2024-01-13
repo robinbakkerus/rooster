@@ -10,6 +10,7 @@ import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 // import 'package:collection/collection.dart';
+import 'package:rooster/data/populate_data.dart' as p;
 
 class AppController {
   AppController._();
@@ -109,7 +110,7 @@ class AppController {
   }
 
   ///--------------------
-  void finalizeRoster(SpreadSheet spreadSheet) async {
+  void finalizeSpreadsheet(SpreadSheet spreadSheet) async {
     await _sendEmailToTrainers(spreadSheet);
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
@@ -118,23 +119,32 @@ class AppController {
   }
 
   Future<void> _sendEmailToTrainers(SpreadSheet spreadSheet) async {
-    // String html = SpreadsheetGenerator.instance.generateHtml(spreadSheet);
-    // List<String> csvList =
-    //     SpreadsheetGenerator.instance.generateCsv(spreadSheet);
-    // String content = '$html<br><br>';
-    // for (String line in csvList) {
-    //   content += '$line<br>';
-    // }
-    // bool okay = await FirestoreHelper.instance.sendEmail(
-    //     toTrainers: AppData.instance.getAllTrainers(),
-    //     subject: 'Trainingschema',
-    //     html: content);
+    String html = _generateSpreadsheetReadyHtml(spreadSheet);
+    List<Trainer> toTrainers = AppData.instance.getAllTrainers();
+    toTrainers = [p.trainerRobin]; //todo
 
-    // if (okay) {
-    //   log("email okay");
-    // } else {
-    //   log("!email NOT  okay");
-    // }
+    bool okay = await FirestoreHelper.instance.sendEmail(
+        toTrainers: toTrainers, subject: 'Trainingschema', html: html);
+
+    if (okay) {
+      log("email okay");
+    } else {
+      log("!email NOT  okay");
+    }
+  }
+
+  String _generateSpreadsheetReadyHtml(SpreadSheet spreadSheet) {
+    String html = '<div>';
+    html += 'Hallo <br><br>';
+    String maand = AppHelper.instance
+        .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
+    html += 'Het trainingschema voor $maand is nu definitief. <br>';
+    html +=
+        'Deze is zichtbaar op https://public-lonutrainingschemas.web.app <br>';
+    html +=
+        'Er kunnen nu geen verhinderingen meer in deze maand worden opgegeven. <br>';
+
+    return '$html</div>';
   }
 
   ///--------------------

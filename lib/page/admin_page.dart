@@ -38,7 +38,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               child: const Text('Add ApplyWeightValue(s)')),
           OutlinedButton(
               onPressed: _addTrainingItems,
-              child: const Text('Add training items'))
+              child: const Text('Add training items')),
+          OutlinedButton(onPressed: _sendEmail, child: const Text('Send email'))
         ],
       ),
     );
@@ -119,5 +120,12 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     await ref.doc('training_items').set(map).then((val) {
       lp('training items added ');
     }).onError((error, stackTrace) => lp(error.toString()));
+  }
+
+  void _sendEmail() async {
+    List<Trainer> toTrainers = [p.trainerRobin];
+    String html = '<p>Test</p>';
+    FirestoreHelper.instance
+        .sendEmail(toTrainers: toTrainers, subject: 'subject', html: html);
   }
 }

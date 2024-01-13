@@ -197,7 +197,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   void _doFinalizeRoster(BuildContext context) async {
-    AppController.instance.finalizeRoster(_spreadSheet);
+    AppController.instance.finalizeSpreadsheet(_spreadSheet);
     wh.showSnackbar('Training schema is nu definitief!');
   }
 
