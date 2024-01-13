@@ -46,7 +46,7 @@ class SpreadsheetGenerator with AppMixin {
 
     for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
       DateTime date = AppData.instance.getActiveDates()[i];
-      result.add(_genCountProcessDate(i, date));
+      result.add(_genCountsProcessDate(i, date));
     }
 
     return result;
@@ -129,7 +129,7 @@ class SpreadsheetGenerator with AppMixin {
     return result;
   }
 
-  Available _genCountProcessDate(int dateIndex, DateTime date) {
+  Available _genCountsProcessDate(int dateIndex, DateTime date) {
     Available available = Available(date: date);
 
     for (Groep groep in Groep.values) {
@@ -138,11 +138,27 @@ class SpreadsheetGenerator with AppMixin {
       for (Trainer trainer in _getTrainersForGroup(groep)) {
         TrainerSchema schemas = getSchemaFromAllTrainerData(trainer);
 
+        int groupPref = trainer.getPrefValue(paramName: groep.name);
+        int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
+
         if (schemas.isEmpty()) {
-          availableCounts.notEnteredYet.add(trainer);
+          if (groupPref == 2 || dayPref == 2) {
+            availableCounts.ifNeededBnye.add(trainer);
+          } else if (groupPref == 1 && dayPref == 1) {
+            availableCounts.availableBnye.add(trainer);
+          } else {
+            availableCounts.notAvailableBnye.add(trainer);
+          }
+        } else if (schemas.availableList.length >= dateIndex &&
+            schemas.availableList[dateIndex] == 0) {
+          availableCounts.notAvailable.add(trainer);
         } else if (schemas.availableList.length >= dateIndex &&
             schemas.availableList[dateIndex] == 1) {
-          availableCounts.confirmed.add(trainer);
+          if (groupPref == 2) {
+            availableCounts.ifNeeded.add(trainer);
+          } else {
+            availableCounts.available.add(trainer);
+          }
         } else if (schemas.availableList.length >= dateIndex &&
             schemas.availableList[dateIndex] == 2) {
           availableCounts.ifNeeded.add(trainer);
@@ -198,18 +214,20 @@ class SpreadsheetGenerator with AppMixin {
       {required bool isZamo}) {
     List<TrainerWeight> result = [];
 
-    for (Trainer trainer in cnts.confirmed) {
+    List<Trainer> trainerList = [];
+    trainerList.addAll(cnts.available);
+    trainerList.addAll(cnts.availableBnye);
+    for (Trainer trainer in trainerList) {
       double weight = _getStartWeight(trainer: trainer, isZamo: isZamo);
       result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
-    for (Trainer trainer in cnts.ifNeeded) {
+
+    trainerList = [];
+    trainerList.addAll(cnts.ifNeeded);
+    trainerList.addAll(cnts.ifNeededBnye);
+    for (Trainer trainer in trainerList) {
       double weight = _getStartWeight(trainer: trainer, isZamo: isZamo) +
           AppData.instance.applyWeightValues.onlyIfNeeded;
-      result.add(TrainerWeight(trainer: trainer, weight: weight));
-    }
-    for (Trainer trainer in cnts.notEnteredYet) {
-      //todo should we make this optional
-      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo);
       result.add(TrainerWeight(trainer: trainer, weight: weight));
     }
 

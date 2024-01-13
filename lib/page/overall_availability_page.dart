@@ -112,7 +112,8 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
         AppHelper.instance.getAvailableCounts(rowIndex, groep);
 
     String text =
-        '${cnts.confirmed.length}, ${cnts.ifNeeded.length}, ${cnts.notEnteredYet.length}';
+        _getSummaryFormattedCounts(cnts, rowIndex: rowIndex, groep: groep);
+
     Color color = _buildAvailFieldColor(cnts);
 
     return DataCell(InkWell(
@@ -130,12 +131,17 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     ));
   }
 
+  String _getSummaryFormattedCounts(AvailableCounts cnts,
+      {required rowIndex, required Groep groep}) {
+    String result = '${(cnts.available + cnts.availableBnye).length}, '
+        '${(cnts.ifNeeded + cnts.ifNeededBnye).length}, ${cnts.notAvailable.length}';
+    return result;
+  }
+
   Color _buildAvailFieldColor(AvailableCounts cnts) {
-    if (cnts.confirmed.isNotEmpty) {
+    if (cnts.available.isNotEmpty) {
       return c.lightBrown;
-    } else if (cnts.confirmed.isEmpty &&
-        cnts.ifNeeded.isEmpty &&
-        cnts.notEnteredYet.isEmpty) {
+    } else if (cnts.available.isEmpty && cnts.ifNeeded.isEmpty) {
       return c.lightOrange;
     }
     return c.lightGeen;
@@ -178,17 +184,23 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
 
     List<Widget> colWidgets = [];
 
+    colWidgets.add(const Text('* : Heeft schema nog niet ingevuld.'));
+    colWidgets.add(wh.verSpace(15));
     colWidgets.add(const Text(
       'Aanwezig',
       style: TextStyle(color: Colors.green),
     ));
     colWidgets.add(_horLine());
 
-    for (Trainer trainer in cnts.confirmed) {
+    for (Trainer trainer in cnts.available) {
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(wh.verSpace(20));
+    for (Trainer trainer in cnts.availableBnye) {
+      Widget w = Text('${trainer.firstName()} *');
+      colWidgets.add(w);
+    }
+    colWidgets.add(wh.verSpace(15));
 
     colWidgets.add(const Text(
       'Alleen als nodig',
@@ -200,20 +212,11 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
       Widget w = Text(trainer.firstName());
       colWidgets.add(w);
     }
-    colWidgets.add(wh.verSpace(20));
-
-    colWidgets.add(const Text('Nog niet ingevuld',
-        style: TextStyle(
-          color: Colors.brown,
-        )));
-    colWidgets.add(_horLine());
-
-    for (Trainer trainer in cnts.notEnteredYet) {
-      Widget w = Text(trainer.firstName());
+    for (Trainer trainer in cnts.ifNeededBnye) {
+      Widget w = Text('${trainer.firstName()} *');
       colWidgets.add(w);
     }
-
-    colWidgets.add(wh.verSpace(20));
+    colWidgets.add(wh.verSpace(15));
 
     colWidgets.add(const Text('Niet aanwezig',
         style: TextStyle(
@@ -221,9 +224,12 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
         )));
     colWidgets.add(_horLine());
 
-    for (Trainer trainer
-        in _getUnavailbeTrainers(rowIndex, group, cnts.notEnteredYet)) {
+    for (Trainer trainer in cnts.notAvailable) {
       Widget w = Text(trainer.firstName());
+      colWidgets.add(w);
+    }
+    for (Trainer trainer in cnts.notAvailableBnye) {
+      Widget w = Text('${trainer.firstName()} *');
       colWidgets.add(w);
     }
 
@@ -237,22 +243,5 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return const Divider(
       color: Colors.grey,
     );
-  }
-
-  List<Trainer> _getUnavailbeTrainers(
-      int rowIndex, Groep groep, List<Trainer> notEnteredYet) {
-    List<Trainer> result = [];
-
-    for (Trainer trainer in AppData.instance.getAllTrainers()) {
-      if (!notEnteredYet.contains(trainer) &&
-          trainer.getPrefValue(paramName: groep.name) > 0) {
-        int avail = AppHelper.instance.getAvailability(trainer, rowIndex);
-        if (avail == 0) {
-          result.add(trainer);
-        }
-      }
-    }
-
-    return result;
   }
 }

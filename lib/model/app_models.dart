@@ -364,33 +364,25 @@ class TrainerData {
 ///---------------------------
 
 class AvailableCounts {
-  List<Trainer> confirmed = [];
+  List<Trainer> available = [];
+  List<Trainer> availableBnye = []; //but not yet entered
   List<Trainer> ifNeeded = [];
-  List<Trainer> notEnteredYet = [];
-
-  @override
-  String toString() =>
-      'AvailableCounts(confirmed: $confirmed, ifNeeded: $ifNeeded, notEnteredYet: $notEnteredYet)';
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is AvailableCounts &&
-        listEquals(other.confirmed, confirmed) &&
-        listEquals(other.ifNeeded, ifNeeded) &&
-        listEquals(other.notEnteredYet, notEnteredYet);
-  }
-
-  @override
-  int get hashCode =>
-      confirmed.hashCode ^ ifNeeded.hashCode ^ notEnteredYet.hashCode;
+  List<Trainer> ifNeededBnye = [];
+  List<Trainer> notAvailable = [];
+  List<Trainer> notAvailableBnye = [];
 
   List<Trainer> getAllTrainers() {
     List<Trainer> result = [];
-    result.addAll(confirmed);
+    result.addAll(available);
+    result.addAll(availableBnye);
     result.addAll(ifNeeded);
-    result.addAll(notEnteredYet);
+    result.addAll(ifNeededBnye);
     return result;
+  }
+
+  @override
+  String toString() {
+    return 'AvailableCounts(available: $available, availableBnye: $availableBnye, ifNeeded: $ifNeeded, ifNeededBnye: $ifNeededBnye, notAvailable: $notAvailable, notAvailableBnye: $notAvailableBnye)';
   }
 }
 
