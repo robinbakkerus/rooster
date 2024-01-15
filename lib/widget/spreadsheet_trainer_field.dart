@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class SpreadsheetTrainerColumn extends StatefulWidget {
   final SheetRow sheetRow;
   final Groep groep;
+  final bool isEditable;
   const SpreadsheetTrainerColumn(
-      {required super.key, required this.sheetRow, required this.groep});
+      {required super.key,
+      required this.sheetRow,
+      required this.groep,
+      required this.isEditable});
 
   @override
   State<SpreadsheetTrainerColumn> createState() =>
@@ -118,8 +123,19 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   bool _isEditable() {
-    return AppData.instance.getTrainer().isSupervisor() &&
-        !AppData.instance.schemaIsFinal();
+    return (widget.isEditable &&
+            AppData.instance.getTrainer().isSupervisor()) ||
+        (widget.isEditable && _isSameTrainer());
+  }
+
+  bool _isSameTrainer() {
+    String name = widget.sheetRow.rowCells[widget.groep.index].text;
+    Trainer trainer = AppHelper.instance.findTrainerByFirstName(name);
+    if (!trainer.isEmpty()) {
+      return trainer.pk == AppData.instance.getTrainer().pk;
+    } else {
+      return false;
+    }
   }
 
   Widget _buildOtherTrainerField() {

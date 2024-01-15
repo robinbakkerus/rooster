@@ -47,7 +47,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     List<Trainer> trainers = [
       p.trainerAnne,
       p.trainerPaula,
-      p.trainerRobin,
+      // p.trainerRobin,
       p.trainerFried,
       p.trainerHuib,
       p.trainerJanneke,
@@ -133,6 +133,6 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     List<Trainer> toTrainers = [p.trainerRobin];
     String html = '<p>Test</p>';
     FirestoreHelper.instance
-        .sendEmail(toTrainers: toTrainers, subject: 'subject', html: html);
+        .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
   }
 }

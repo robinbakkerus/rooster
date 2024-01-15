@@ -18,7 +18,6 @@ class AppData {
   double screenHeight = 600.0; //assume
   double shortestSide = 600; //assume
   String trainerId = "";
-  SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
 
   DateTime _activeDate = DateTime(2024, 1, 1);
   DateTime lastActiveDate = DateTime(2024, 1, 1);
@@ -28,12 +27,22 @@ class AppData {
   List<String> trainerItems = [];
   late ApplyWeightValues applyWeightValues;
 
+  // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
+  SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
+  SpreadSheet _oldSpreadSheet =
+      SpreadSheet(year: 2024, month: 1); // to obtain the diffs
+
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
   }
 
+  SpreadSheet getOldpreadsheet() {
+    return _oldSpreadSheet;
+  }
+
   void setSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
+    _oldSpreadSheet = spreadSheet.clone();
     rebuildSpreadsheet = false;
   }
 

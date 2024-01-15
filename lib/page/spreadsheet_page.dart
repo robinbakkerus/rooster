@@ -24,7 +24,9 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
 
-  bool _isEditable = false;
+  bool _isNew = true;
+  bool _isMutable = false;
+
   Widget _dataGrid = Container();
 
   _SpreadsheetPageState();
@@ -37,8 +39,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     AppEvents.onSpreadsheetTrainerUpdatedEvent(_onSpreadTrainerUpdated);
 
     _spreadSheet = AppData.instance.getSpreadsheet();
-    _isEditable = AppData.instance.getTrainer().isSupervisor() &&
-        !AppData.instance.schemaIsFinal();
+    _isNew = !AppData.instance.schemaIsFinal();
     _dataGrid = _buildGrid();
 
     super.initState();
@@ -55,14 +56,28 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
           children: [
             _dataGrid,
             wh.verSpace(10),
-            _isEditable ? _buildSupervisorButtons() : Container(),
+            _buildButtons(),
           ],
         ),
       ),
     );
   }
 
-//--------------------------------------------------------
+  //-----------------------
+  bool _isEditable() {
+    if (_isNew && _isSupervisor()) {
+      return true;
+    } else {
+      return _isMutable;
+    }
+  }
+
+  //--------------------------------
+  bool _isSupervisor() {
+    return AppData.instance.getTrainer().isSupervisor();
+  }
+
+  //--------------------------------------------------------
   Widget _buildGrid() {
     double colSpace = AppHelper.instance.isWindows() ? 25 : 10;
     return SingleChildScrollView(
@@ -150,7 +165,10 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   DataCell _buildTrainerCell(SheetRow sheetRow, Groep groep) {
     return DataCell(SpreadsheetTrainerColumn(
-        key: UniqueKey(), sheetRow: sheetRow, groep: groep));
+        key: UniqueKey(),
+        sheetRow: sheetRow,
+        groep: groep,
+        isEditable: _isEditable()));
   }
 
   DataCell _buildDayCell(SheetRow sheetRow) {
@@ -165,11 +183,14 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         decoration:
             BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey)),
         width: w,
-        child:
-            SpreadsheetTrainingColumn(key: UniqueKey(), sheetRow: sheetRow)));
+        child: SpreadsheetTrainingColumn(
+          key: UniqueKey(),
+          sheetRow: sheetRow,
+          isEditable: _isEditable(),
+        )));
   }
 
-  Widget _buildSupervisorButtons() {
+  Widget _buildButtons() {
     return Row(
       children: [
         wh.horSpace(10),
@@ -178,22 +199,60 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
             child: const Icon(
               Icons.info_outline,
               size: 32,
-              color: Colors.grey,
+              color: Colors.lightBlue,
             )),
         wh.horSpace(20),
-        OutlinedButton(
-            onPressed: _onConfirmFinalizeRoster,
-            child: const Text('Maak schema defintief'))
+        _buildActionButton(context),
       ],
     );
   }
 
+  Widget _buildActionButton(BuildContext context) {
+    if (_isNew) {
+      return _buildActionButtonsNewSpreadsheet();
+    } else {
+      return _buildActionButtonPublishedSpreadsheet();
+    }
+  }
+
+  Widget _buildActionButtonsNewSpreadsheet() {
+    if (_isSupervisor()) {
+      return OutlinedButton(
+          onPressed: _onConfirmFinalizeSpreadsheet,
+          child: const Text('Maak schema definitief'));
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _buildActionButtonPublishedSpreadsheet() {
+    if (!_isMutable) {
+      return OutlinedButton(
+          onPressed: _buildDialogMakeSpreadsheetMutable,
+          child: const Text('Maak schema open voor wijziging(en)'));
+    } else {
+      return OutlinedButton(
+          onPressed: _saveSpreadsheetMuations,
+          child: const Text('Voer wijzigingen door'));
+    }
+  }
+
+  ///--------------------------------------------------------
   void _onShowSpreadsheetInfo() {
     _buildDialogSpreadsheetInfo(context);
   }
 
-  void _onConfirmFinalizeRoster() {
+  void _onConfirmFinalizeSpreadsheet() {
     _buildDialogConfirm(context, _areProgramFieldSet());
+  }
+
+  void _saveSpreadsheetMuations() async {
+    await AppController.instance.updateSpreadsheet(_spreadSheet);
+    setState(() {
+      _isMutable = false;
+      _dataGrid = _buildGrid();
+    });
+    wh.showSnackbar('Wijzigingen zijn doorgevoerd', color: Colors.lightGreen);
   }
 
   void _doFinalizeRoster(BuildContext context) async {
@@ -224,6 +283,67 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     );
   }
 
+  //--------------------------------
+  void _buildDialogMakeSpreadsheetMutable() async {
+    Widget noButton = TextButton(
+      onPressed: () {
+        Navigator.pop(context, false);
+        // Navigator.of(context, rootNavigator: true)
+        //     .pop(); // dismisses only the dialog and returns nothing
+      },
+      child: const Text(
+        "Nee",
+        style: TextStyle(color: Colors.red),
+      ),
+    );
+
+    Widget yesButton = TextButton(
+      onPressed: () {
+        Navigator.pop(context, true);
+        // Navigator.of(context, rootNavigator: true)
+        //     .pop(); // dismisses only the dialog and returns nothing
+      },
+      child: const Text(
+        "Ja",
+        style: TextStyle(color: Colors.green),
+      ),
+    );
+
+    /// set up the AlertDialog
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Trainingschema"),
+      content: const SizedBox(
+        height: 100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Dit schema is gepubliceerd!'),
+            Text('Weet je zeker dat je wijzigingen wilt aanbrengen?'),
+          ],
+        ),
+      ),
+      actions: [
+        noButton,
+        yesButton,
+      ],
+    ); // show the dialog
+
+    bool dialogResult = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+
+    setState(() {
+      _isMutable = dialogResult;
+      _dataGrid = _buildGrid();
+    });
+  }
+
+  //---------------------------------
   String _getTrainerDeployed() {
     Map<String, int> counts = {};
 
@@ -304,15 +424,13 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   void _onReady(AllTrainersDataReadyEvent event) {
     if (mounted) {
       setState(() {
+        _isNew = !AppData.instance.schemaIsFinal();
+        _isMutable = false;
         _spreadSheet = AppData.instance.getSpreadsheet();
         _dataGrid = _buildGrid();
-        _isEditable = AppData.instance.getTrainer().isSupervisor() &&
-            !AppData.instance.schemaIsFinal();
 
-        if (AppData.instance.schemaIsFinal()) {
-          wh.showSnackbar(
-              'Schema is al definitief: er kunnen geen wijzigingen worden aangebracht',
-              color: Colors.orange);
+        if (!_isNew) {
+          wh.showSnackbar('Schema is al definitief!', color: Colors.orange);
         }
       });
     }

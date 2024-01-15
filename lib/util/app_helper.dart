@@ -194,6 +194,25 @@ class AppHelper with AppMixin {
     return 0;
   }
 
+  ///---------------------------------------------
+  List<Trainer> getAllSupervisors() {
+    return AppData.instance
+        .getAllTrainers()
+        .where((e) => e.isSupervisor())
+        .toList();
+  }
+
+  Trainer findTrainerByFirstName(String name) {
+    Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull(
+        (e) => e.firstName().toLowerCase() == name.toLowerCase());
+
+    if (trainer != null) {
+      return trainer;
+    } else {
+      return Trainer.empty();
+    }
+  }
+
   /// -------- private methods --------------------------------
 
   String _getShortWeekDay(DateTime dateTime) {

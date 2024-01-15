@@ -239,7 +239,7 @@ class _StartPageState extends State<StartPage> {
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
     if (_getStackIndex() == PageEnum.spreadSheet.code) {
-      AppController.instance.generateSpreadsheet();
+      AppController.instance.generateOrRetrieveSpreadsheet();
     }
   }
 
@@ -258,7 +258,7 @@ class _StartPageState extends State<StartPage> {
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
     if (_getStackIndex() == PageEnum.spreadSheet.code) {
-      AppController.instance.generateSpreadsheet();
+      AppController.instance.generateOrRetrieveSpreadsheet();
     }
   }
 
@@ -271,7 +271,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _gotoSpreadsheet() {
-    AppController.instance.generateSpreadsheet();
+    AppController.instance.generateOrRetrieveSpreadsheet();
     setState(() {
       _setStackIndex(4);
       _barTitle = _buildBarTitle();

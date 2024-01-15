@@ -138,8 +138,11 @@ class FirestoreHelper with AppMixin {
       CollectionReference zamoRef = firestore.collection('metadata');
       await zamoRef.doc('zamo_trainers').get().then(
         (val) {
-          Map<String, dynamic> map = val.data() as Map<String, dynamic>;
-          return map['trainers'];
+          Map<String, dynamic> map = val.data()! as Map<String, dynamic>;
+          var list = map['trainers'];
+          for (var pk in list) {
+            result.add(pk.toString());
+          }
         },
         onError: (e) => lp("Error completing getZamoTrainers: $e"),
       ).catchError((e) {
@@ -191,7 +194,7 @@ class FirestoreHelper with AppMixin {
         },
         onError: (e) => lp("Error getting weight_values: $e"),
       ).catchError((e) {
-        lp('Error in getZamoTrainers : $e');
+        lp('Error in getApplyWeightValues : $e');
         throw e;
       });
     } else {
@@ -247,28 +250,34 @@ class FirestoreHelper with AppMixin {
     });
   }
 
+  //-----------------------------------------
+  Future<FsSpreadsheet> retrieveSpreadsheet(
+      {required int year, required int month}) async {
+    CollectionReference colref = firestore.collection('spreadsheet');
+
+    String docId = '${year}_$month';
+    DocumentSnapshot snapshot =
+        await colref.doc(docId).get().catchError((error) {
+      lp(' Error in retrieveSpreadsheet $error');
+      throw error;
+    });
+
+    return FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
+  }
+
   ///-------- sendEmail
   Future<bool> sendEmail(
-      {required List<Trainer> toTrainers,
+      {required List<Trainer> to,
+      required List<Trainer> cc,
       required String subject,
       required String html}) async {
     bool result = false;
     CollectionReference mailRef = firestore.collection('mail');
 
     Map<String, dynamic> map = {};
-    List<String> recipients = [];
-    for (Trainer trainer in toTrainers) {
-      if (trainer.email.isNotEmpty) {
-        recipients.add(trainer.email);
-      }
-    }
-    map['to'] = recipients;
-
-    Map<String, dynamic> msgmap = {};
-    msgmap['subject'] = subject;
-    msgmap['html'] = html;
-
-    map['message'] = msgmap;
+    map['to'] = _buildEmailAdresList(to);
+    map['cc'] = _buildEmailAdresList(cc);
+    map['message'] = _buildEmailMessageMap(subject, html);
 
     await mailRef
         .add(map)
@@ -279,6 +288,23 @@ class FirestoreHelper with AppMixin {
     });
 
     return result;
+  }
+
+  Map<String, dynamic> _buildEmailMessageMap(String subject, String html) {
+    Map<String, dynamic> msgMap = {};
+    msgMap['subject'] = subject;
+    msgMap['html'] = html;
+    return msgMap;
+  }
+
+  List<String> _buildEmailAdresList(List<Trainer> trainerList) {
+    List<String> toList = [];
+    for (Trainer trainer in trainerList) {
+      if (trainer.email.isNotEmpty) {
+        toList.add(trainer.email);
+      }
+    }
+    return toList;
   }
 
   ///============ private methods --------

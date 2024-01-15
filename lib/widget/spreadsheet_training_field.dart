@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 class SpreadsheetTrainingColumn extends StatefulWidget {
   final SheetRow sheetRow;
-  const SpreadsheetTrainingColumn({required super.key, required this.sheetRow});
+  final bool isEditable;
+  const SpreadsheetTrainingColumn(
+      {required super.key, required this.sheetRow, required this.isEditable});
 
   @override
   State<SpreadsheetTrainingColumn> createState() =>
@@ -48,8 +50,8 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
         isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
       onTap: isEditable()
-          ? () => _buildSupervisorDialog(context)
-          : () => _buildTrainerDialog(context),
+          ? () => _buildEditTrainingDialog(context)
+          : () => _buildReadOnlyDialog(context),
       child: Container(
           decoration: decoration,
           child: Padding(
@@ -62,7 +64,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     );
   }
 
-  Future<void> _buildSupervisorDialog(BuildContext context) {
+  Future<void> _buildEditTrainingDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -111,7 +113,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     );
   }
 
-  Future<void> _buildTrainerDialog(BuildContext context) {
+  Future<void> _buildReadOnlyDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -144,8 +146,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   bool _isExtraRow() => widget.sheetRow.isExtraRow;
 
   bool isEditable() {
-    return AppData.instance.getTrainer().isSupervisor() &&
-        !AppData.instance.schemaIsFinal();
+    bool b = (widget.isEditable &&
+            AppData.instance.getTrainer().isSupervisor()) ||
+        (widget.isEditable &&
+            widget.sheetRow.date.weekday == DateTime.saturday &&
+            AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk));
+    return b;
   }
 
   void _onDropdownSelected(Object? value) {

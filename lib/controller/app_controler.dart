@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:intl/intl.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:rooster/data/app_data.dart';
@@ -96,56 +98,86 @@ class AppController {
     AppEvents.fireDatesReady();
   }
 
-  Future<SpreadSheet> generateSpreadsheet() async {
+  Future<SpreadSheet> generateOrRetrieveSpreadsheet() async {
     await _getAllTrainerData();
 
+    SpreadSheet result;
+    if (AppData.instance.schemaIsFinal()) {
+      result = await _getTheSpreadsheet();
+    } else {
+      result = _generateTheSpreadsheet();
+    }
+
+    AppData.instance.setSpreadsheet(result);
+    AppEvents.fireAllTrainerDataReady();
+    return result;
+  }
+
+  ///------------------------------------------------
+  SpreadSheet _generateTheSpreadsheet() {
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
         .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+    return spreadSheet;
+  }
 
-    AppData.instance.setSpreadsheet(spreadSheet);
-    AppEvents.fireAllTrainerDataReady();
+  ///------------------------------------------------
+  Future<SpreadSheet> _getTheSpreadsheet() async {
+    FsSpreadsheet fsSpreadsheet = await FirestoreHelper.instance
+        .retrieveSpreadsheet(
+            year: AppData.instance.getActiveYear(),
+            month: AppData.instance.getActiveMonth());
 
+    SpreadSheet spreadSheet = _mapFromFsSpreadsheet(fsSpreadsheet);
+    return spreadSheet;
+  }
+
+  SpreadSheet _mapFromFsSpreadsheet(FsSpreadsheet fsSpreadsheet) {
+    SpreadSheet spreadSheet = SpreadSheet(
+        year: AppData.instance.getActiveYear(),
+        month: AppData.instance.getActiveMonth());
+
+    for (int r = 0; r < fsSpreadsheet.rows.length; r++) {
+      FsSpreadsheetRow fsRow = fsSpreadsheet.rows[r];
+      SheetRow row =
+          SheetRow(rowIndex: r, date: fsRow.date, isExtraRow: fsRow.isExtraRow);
+      row.trainingText = fsRow.trainingText;
+
+      for (int c = 0; c < fsRow.rowCells.length; c++) {
+        RowCell cell = RowCell(rowIndex: r, colIndex: c);
+        cell.text = fsRow.rowCells[c];
+        row.rowCells.add(cell);
+      }
+
+      spreadSheet.rows.add(row);
+    }
     return spreadSheet;
   }
 
   ///--------------------
   void finalizeSpreadsheet(SpreadSheet spreadSheet) async {
-    await _sendEmailToTrainers(spreadSheet);
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
     await FirestoreHelper.instance.saveLastRosterFinal();
+    await _mailSpreadsheetIsFinal(spreadSheet);
   }
 
-  Future<void> _sendEmailToTrainers(SpreadSheet spreadSheet) async {
-    String html = _generateSpreadsheetReadyHtml(spreadSheet);
-    List<Trainer> toTrainers = AppData.instance.getAllTrainers();
-    toTrainers = [p.trainerRobin]; //todo
-
-    bool okay = await FirestoreHelper.instance.sendEmail(
-        toTrainers: toTrainers, subject: 'Trainingschema', html: html);
-
-    if (okay) {
-      log("email okay");
-    } else {
-      log("!email NOT  okay");
-    }
-  }
-
-  String _generateSpreadsheetReadyHtml(SpreadSheet spreadSheet) {
-    String html = '<div>';
-    html += 'Hallo <br><br>';
-    String maand = AppHelper.instance
-        .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
-    html += 'Het trainingschema voor $maand is nu definitief. <br>';
-    html +=
-        'Deze is zichtbaar op https://public-lonutrainingschemas.web.app <br>';
-    html +=
-        'Er kunnen nu geen verhinderingen meer in deze maand worden opgegeven. <br>';
-
-    return '$html</div>';
+  ///--------------------
+  Future<void> updateSpreadsheet(SpreadSheet spreadSheet) async {
+    FsSpreadsheet fsSpreadsheet =
+        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+    FsSpreadsheet oldFsSpreadsheet = SpreadsheetGenerator.instance
+        .fsSpreadsheetFrom(AppData.instance.getOldpreadsheet());
+    List<SpreedsheetDiff> diffs = _getSpreadsheetDiffs(
+        newSpreadsheet: fsSpreadsheet, oldSpreadsheet: oldFsSpreadsheet);
+    String html =
+        _getSpreadsheetDiffsAsHtml(diffs: diffs, spreadSheet: spreadSheet);
+    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
+    List<Trainer> toTrainers =
+        _getSpreadsheetDiffsEmailRecipients(diffs: diffs);
+    await _mailSpreadsheetUpdate(html, to: toTrainers, cc: []);
   }
 
   ///--------------------
@@ -153,7 +185,7 @@ class AppController {
     return await FirestoreHelper.instance.getLastRosterFinal();
   }
 
-  /// private methods -----------------
+  /// ============ private methods -----------------
 
   /// get trainer data
   Future<TrainerData> _getTheTrainerData(
@@ -214,6 +246,7 @@ class AppController {
     }
   }
 
+  //-------------------------------------------
   void _setDates() async {
     DateTime lastActiveDate = await _getLastActiveDate();
 
@@ -231,6 +264,7 @@ class AppController {
     AppData.instance.lastMonth = lastMonth;
   }
 
+  //-------------------------------------------
   Future<DateTime> _getLastActiveDate() async {
     DateTime now = DateTime.now();
     DateTime lastActiveDate = DateTime(now.year, now.month, 1); //assume
@@ -248,6 +282,7 @@ class AppController {
     return lastActiveDate;
   }
 
+  //-------------------------------------------
   void _setScreenSizes(BuildContext context) {
     double width = (MediaQuery.of(context).size.width);
     AppData.instance.screenWidth = width;
@@ -255,5 +290,127 @@ class AppController {
     AppData.instance.screenHeight = height;
 
     AppData.instance.shortestSide = MediaQuery.of(context).size.shortestSide;
+  }
+
+  //-------------------------------------
+  Future<void> _mailSpreadsheetIsFinal(SpreadSheet spreadSheet) async {
+    String html = _generateSpreadsheetIsFinalHtml(spreadSheet);
+    List<Trainer> toTrainers = AppData.instance.getAllTrainers();
+    toTrainers = [p.trainerRobin]; //todo
+
+    bool okay = await FirestoreHelper.instance.sendEmail(
+        to: toTrainers,
+        cc: [],
+        subject: 'Trainingschema definitief',
+        html: html);
+
+    if (okay) {
+      log("email okay");
+    } else {
+      log("!email NOT  okay");
+    }
+  }
+
+  //-------------------------------------
+  Future<void> _mailSpreadsheetUpdate(String html,
+      {required List<Trainer> to, required List<Trainer> cc}) async {
+    bool okay = await FirestoreHelper.instance.sendEmail(
+        to: to, cc: cc, subject: 'Trainingschema wijziging', html: html);
+
+    if (okay) {
+      log("email okay");
+    } else {
+      log("!email NOT  okay");
+    }
+  }
+
+  //-------------------------------------------
+  String _generateSpreadsheetIsFinalHtml(SpreadSheet spreadSheet) {
+    String html = '<div>';
+    html += 'Hallo <br><br>';
+    String maand = AppHelper.instance
+        .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
+    html += 'Het trainingschema voor $maand is nu definitief. <br>';
+    html +=
+        'Deze is zichtbaar op https://public-lonutrainingschemas.web.app <br>';
+    html +=
+        'Er kunnen nu geen verhinderingen meer in deze maand worden opgegeven. <br>';
+
+    return '$html</div>';
+  }
+
+  //------------------------------------
+  List<SpreedsheetDiff> _getSpreadsheetDiffs(
+      {required FsSpreadsheet newSpreadsheet,
+      required FsSpreadsheet oldSpreadsheet}) {
+    List<SpreedsheetDiff> diffs = [];
+    for (int r = 0; r < newSpreadsheet.rows.length; r++) {
+      FsSpreadsheetRow newRow = newSpreadsheet.rows[r];
+      FsSpreadsheetRow oldRow = oldSpreadsheet.rows[r];
+      if (newRow.trainingText != oldRow.trainingText) {
+        SpreedsheetDiff diff = SpreedsheetDiff(
+            date: newRow.date,
+            column: 'Training',
+            oldValue: oldRow.trainingText,
+            newValue: newRow.trainingText);
+        diffs.add(diff);
+      }
+      for (int c = 0; c < newRow.rowCells.length; c++) {
+        String newVal = newRow.rowCells[c];
+        String oldVal = oldRow.rowCells[c];
+        if (newVal != oldVal) {
+          String column = Groep.values[c].name;
+          SpreedsheetDiff diff = SpreedsheetDiff(
+              date: newRow.date,
+              column: column,
+              oldValue: oldVal,
+              newValue: newVal);
+          diffs.add(diff);
+        }
+      }
+    }
+
+    return diffs;
+  }
+
+  //--------------------------------------
+  String _getSpreadsheetDiffsAsHtml(
+      {required List<SpreedsheetDiff> diffs,
+      required SpreadSheet spreadSheet}) {
+    String html = '<div>';
+    html += 'Hallo <br><br>';
+    String maand = AppHelper.instance
+        .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
+    String by = AppData.instance.getTrainer().firstName();
+    html += 'Het trainingschema voor $maand is aangepast door $by <br>';
+    html += 'Wijzigingen : <br>';
+    for (SpreedsheetDiff diff in diffs) {
+      var formatter = DateFormat('EEEE dd MMMM', AppConstants().localNL);
+      String dateStr = formatter.format(diff.date);
+      html +=
+          '$dateStr : <b>${diff.column.toUpperCase()}</b>,  van <b>"${diff.oldValue}"</b> naar <b>"${diff.newValue}"</b> <br>';
+    }
+    html +=
+        '<br>Deze is zichtbaar op https://public-lonutrainingschemas.web.app <br>';
+
+    return '$html</div>';
+  }
+
+  //--------------------------------------
+  List<Trainer> _getSpreadsheetDiffsEmailRecipients(
+      {required List<SpreedsheetDiff> diffs}) {
+    List<Trainer> result = AppHelper.instance.getAllSupervisors();
+    //plus the one who made the change
+    result.add(AppData.instance.getTrainer());
+
+    // plus all trainers that are affected
+    for (SpreedsheetDiff diff in diffs) {
+      Trainer trainer =
+          AppHelper.instance.findTrainerByFirstName(diff.newValue);
+      if (!trainer.isEmpty()) {
+        result.add(trainer);
+      }
+    }
+    return result;
   }
 }

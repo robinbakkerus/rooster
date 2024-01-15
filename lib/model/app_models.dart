@@ -545,6 +545,14 @@ class SpreadSheet {
     required this.year,
     required this.month,
   });
+
+  SpreadSheet clone() {
+    SpreadSheet result = SpreadSheet(year: year, month: month);
+    for (SheetRow row in rows) {
+      result.rows.add(row.clone());
+    }
+    return result;
+  }
 }
 
 //----------------------
@@ -573,6 +581,16 @@ class SheetRow {
     return AppHelper.instance.getDateStringForSpreadsheet(date);
   }
 
+  SheetRow clone() {
+    SheetRow result =
+        SheetRow(rowIndex: rowIndex, date: date, isExtraRow: isExtraRow);
+    result.trainingText = trainingText;
+    for (RowCell cell in rowCells) {
+      result.rowCells.add(cell.clone());
+    }
+    return result;
+  }
+
   @override
   String toString() {
     return '$rowIndex, \t $date}';
@@ -597,6 +615,16 @@ class RowCell {
   }
 
   Trainer getTrainer() => _trainer;
+
+  RowCell clone() {
+    RowCell result = RowCell(rowIndex: rowIndex, colIndex: colIndex);
+    result.setTrainer(getTrainer());
+    result.text = text;
+    result.availableCounts =
+        availableCounts; // we dont need to clone these onea
+    result.trainerWeights = trainerWeights; // and this one
+    return result;
+  }
 }
 
 ///----------- LastRosterFinal -----
@@ -701,8 +729,8 @@ class FsSpreadsheet {
       year: map['year'] as int,
       month: map['month'] as int,
       rows: List<FsSpreadsheetRow>.from(
-        (map['rows'] as List<int>).map<FsSpreadsheetRow>(
-          (x) => FsSpreadsheetRow.fromMap(x as Map<String, dynamic>),
+        (map['rows'] as List<dynamic>).map<FsSpreadsheetRow>(
+          (x) => FsSpreadsheetRow.fromMap(x),
         ),
       ),
       isFinal: map['isFinal'] as bool,
@@ -753,7 +781,7 @@ class FsSpreadsheetRow {
         trainingText: map['trainingText'] as String,
         isExtraRow: map['isExtraRow'] as bool,
         rowCells: List<String>.from(
-          (map['rowCells'] as List<String>),
+          (map['rowCells'] as List<dynamic>),
         ));
   }
 
@@ -773,4 +801,20 @@ class FsSpreadsheetRow {
   @override
   int get hashCode =>
       trainingText.hashCode ^ isExtraRow.hashCode ^ rowCells.hashCode;
+}
+
+///-----------------------------
+
+class SpreedsheetDiff {
+  DateTime date;
+  String column;
+  String oldValue;
+  String newValue;
+
+  SpreedsheetDiff({
+    required this.date,
+    required this.column,
+    required this.oldValue,
+    required this.newValue,
+  });
 }
