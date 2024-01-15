@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
-  final String version = '1.4';
+  final String version = 'v 1.0';
 
   @override
   State<SplashPage> createState() => _SplashPageState();

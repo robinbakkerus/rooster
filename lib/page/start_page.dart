@@ -98,12 +98,23 @@ class _StartPageState extends State<StartPage> {
       result += ' Instellingen';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       result = ' Schema ${AppData.instance.getActiveMonthAsString()}';
+      result += _getSpreadstatus();
     } else if (_getStackIndex() == PageEnum.helpPage.code) {
       return 'Help pagina';
     } else if (_getStackIndex() == PageEnum.adminPage.code) {
       return 'Admin pagina';
     }
 
+    return result;
+  }
+
+  String _getSpreadstatus() {
+    String result = ', status: ';
+    if (AppData.instance.schemaIsFinal()) {
+      result += 'gepubliceerd.';
+    } else {
+      result += 'nieuw';
+    }
     return result;
   }
 

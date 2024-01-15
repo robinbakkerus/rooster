@@ -33,6 +33,8 @@ class AppData {
   SpreadSheet _oldSpreadSheet =
       SpreadSheet(year: 2024, month: 1); // to obtain the diffs
 
+  String lastSnackbarMsg = '';
+
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
   }
@@ -44,10 +46,7 @@ class AppData {
   void setSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
     _oldSpreadSheet = spreadSheet.clone();
-    rebuildSpreadsheet = false;
   }
-
-  bool rebuildSpreadsheet = true;
 
   TrainerData _trainerData = TrainerData.empty();
   List<int> newAvailaibleList = [];
