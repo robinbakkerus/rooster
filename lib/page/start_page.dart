@@ -36,7 +36,7 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     _checkCookie();
-    AppController.instance.getZamoTrainers();
+    AppController.instance.getZamoTrainersAndDefaultTraining();
     AppController.instance.getTrainingItems();
     AppController.instance.getApplyWeightValues();
     _getTrainerDataIfNeeded();

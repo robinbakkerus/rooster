@@ -158,6 +158,15 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  Future<String> getZamoTrainingDefault() async {
+    CollectionReference zamoRef = firestore.collection('metadata');
+    DocumentSnapshot snapshot = await zamoRef.doc('zamo_default').get();
+    Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+    return map['training'];
+  }
+
+  ///--------------------------------------------
+
   Future<List<String>> getTrainingItems() async {
     List<String> result = [];
 
@@ -275,9 +284,9 @@ class FirestoreHelper with AppMixin {
     CollectionReference mailRef = firestore.collection('mail');
 
     Map<String, dynamic> map = {};
-    map['to'] = _buildEmailAdresList(to);
-    map['cc'] = _buildEmailAdresList(cc);
-    map['message'] = _buildEmailMessageMap(subject, html);
+    map['to'] = buildEmailAdresList(to);
+    map['cc'] = buildEmailAdresList(cc);
+    map['message'] = buildEmailMessageMap(subject, html);
 
     await mailRef
         .add(map)
@@ -290,14 +299,14 @@ class FirestoreHelper with AppMixin {
     return result;
   }
 
-  Map<String, dynamic> _buildEmailMessageMap(String subject, String html) {
+  Map<String, dynamic> buildEmailMessageMap(String subject, String html) {
     Map<String, dynamic> msgMap = {};
     msgMap['subject'] = subject;
     msgMap['html'] = html;
     return msgMap;
   }
 
-  List<String> _buildEmailAdresList(List<Trainer> trainerList) {
+  List<String> buildEmailAdresList(List<Trainer> trainerList) {
     List<String> toList = [];
     for (Trainer trainer in trainerList) {
       if (trainer.email.isNotEmpty) {

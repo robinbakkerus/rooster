@@ -24,6 +24,7 @@ class AppData {
   DateTime lastMonth = DateTime(2024, 1, 1);
   int stackIndex = 0;
   List<String> zamoTrainers = [];
+  String zamoDefaultTraing = '';
   List<String> trainerItems = [];
   late ApplyWeightValues applyWeightValues;
 

@@ -461,7 +461,7 @@ class SpreadsheetGenerator with AppMixin {
   void postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.saturday) {
-        sheetRow.trainingText = 'ZaMo';
+        sheetRow.trainingText = AppData.instance.zamoDefaultTraing;
         String zamoTrainer = sheetRow.rowCells[Groep.zamo.index].text;
         for (int i = 0; i < Groep.values.length; i++) {
           sheetRow.rowCells[i].text = '';

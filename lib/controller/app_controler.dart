@@ -54,10 +54,14 @@ class AppController {
   }
 
   // get Zamo trainers
-  Future<void> getZamoTrainers() async {
+  Future<void> getZamoTrainersAndDefaultTraining() async {
     List<String> zamoTrainers =
         await FirestoreHelper.instance.getZamoTrainers();
     AppData.instance.zamoTrainers = zamoTrainers;
+
+    String defaultTraining =
+        await FirestoreHelper.instance.getZamoTrainingDefault();
+    AppData.instance.zamoDefaultTraing = defaultTraining;
   }
 
   // get Zamo trainers
@@ -382,7 +386,7 @@ class AppController {
     String maand = AppHelper.instance
         .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
     String by = AppData.instance.getTrainer().firstName();
-    html += 'Het trainingschema voor $maand is aangepast door $by <br>';
+    html += 'Het trainingschema voor $maand is aangepast door <b>$by</b> <br>';
     html += 'Wijzigingen : <br>';
     for (SpreedsheetDiff diff in diffs) {
       var formatter = DateFormat('EEEE dd MMMM', AppConstants().localNL);
