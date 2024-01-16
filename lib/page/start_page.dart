@@ -35,11 +35,8 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    _checkCookie();
-    AppController.instance.getZamoTrainersAndDefaultTraining();
-    AppController.instance.getTrainingItems();
-    AppController.instance.getApplyWeightValues();
-    _getTrainerDataIfNeeded();
+    _accessCode = _checkCookie(); // this may be empty
+    AppEvents.onTrainerReadyEvent(_onTrainerReady);
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
 
@@ -144,6 +141,17 @@ class _StartPageState extends State<StartPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onTrainerReady(TrainerReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        AppController.instance.getZamoTrainersAndDefaultTraining();
+        AppController.instance.getTrainingItems();
+        AppController.instance.getApplyWeightValues();
+        _getTrainerDataIfNeeded();
+      });
+    }
   }
 
   void _onTrainerDataReady(TrainerDataReadyEvent event) {
@@ -334,14 +342,15 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
-  void _checkCookie() {
+  String _checkCookie() {
     final cookie = html.document.cookie!;
     if (cookie.isNotEmpty) {
       List<String> tokens = cookie.split('=');
       if (tokens.isNotEmpty) {
-        _accessCode = tokens[1];
+        return tokens[1];
       }
     }
+    return '';
   }
 
   int _getStackIndex() => AppData.instance.stackIndex;

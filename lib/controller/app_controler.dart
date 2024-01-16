@@ -40,6 +40,8 @@ class AppController {
 
     result = _setCookieIfNeeded(trainer, result, accessCode);
 
+    AppEvents.fireTrainerReady();
+
     return result;
   }
 

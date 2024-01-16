@@ -14,6 +14,8 @@ class ShowPageEvent {
   ShowPageEvent(this.page);
 }
 
+class TrainerReadyEvent {}
+
 class TrainerDataReadyEvent {}
 
 class SchemaUpdatedEvent {}
@@ -79,6 +81,8 @@ class AppEvents {
   static void fireShowPage(ShowPage page) =>
       _sEventBus.fire(ShowPageEvent(page));
 
+  static void fireTrainerReady() => _sEventBus.fire(TrainerReadyEvent());
+
   static void fireTrainerDataReady() =>
       _sEventBus.fire(TrainerDataReadyEvent());
 
@@ -110,6 +114,9 @@ class AppEvents {
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
+
+  static void onTrainerReadyEvent(OnTrainerReadyEventFunc func) =>
+      _sEventBus.on<TrainerReadyEvent>().listen((event) => func(event));
 
   static void onTrainerDataReadyEvent(OnTrainerDataReadyEventFunc func) =>
       _sEventBus.on<TrainerDataReadyEvent>().listen((event) => func(event));
@@ -148,6 +155,8 @@ class AppEvents {
 
 /// ----- typedef's -----------
 typedef OnShowPageFunc = void Function(ShowPageEvent event);
+
+typedef OnTrainerReadyEventFunc = void Function(TrainerReadyEvent event);
 
 typedef OnTrainerDataReadyEventFunc = void Function(
     TrainerDataReadyEvent event);
