@@ -34,7 +34,7 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
     {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
 
-  // email = 'robin.bakkerus@gmail.com';
+  email = 'robin.bakkerus@gmail.com'; // todo
 
   return Trainer(
       accessCode: accesscode,

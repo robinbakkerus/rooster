@@ -34,7 +34,7 @@ class AppController {
     Trainer trainer =
         await FirestoreHelper.instance.findTrainerByAccessCode(accessCode);
 
-    AuthHelper.instance.signIn(
+    await AuthHelper.instance.signIn(
         email: trainer.email,
         password: AppHelper.instance.getAuthPassword(trainer));
 
