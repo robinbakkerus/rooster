@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:intl/intl.dart';
+import 'package:rooster/repo/authentication.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:intl/date_symbol_data_local.dart';
@@ -19,7 +20,7 @@ class AppController {
 
   static AppController instance = AppController._();
 
-  /// get screen widt and save this
+  /// get screen sizes and save this
   Future<void> initializeAppData(BuildContext context) async {
     _setScreenSizes(context);
     _setDates();
@@ -33,6 +34,16 @@ class AppController {
     Trainer trainer =
         await FirestoreHelper.instance.findTrainerByAccessCode(accessCode);
 
+    AuthHelper.instance.signIn(
+        email: trainer.email,
+        password: AppHelper.instance.getAuthPassword(trainer));
+
+    result = _setCookieIfNeeded(trainer, result, accessCode);
+
+    return result;
+  }
+
+  bool _setCookieIfNeeded(Trainer trainer, bool result, String accessCode) {
     if (!trainer.isEmpty()) {
       getTrainerData(trainer: trainer);
       html.document.cookie = "ac=${trainer.accessCode}";
@@ -41,7 +52,6 @@ class AppController {
       log("no trainer with access code $accessCode");
       result = false;
     }
-
     return result;
   }
 

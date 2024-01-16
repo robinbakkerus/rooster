@@ -352,4 +352,13 @@ class FirestoreHelper with AppMixin {
         '${AppData.instance.getTrainer().pk}-${DateTime.now().microsecondsSinceEpoch}';
     logsRef.doc(id).set(map);
   }
+
+  //--
+
+  //-----------------------------------------
+  Future<void> testRule() async {
+    CollectionReference colRef = FirebaseFirestore.instance.collection('test');
+    DocumentSnapshot snapshot = await colRef.doc('test1').get();
+    lp(snapshot.toString());
+  }
 }

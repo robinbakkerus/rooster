@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/authentication.dart';
 import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -37,13 +39,25 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _addTrainingItems,
               child: const Text('Add training items')),
-          OutlinedButton(onPressed: _sendEmail, child: const Text('Send email'))
+          OutlinedButton(
+              onPressed: _sendEmail, child: const Text('Send email')),
+          OutlinedButton(onPressed: _testRule, child: const Text('Test rule')),
+          OutlinedButton(
+              onPressed: _signUpOrSignIn, child: const Text('SignUp'))
         ],
       ),
     );
   }
 
   void _addTrainers() {
+    List<Trainer> trainers = _allTrainers();
+
+    for (Trainer trainer in trainers) {
+      FirestoreHelper.instance.createOrUpdateTrainer(trainer);
+    }
+  }
+
+  List<Trainer> _allTrainers() {
     List<Trainer> trainers = [
       p.trainerAnne,
       p.trainerPaula,
@@ -58,10 +72,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       p.trainerRonald,
       p.trainerCyriel,
     ];
-
-    for (Trainer trainer in trainers) {
-      FirestoreHelper.instance.createOrUpdateTrainer(trainer);
-    }
+    return trainers;
   }
 
   void _removeCookie() {
@@ -134,5 +145,20 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     String html = '<p>Test</p>';
     FirestoreHelper.instance
         .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
+  }
+
+  void _testRule() async {
+    List<Trainer> toTrainers = [p.trainerRobin];
+    String html = '<p>Test</p>';
+    FirestoreHelper.instance
+        .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
+  }
+
+  void _signUpOrSignIn() async {
+    for (Trainer trainer in _allTrainers()) {
+      AuthHelper.instance.signUp(
+          email: trainer.email,
+          password: AppHelper.instance.getAuthPassword(trainer));
+    }
   }
 }

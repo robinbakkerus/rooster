@@ -221,6 +221,10 @@ class AppHelper with AppMixin {
     }
   }
 
+  String getAuthPassword(Trainer trainer) {
+    return 'pwd${trainer.accessCode}!678123';
+  }
+
   /// -------- private methods --------------------------------
 
   String _getShortWeekDay(DateTime dateTime) {
