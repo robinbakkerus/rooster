@@ -345,10 +345,37 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //---------------------------------
   String _getTrainerDeployed() {
+    Map<String, int> groupCounts = _countGroups(forZamo: false);
+    Map<String, int> zamoCounts = _countGroups(forZamo: true);
+
+    List<Map<String, int>> list = [];
+
+    for (String key in groupCounts.keys) {
+      list.add({key: groupCounts[key]!});
+    }
+    list.sort((a, b) => b.values.first.compareTo(a.values.first));
+
+    String result = '';
+    for (Map<String, int> map in list) {
+      String key = map.keys.first;
+      result += '\n $key \t ${map[key]}';
+      if (zamoCounts.containsKey(key)) {
+        result += ' (${zamoCounts[key]})';
+      }
+    }
+
+    return result;
+  }
+
+  Map<String, int> _countGroups({required bool forZamo}) {
     Map<String, int> counts = {};
 
+    int len = _spreadSheet.rows[0].rowCells.length;
+    int start = forZamo ? len - 1 : 0;
+    int end = forZamo ? len : len - 1;
     for (SheetRow row in _spreadSheet.rows) {
-      for (RowCell cell in row.rowCells) {
+      for (int c = start; c < end; c++) {
+        RowCell cell = row.rowCells[c];
         String txt = cell.text.replaceAll(' ', '');
         if (txt.isNotEmpty && !txt.startsWith('(')) {
           if (counts.containsKey(txt)) {
@@ -360,19 +387,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         }
       }
     }
-
-    List<Map<String, int>> list = [];
-    for (String key in counts.keys) {
-      list.add({key: counts[key]!});
-    }
-    list.sort((a, b) => b.values.first.compareTo(a.values.first));
-
-    String result = '';
-    for (Map<String, int> map in list) {
-      result += '\n ${map.keys.first} \t ${map[map.keys.first]}';
-    }
-
-    return result;
+    return counts;
   }
 
   void _buildDialogConfirm(BuildContext context, bool allProgramFieldSet) {
