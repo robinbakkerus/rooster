@@ -102,7 +102,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
   }
 
   DataCell _buildDayDataCell(int rowIndex) {
-    DateTime dateTime = AppData.instance.getActiveDates()[rowIndex];
+    DateTime dateTime = AppData.instance.getSpreadsheet().rows[rowIndex].date;
     String text = AppHelper.instance.getSimpleDayString(dateTime);
     return DataCell(Text(text));
   }

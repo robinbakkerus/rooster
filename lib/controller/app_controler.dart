@@ -11,7 +11,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
-// import 'package:collection/collection.dart';
+import 'package:collection/collection.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 
 class AppController {
@@ -107,7 +107,7 @@ class AppController {
 
     SpreadSheet result;
     if (AppData.instance.schemaIsFinal()) {
-      result = await _getTheSpreadsheet();
+      result = await _getTheActiveSpreadsheet();
     } else {
       result = _generateTheSpreadsheet();
     }
@@ -127,7 +127,7 @@ class AppController {
   }
 
   ///------------------------------------------------
-  Future<SpreadSheet> _getTheSpreadsheet() async {
+  Future<SpreadSheet> _getTheActiveSpreadsheet() async {
     FsSpreadsheet fsSpreadsheet = await FirestoreHelper.instance
         .retrieveSpreadsheet(
             year: AppData.instance.getActiveYear(),
@@ -137,10 +137,14 @@ class AppController {
     return spreadSheet;
   }
 
+  ///-------------- map spreadsheet
   SpreadSheet _mapFromFsSpreadsheet(FsSpreadsheet fsSpreadsheet) {
     SpreadSheet spreadSheet = SpreadSheet(
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
+
+    List<Available> availableList =
+        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
 
     for (int r = 0; r < fsSpreadsheet.rows.length; r++) {
       FsSpreadsheetRow fsRow = fsSpreadsheet.rows[r];
@@ -151,12 +155,18 @@ class AppController {
       for (int c = 0; c < fsRow.rowCells.length; c++) {
         RowCell cell = RowCell(rowIndex: r, colIndex: c);
         cell.text = fsRow.rowCells[c];
+        cell.availableCounts = _getAvailable(availableList, row.date).counts[c];
         row.rowCells.add(cell);
       }
 
       spreadSheet.rows.add(row);
     }
     return spreadSheet;
+  }
+
+  Available _getAvailable(List<Available> availableList, DateTime date) {
+    Available? result = availableList.firstWhereOrNull((e) => e.date == date);
+    return result ?? Available(date: date);
   }
 
   ///--------------------

@@ -43,6 +43,10 @@ class AppData {
     return _oldSpreadSheet;
   }
 
+  DateTime getSpreadsheetDate() {
+    return DateTime(getSpreadsheet().year, getSpreadsheet().month, 1);
+  }
+
   void setSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
     _oldSpreadSheet = spreadSheet.clone();

@@ -109,11 +109,17 @@ class _StartPageState extends State<StartPage> {
   }
 
   String _getSpreadstatus() {
-    String result = ', status: ';
+    String result = ' : ';
     if (AppData.instance.schemaIsFinal()) {
-      result += 'gepubliceerd.';
+      result += '(actief)';
     } else {
-      result += 'nieuw';
+      if (AppData.instance
+          .getSpreadsheetDate()
+          .isBefore(DateTime.now().copyWith(day: 1))) {
+        result += '(verlopen)';
+      } else {
+        result += '(onderhanden)';
+      }
     }
     return result;
   }
@@ -281,8 +287,8 @@ class _StartPageState extends State<StartPage> {
     });
   }
 
-  void _gotoSpreadsheet() {
-    AppController.instance.generateOrRetrieveSpreadsheet();
+  void _gotoSpreadsheet() async {
+    await AppController.instance.generateOrRetrieveSpreadsheet();
     setState(() {
       _setStackIndex(4);
       _barTitle = _buildBarTitle();

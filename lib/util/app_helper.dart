@@ -93,11 +93,19 @@ class AppHelper with AppMixin {
 
   ///----------------------------------------//------------------
   AvailableCounts getAvailableCounts(int rowIndex, Groep group) {
-    return AppData.instance
-        .getSpreadsheet()
-        .rows[rowIndex]
-        .rowCells[group.index]
-        .availableCounts;
+    SpreadSheet spreadsheet = AppData.instance.getSpreadsheet();
+    if (rowIndex < spreadsheet.rows.length - 1) {
+      SheetRow sheetRow = spreadsheet.rows[rowIndex];
+      if (!sheetRow.isExtraRow) {
+        return AppData.instance
+            .getSpreadsheet()
+            .rows[rowIndex]
+            .rowCells[group.index]
+            .availableCounts;
+      }
+    }
+
+    return AvailableCounts();
   }
 
   ///-----------------
