@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:rooster/page/error_page.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:rooster/controller/app_controler.dart';
@@ -39,6 +40,7 @@ class _StartPageState extends State<StartPage> {
     AppEvents.onTrainerReadyEvent(_onTrainerReady);
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
+    AppEvents.onErrorEvent(_onErrorEvent);
 
     Timer(const Duration(seconds: 3), () {
       if (_accessCode.length == 4) {
@@ -66,6 +68,7 @@ class _StartPageState extends State<StartPage> {
           ViewAllSchemasPage(), //4
           HelpPage(), //5
           AdminPage(), //6
+          AppErrorPage(), //7
         ],
       ),
     );
@@ -340,6 +343,12 @@ class _StartPageState extends State<StartPage> {
         _barTitle = _buildBarTitle();
       });
     }
+  }
+
+  void _onErrorEvent(ErrorEvent event) {
+    setState(() {
+      AppData.instance.stackIndex = PageEnum.errorPage.code;
+    });
   }
 
   String _checkCookie() {

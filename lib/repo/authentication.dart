@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rooster/event/app_events.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class AuthHelper with AppMixin {
@@ -22,14 +23,13 @@ class AuthHelper with AppMixin {
   }
 
   //SIGN IN METHOD
-  Future<dynamic> signIn(
-      {required String email, required String password}) async {
+  Future<bool> signIn({required String email, required String password}) async {
     try {
-      var auth = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return auth;
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return true;
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      AppEvents.fireErrorEvent(e.message!);
+      return false;
     }
   }
 

@@ -31,7 +31,8 @@ enum PageEnum {
   trainerSettings(3),
   spreadSheet(4),
   helpPage(5),
-  adminPage(6);
+  adminPage(6),
+  errorPage(7);
 
   const PageEnum(this.code);
   final int code;

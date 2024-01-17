@@ -29,32 +29,31 @@ class AppController {
 
   /// find the trainer gived the access code
   Future<bool> findTrainer(String accessCode) async {
-    bool result = false;
-
     Trainer trainer =
         await FirestoreHelper.instance.findTrainerByAccessCode(accessCode);
 
-    await AuthHelper.instance.signIn(
+    bool signInOkay = await AuthHelper.instance.signIn(
         email: trainer.email,
         password: AppHelper.instance.getAuthPassword(trainer));
 
-    result = _setCookieIfNeeded(trainer, result, accessCode);
-
-    AppEvents.fireTrainerReady();
-
-    return result;
+    if (signInOkay) {
+      _setCookieIfNeeded(trainer, accessCode);
+      AppEvents.fireTrainerReady();
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  bool _setCookieIfNeeded(Trainer trainer, bool result, String accessCode) {
+  bool _setCookieIfNeeded(Trainer trainer, String accessCode) {
     if (!trainer.isEmpty()) {
       getTrainerData(trainer: trainer);
       html.document.cookie = "ac=${trainer.accessCode}";
-      result = true;
+      return true;
     } else {
       log("no trainer with access code $accessCode");
-      result = false;
+      return false;
     }
-    return result;
   }
 
   /// get trainer data

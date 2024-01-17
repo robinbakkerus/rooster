@@ -210,6 +210,7 @@ class AppHelper with AppMixin {
         .toList();
   }
 
+  ///---------------------------------------------
   Trainer findTrainerByFirstName(String name) {
     Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull(
         (e) => e.firstName().toLowerCase() == name.toLowerCase());
@@ -221,6 +222,7 @@ class AppHelper with AppMixin {
     }
   }
 
+  ///---------------------------------------------
   String getAuthPassword(Trainer trainer) {
     return 'pwd${trainer.accessCode}!678123';
   }

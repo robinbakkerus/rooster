@@ -66,6 +66,13 @@ class TrainerPrefUpdatedEvent {
 
 class SpreadsheetReadyEvent {}
 
+class ErrorEvent {
+  final String errMsg;
+  ErrorEvent(
+    this.errMsg,
+  );
+}
+
 /*
 	Static class that contains all onXxx and fireXxx methods.
 */
@@ -111,6 +118,9 @@ class AppEvents {
   static void fireSpreadsheetReady() =>
       _sEventBus.fire(SpreadsheetReadyEvent());
 
+  static void fireErrorEvent(String errMsg) =>
+      _sEventBus.fire(ErrorEvent(errMsg));
+
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
@@ -151,6 +161,9 @@ class AppEvents {
 
   static void onSpreadsheetReadyEvent(OnSpreadsheetReadyEventFunc func) =>
       _sEventBus.on<SpreadsheetReadyEvent>().listen((event) => func(event));
+
+  static void onErrorEvent(OnErrorEventFunc func) =>
+      _sEventBus.on<ErrorEvent>().listen((event) => func(event));
 }
 
 /// ----- typedef's -----------
@@ -181,3 +194,5 @@ typedef OnTrainerPrefUpdatedEventFunc = void Function(
 
 typedef OnSpreadsheetReadyEventFunc = void Function(
     SpreadsheetReadyEvent event);
+
+typedef OnErrorEventFunc = void Function(ErrorEvent event);
