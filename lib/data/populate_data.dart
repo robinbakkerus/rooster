@@ -77,10 +77,10 @@ TrainerSchema trainerSchemasJeroen = _buildTrainerSchema(trainerJeroen);
 // build schema's for februari
 TrainerSchema _buildTrainerSchema(Trainer trainer) {
   TrainerSchema result = TrainerSchema.empty();
-  AppData.instance.setActiveDate(DateTime(2024, 2, 1));
+  AppData.instance.setActiveDate(DateTime(2024, 1, 1));
 
   Map<String, dynamic> map = result.toMap();
-  map['id'] = '${trainer.pk}_2024_2'; //todo
+  map['id'] = '${trainer.pk}_2024_1'; //todo
   map['year'] = DateTime.now().year;
   map['month'] = DateTime.now().month;
   map['trainerPk'] = trainer.pk;

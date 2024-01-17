@@ -153,11 +153,13 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
     Color col = Colors.lightBlue;
 
+    String maand = AppData.instance.getActiveMonthAsString();
+
     if (ts.isNew != null && ts.isNew!) {
       msg +=
-          'Met succes nieuw schema aangemaakt, deze wordt nu als ingevuld beschouwd';
+          'Schema voor $maand aangemaakt, deze wordt nu als ingevuld beschouwd';
     } else {
-      msg += 'Met succes schema geopend';
+      msg += 'Schema $maand geopend';
       if (AppData.instance.schemaIsFinal()) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;

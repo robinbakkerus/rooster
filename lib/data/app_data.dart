@@ -22,6 +22,8 @@ class AppData {
   DateTime _activeDate = DateTime(2024, 1, 1);
   DateTime lastActiveDate = DateTime(2024, 1, 1);
   DateTime lastMonth = DateTime(2024, 1, 1);
+  DateTime firstSpreadDate = DateTime(2024, 1, 1);
+
   int stackIndex = 0;
   List<String> zamoTrainers = [];
   String zamoDefaultTraing = '';
@@ -99,7 +101,6 @@ class AppData {
 
   bool schemaIsFinal() {
     DateTime activeDate = AppData.instance.getActiveDate();
-    DateTime lastActiveDate = AppData.instance.lastActiveDate;
     return !activeDate.isAfter(lastActiveDate);
   }
 

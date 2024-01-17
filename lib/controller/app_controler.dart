@@ -275,33 +275,31 @@ class AppController {
   void _setDates() async {
     DateTime lastActiveDate = await _getLastActiveDate();
 
-    DateTime nextMonth = lastActiveDate.day > 15
-        ? lastActiveDate.add(const Duration(days: 20))
-        : lastActiveDate.add(const Duration(days: 31));
+    DateTime nextMonth =
+        lastActiveDate.copyWith(month: lastActiveDate.month + 1);
 
-    setActiveDate(DateTime(nextMonth.year, nextMonth.month, 1));
+    setActiveDate(nextMonth);
     AppData.instance.lastActiveDate = lastActiveDate;
 
-    const int nMonths = 2;
-    DateTime lastMonth = lastActiveDate.day > 15
-        ? lastActiveDate.add(const Duration(days: (nMonths * 31) - 5))
-        : lastActiveDate.add(const Duration(days: nMonths * 31));
+    // trainer may create 2 months ahead if where near the end the curr month (day=20), else 1 month ahead
+    DateTime lastMonth = DateTime.now().day > 15
+        ? AppHelper.instance.addMonths(lastActiveDate, 2)
+        : AppHelper.instance.addMonths(lastActiveDate, 1);
     AppData.instance.lastMonth = lastMonth;
   }
 
   //-------------------------------------------
   Future<DateTime> _getLastActiveDate() async {
-    DateTime now = DateTime.now();
-    DateTime lastActiveDate = DateTime(now.year, now.month, 1); //assume
-    LastRosterFinal? lastRosterFinal = await getLastRosterFinal();
+    DateTime lastActiveDate =
+        DateTime(DateTime.now().year, DateTime.now().month, 1);
 
+    LastRosterFinal? lastRosterFinal = await getLastRosterFinal();
     if (lastRosterFinal != null) {
       DateTime lrfDate =
           DateTime(lastRosterFinal.year, lastRosterFinal.month, 1);
-      if (lrfDate.millisecondsSinceEpoch >
-          lastActiveDate.millisecondsSinceEpoch) {
-        lastActiveDate =
-            DateTime(lastRosterFinal.year, lastRosterFinal.month, 1);
+
+      if (lrfDate.isAfter(lastActiveDate)) {
+        lastActiveDate = lrfDate;
       }
     }
     return lastActiveDate;

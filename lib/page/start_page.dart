@@ -166,13 +166,15 @@ class _StartPageState extends State<StartPage> {
 
         _barTitle = _buildBarTitle();
 
-        _prevMonthEnabled =
-            AppData.instance.getActiveDate().millisecondsSinceEpoch >
-                AppData.instance.lastActiveDate.millisecondsSinceEpoch;
+        // we go back 1 month and check if date is after the first spreadsheet date
+        _prevMonthEnabled = AppData.instance
+            .getActiveDate()
+            .add(const Duration(days: -30))
+            .isAfter(AppData.instance.firstSpreadDate);
 
-        _nextMonthEnabled =
-            AppData.instance.getActiveDate().millisecondsSinceEpoch <
-                AppData.instance.lastMonth.millisecondsSinceEpoch;
+        _nextMonthEnabled = AppData.instance
+            .getActiveDate()
+            .isBefore(AppData.instance.lastMonth);
       });
     }
   }
@@ -210,10 +212,6 @@ class _StartPageState extends State<StartPage> {
             value: '4',
             child: Text("Spreadsheet & voortgang"),
           ),
-          // const PopupMenuItem(
-          //   value: '5',
-          //   child: Text("Help pagina"),
-          // ),
           _adminPopup(),
         ];
       },

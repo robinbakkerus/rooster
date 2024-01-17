@@ -93,6 +93,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       p.trainerSchemasPauline,
       p.trainerSchemasRonald,
       p.trainerSchemasJeroen,
+      p.trainerSchemasRobin,
     ];
 
     for (TrainerSchema ts in schemas) {

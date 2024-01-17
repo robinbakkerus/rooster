@@ -130,6 +130,23 @@ class AppHelper with AppMixin {
   }
 
   ///-----------------
+  DateTime addMonths(DateTime date, int nMonths) {
+    DateTime result = date;
+    for (int i = 0; i < nMonths; i++) {
+      result = add1Month(result);
+    }
+    return result;
+  }
+
+  DateTime add1Month(DateTime date) {
+    if (date.month == 12) {
+      return DateTime(date.year + 1, 1, 1);
+    } else {
+      return DateTime(date.year, date.month + 1, 1);
+    }
+  }
+
+  ///-----------------
   /// return something like: 'din 1'
   String weekDayStringFromDate(
       {required DateTime date, required String locale, int length = -1}) {
