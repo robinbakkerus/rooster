@@ -25,8 +25,8 @@ abstract class Dbs {
   Future<FsSpreadsheet> retrieveSpreadsheet(
       {required int year, required int month});
   Future<bool> sendEmail(
-      {required List<Trainer> to,
-      required List<Trainer> cc,
+      {required List<Trainer> toList,
+      required List<Trainer> ccList,
       required String subject,
       required String html});
 }

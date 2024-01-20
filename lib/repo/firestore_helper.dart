@@ -292,17 +292,17 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///-------- sendEmail
   @override
   Future<bool> sendEmail(
-      {required List<Trainer> to,
-      required List<Trainer> cc,
+      {required List<Trainer> toList,
+      required List<Trainer> ccList,
       required String subject,
       required String html}) async {
     bool result = false;
     CollectionReference mailRef = firestore.collection('mail');
 
     Map<String, dynamic> map = {};
-    map['to'] = buildEmailAdresList(to);
-    map['cc'] = buildEmailAdresList(cc);
-    map['message'] = buildEmailMessageMap(subject, html);
+    map['to'] = _buildEmailAdresList(toList);
+    map['cc'] = _buildEmailAdresList(ccList);
+    map['message'] = _buildEmailMessageMap(subject, html);
 
     await mailRef
         .add(map)
@@ -315,24 +315,26 @@ class FirestoreHelper with AppMixin implements Dbs {
     return result;
   }
 
-  Map<String, dynamic> buildEmailMessageMap(String subject, String html) {
+  ///============ private methods --------
+
+  Map<String, dynamic> _buildEmailMessageMap(String subject, String html) {
     Map<String, dynamic> msgMap = {};
     msgMap['subject'] = subject;
     msgMap['html'] = html;
     return msgMap;
   }
 
-  List<String> buildEmailAdresList(List<Trainer> trainerList) {
+  List<String> _buildEmailAdresList(List<Trainer> trainerList) {
     List<String> toList = [];
     for (Trainer trainer in trainerList) {
       if (trainer.email.isNotEmpty) {
         toList.add(trainer.email);
       }
     }
+
+    toList = ['robin.bakkerus@gmail.com']; //todo
     return toList;
   }
-
-  ///============ private methods --------
 
   ///-- get schema's for trainer
   Future<TrainerSchema> _getTheTrainerSchema(String schemaId) async {

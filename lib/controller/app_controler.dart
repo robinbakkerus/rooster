@@ -316,8 +316,8 @@ class AppController {
     toTrainers = [p.trainerRobin]; //todo
 
     bool okay = await Dbs.instance.sendEmail(
-        to: toTrainers,
-        cc: [],
+        toList: toTrainers,
+        ccList: [],
         subject: 'Trainingschema definitief',
         html: html);
 
@@ -332,7 +332,10 @@ class AppController {
   Future<void> _mailSpreadsheetUpdate(String html,
       {required List<Trainer> to, required List<Trainer> cc}) async {
     bool okay = await Dbs.instance.sendEmail(
-        to: to, cc: cc, subject: 'Trainingschema wijziging', html: html);
+        toList: to,
+        ccList: cc,
+        subject: 'Trainingschema wijziging',
+        html: html);
 
     if (okay) {
       log("email okay");

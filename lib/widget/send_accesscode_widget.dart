@@ -76,8 +76,8 @@ class _SendAccessCodeWidgetState extends State<SendAccessCodeWidget>
               'gevonden, email is verstuurd!\nja kan het scherm sluiten.';
         });
         Dbs.instance.sendEmail(
-            to: [trainer],
-            cc: [],
+            toList: [trainer],
+            ccList: [],
             subject: 'AccessCode',
             html: _buildMailHtml(trainer));
       } else {

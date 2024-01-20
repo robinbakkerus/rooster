@@ -143,15 +143,15 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   void _sendEmail() async {
     List<Trainer> toTrainers = [p.trainerRobin];
     String html = '<p>Test</p>';
-    Dbs.instance
-        .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
+    Dbs.instance.sendEmail(
+        toList: toTrainers, ccList: [], subject: 'subject', html: html);
   }
 
   void _testRule() async {
     List<Trainer> toTrainers = [p.trainerRobin];
     String html = '<p>Test</p>';
-    Dbs.instance
-        .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
+    Dbs.instance.sendEmail(
+        toList: toTrainers, ccList: [], subject: 'subject', html: html);
   }
 
   void _signUpOrSignIn() async {
