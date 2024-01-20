@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:rooster/page/error_page.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:rooster/controller/app_controler.dart';
@@ -74,12 +75,23 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
+  Color _runModeColor() {
+    if (AppData.instance.runMode == RunMode.prod) {
+      return Colors.white;
+    } else {
+      return AppData.instance.runMode == RunMode.dev
+          ? Colors.lightGreen
+          : Colors.yellow;
+    }
+  }
+
   bool _showTabBar() {
     return _getStackIndex() > 1;
   }
 
   PreferredSizeWidget? _appBar() {
     return AppBar(
+      backgroundColor: _runModeColor(),
       title: Text(_barTitle),
       actions: [
         _actionPrevMonth(),
@@ -94,6 +106,9 @@ class _StartPageState extends State<StartPage> {
 
     if (_getStackIndex() == PageEnum.editSchema.code) {
       result += AppData.instance.getActiveMonthAsString();
+      if (AppHelper.instance.isWindows() || AppHelper.instance.isTablet()) {
+        result += ' ${AppData.instance.getActiveYear()}';
+      }
     } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
       result += ' Instellingen';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {

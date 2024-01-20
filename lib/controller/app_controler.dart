@@ -1,13 +1,13 @@
 import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:rooster/repo/authentication.dart';
+import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +29,7 @@ class AppController {
 
   /// find the trainer gived the access code
   Future<bool> findTrainer(String accessCode) async {
-    Trainer trainer =
-        await FirestoreHelper.instance.findTrainerByAccessCode(accessCode);
+    Trainer trainer = await Dbs.instance.findTrainerByAccessCode(accessCode);
 
     bool signInOkay = await AuthHelper.instance.signIn(
         email: trainer.email,
@@ -66,26 +65,23 @@ class AppController {
 
   // get Zamo trainers
   Future<void> getZamoTrainersAndDefaultTraining() async {
-    List<String> zamoTrainers =
-        await FirestoreHelper.instance.getZamoTrainers();
+    List<String> zamoTrainers = await Dbs.instance.getZamoTrainers();
     AppData.instance.zamoTrainers = zamoTrainers;
 
-    String defaultTraining =
-        await FirestoreHelper.instance.getZamoTrainingDefault();
+    String defaultTraining = await Dbs.instance.getZamoTrainingDefault();
     AppData.instance.zamoDefaultTraing = defaultTraining;
   }
 
   // get Zamo trainers
   Future<void> getApplyWeightValues() async {
     ApplyWeightValues applyWeightValues =
-        await FirestoreHelper.instance.getApplyWeightValues();
+        await Dbs.instance.getApplyWeightValues();
     AppData.instance.applyWeightValues = applyWeightValues;
   }
 
   // get trainer_items (to fill combobox)
   Future<void> getTrainingItems() async {
-    List<String> trainerItems =
-        await FirestoreHelper.instance.getTrainingItems();
+    List<String> trainerItems = await Dbs.instance.getTrainingItems();
     AppData.instance.trainerItems = trainerItems;
   }
 
@@ -94,15 +90,14 @@ class AppController {
     TrainerSchema trainerSchemas =
         AppData.instance.getTrainerData().trainerSchemas;
     trainerSchemas.availableList = AppData.instance.newAvailaibleList;
-    FirestoreHelper.instance
+    Dbs.instance
         .createOrUpdateTrainerSchemas(trainerSchemas, updateSchema: true);
     getTrainerData(trainer: AppData.instance.getTrainer());
   }
 
   ///----- updateTrainer
   Future<bool> updateTrainer(Trainer trainer) async {
-    Trainer updatedTrainer =
-        await FirestoreHelper.instance.createOrUpdateTrainer(trainer);
+    Trainer updatedTrainer = await Dbs.instance.createOrUpdateTrainer(trainer);
     AppData.instance.setTrainer(updatedTrainer);
     return true;
   }
@@ -139,10 +134,9 @@ class AppController {
 
   ///------------------------------------------------
   Future<SpreadSheet> _getTheActiveSpreadsheet() async {
-    FsSpreadsheet fsSpreadsheet = await FirestoreHelper.instance
-        .retrieveSpreadsheet(
-            year: AppData.instance.getActiveYear(),
-            month: AppData.instance.getActiveMonth());
+    FsSpreadsheet fsSpreadsheet = await Dbs.instance.retrieveSpreadsheet(
+        year: AppData.instance.getActiveYear(),
+        month: AppData.instance.getActiveMonth());
 
     SpreadSheet spreadSheet = _mapFromFsSpreadsheet(fsSpreadsheet);
     return spreadSheet;
@@ -184,8 +178,8 @@ class AppController {
   void finalizeSpreadsheet(SpreadSheet spreadSheet) async {
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
-    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
-    await FirestoreHelper.instance.saveLastRosterFinal();
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+    await Dbs.instance.saveLastRosterFinal();
     await _mailSpreadsheetIsFinal(spreadSheet);
   }
 
@@ -199,7 +193,7 @@ class AppController {
         newSpreadsheet: fsSpreadsheet, oldSpreadsheet: oldFsSpreadsheet);
     String html =
         _getSpreadsheetDiffsAsHtml(diffs: diffs, spreadSheet: spreadSheet);
-    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
     List<Trainer> toTrainers =
         _getSpreadsheetDiffsEmailRecipients(diffs: diffs);
     await _mailSpreadsheetUpdate(html, to: toTrainers, cc: []);
@@ -207,7 +201,7 @@ class AppController {
 
   ///--------------------
   Future<LastRosterFinal?> getLastRosterFinal() async {
-    return await FirestoreHelper.instance.getLastRosterFinal();
+    return await Dbs.instance.getLastRosterFinal();
   }
 
   /// ============ private methods -----------------
@@ -220,14 +214,14 @@ class AppController {
     TrainerData result = TrainerData.empty();
 
     Trainer? useTrainer = (trainer == null && trainerPk != null)
-        ? await FirestoreHelper.instance.getTrainerById(trainerPk)
+        ? await Dbs.instance.getTrainerById(trainerPk)
         : trainer;
 
     result.trainer = useTrainer!;
     String schemaId = AppHelper.instance.buildTrainerSchemaId(useTrainer);
 
     TrainerSchema trainerSchemas =
-        await FirestoreHelper.instance.getTrainerSchema(schemaId);
+        await Dbs.instance.getTrainerSchema(schemaId);
 
     if (!trainerSchemas.isEmpty()) {
       result.trainerSchemas = trainerSchemas;
@@ -243,7 +237,7 @@ class AppController {
 
   /// ---------- get TrainerData for all trainers
   Future<List<TrainerData>> _getAllTrainerData() async {
-    List<Trainer> allTrainers = await FirestoreHelper.instance.getAllTrainers();
+    List<Trainer> allTrainers = await Dbs.instance.getAllTrainers();
 
     List<TrainerData> allTrainerData = [];
     for (Trainer trainer in allTrainers) {
@@ -264,7 +258,7 @@ class AppController {
     TrainerSchema newTrainerSchemas =
         AppHelper.instance.buildNewSchemaForTrainer(useTrainer);
 
-    bool updateOkay = await FirestoreHelper.instance
+    bool updateOkay = await Dbs.instance
         .createOrUpdateTrainerSchemas(newTrainerSchemas, updateSchema: false);
     if (updateOkay) {
       result.trainerSchemas = newTrainerSchemas;
@@ -321,7 +315,7 @@ class AppController {
     List<Trainer> toTrainers = AppData.instance.getAllTrainers();
     toTrainers = [p.trainerRobin]; //todo
 
-    bool okay = await FirestoreHelper.instance.sendEmail(
+    bool okay = await Dbs.instance.sendEmail(
         to: toTrainers,
         cc: [],
         subject: 'Trainingschema definitief',
@@ -337,7 +331,7 @@ class AppController {
   //-------------------------------------
   Future<void> _mailSpreadsheetUpdate(String html,
       {required List<Trainer> to, required List<Trainer> cc}) async {
-    bool okay = await FirestoreHelper.instance.sendEmail(
+    bool okay = await Dbs.instance.sendEmail(
         to: to, cc: cc, subject: 'Trainingschema wijziging', html: html);
 
     if (okay) {

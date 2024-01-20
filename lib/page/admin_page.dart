@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/authentication.dart';
-import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:universal_html/html.dart' as html;
@@ -53,7 +53,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     List<Trainer> trainers = _allTrainers();
 
     for (Trainer trainer in trainers) {
-      FirestoreHelper.instance.createOrUpdateTrainer(trainer);
+      Dbs.instance.createOrUpdateTrainer(trainer);
     }
   }
 
@@ -97,14 +97,13 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     ];
 
     for (TrainerSchema ts in schemas) {
-      FirestoreHelper.instance
-          .createOrUpdateTrainerSchemas(ts, updateSchema: false);
+      Dbs.instance.createOrUpdateTrainerSchemas(ts, updateSchema: false);
     }
   }
 
   void _saveFsSpreadsheet() async {
     FsSpreadsheet fsSpreadsheet = p.spreadSheetFebruari();
-    await FirestoreHelper.instance.saveFsSpreadsheet(fsSpreadsheet);
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
   }
 
   void _deleteOldLogs() async {
@@ -144,14 +143,14 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   void _sendEmail() async {
     List<Trainer> toTrainers = [p.trainerRobin];
     String html = '<p>Test</p>';
-    FirestoreHelper.instance
+    Dbs.instance
         .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
   }
 
   void _testRule() async {
     List<Trainer> toTrainers = [p.trainerRobin];
     String html = '<p>Test</p>';
-    FirestoreHelper.instance
+    Dbs.instance
         .sendEmail(to: toTrainers, cc: [], subject: 'subject', html: html);
   }
 

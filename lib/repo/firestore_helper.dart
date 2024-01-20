@@ -1,17 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/simulator.dart';
+import 'package:rooster/repo/dbs_simulator.dart';
+import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 
-class FirestoreHelper with AppMixin {
+class FirestoreHelper with AppMixin implements Dbs {
   FirestoreHelper._();
   static final FirestoreHelper instance = FirestoreHelper._();
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   /// find Trainer
+  @override
   Future<Trainer> findTrainerByAccessCode(String accessCode) async {
     CollectionReference trainersRef = firestore.collection('trainer');
 
@@ -32,6 +34,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///- get trainer, or null if not exists
+  @override
   Future<Trainer?> getTrainerById(String trainerPk) async {
     CollectionReference trainersRef = firestore.collection('trainer');
 
@@ -50,8 +53,9 @@ class FirestoreHelper with AppMixin {
   }
 
   /// receive all data used for editSchema view
+  @override
   Future<TrainerSchema> getTrainerSchema(String trainerSchemaId) async {
-    if (AppData.instance.simulate) {
+    if (AppData.instance.runMode == RunMode.dev) {
       return Simulator.instance.getTrainerSchema(trainerSchemaId);
     } else {
       TrainerSchema schemas = await _getTheTrainerSchema(trainerSchemaId);
@@ -60,11 +64,12 @@ class FirestoreHelper with AppMixin {
   }
 
   /// update the available value of the given DaySchema
+  @override
   Future<bool> createOrUpdateTrainerSchemas(TrainerSchema trainerSchemas,
       {required bool updateSchema}) async {
     bool result = false;
 
-    if (!AppData.instance.simulate) {
+    if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference schemaRef = firestore.collection('schemas');
 
       if (updateSchema) {
@@ -88,10 +93,11 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  @override
   Future<List<Trainer>> getAllTrainers() async {
     List<Trainer> result = [];
 
-    if (!AppData.instance.simulate) {
+    if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference trainerRef = firestore.collection('trainer');
       await trainerRef.get().then(
         (querySnapshot) {
@@ -115,6 +121,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///--------------------------
+  @override
   Future<Trainer> createOrUpdateTrainer(trainer) async {
     Trainer result = Trainer.empty();
 
@@ -131,10 +138,11 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  @override
   Future<List<String>> getZamoTrainers() async {
     List<String> result = [];
 
-    if (!AppData.instance.simulate) {
+    if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference zamoRef = firestore.collection('metadata');
       await zamoRef.doc('zamo_trainers').get().then(
         (val) {
@@ -158,6 +166,7 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  @override
   Future<String> getZamoTrainingDefault() async {
     CollectionReference zamoRef = firestore.collection('metadata');
     DocumentSnapshot snapshot = await zamoRef.doc('zamo_default').get();
@@ -166,11 +175,12 @@ class FirestoreHelper with AppMixin {
   }
 
   ///--------------------------------------------
-
+// get list of items used to populate combobox of training items
+  @override
   Future<List<String>> getTrainingItems() async {
     List<String> result = [];
 
-    if (!AppData.instance.simulate) {
+    if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference ref = firestore.collection('metadata');
       await ref.doc('training_items').get().then(
         (val) {
@@ -191,10 +201,11 @@ class FirestoreHelper with AppMixin {
 
   ///--------------------------------------------
 
+  @override
   Future<ApplyWeightValues> getApplyWeightValues() async {
     ApplyWeightValues? result;
 
-    if (!AppData.instance.simulate) {
+    if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference ref = firestore.collection('metadata');
       await ref.doc('apply_weights').get().then(
         (val) {
@@ -214,6 +225,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///--------------------------
+  @override
   Future<LastRosterFinal> saveLastRosterFinal() async {
     LastRosterFinal lrf = LastRosterFinal(
         at: DateTime.now(),
@@ -233,6 +245,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///--------------------------
+  @override
   Future<LastRosterFinal?> getLastRosterFinal() async {
     LastRosterFinal? result;
     CollectionReference trainerRef = firestore.collection('metadata');
@@ -247,6 +260,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///--------------------------
+  @override
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet) async {
     CollectionReference trainerRef = firestore.collection('spreadsheet');
     await trainerRef
@@ -260,6 +274,7 @@ class FirestoreHelper with AppMixin {
   }
 
   //-----------------------------------------
+  @override
   Future<FsSpreadsheet> retrieveSpreadsheet(
       {required int year, required int month}) async {
     CollectionReference colref = firestore.collection('spreadsheet');
@@ -275,6 +290,7 @@ class FirestoreHelper with AppMixin {
   }
 
   ///-------- sendEmail
+  @override
   Future<bool> sendEmail(
       {required List<Trainer> to,
       required List<Trainer> cc,

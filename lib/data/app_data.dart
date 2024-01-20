@@ -13,7 +13,8 @@ class AppData {
   void _initialize() {}
 
   /// these contains the current active values
-  bool simulate = false;
+  RunMode runMode = RunMode.acc;
+
   double screenWidth = 600.0; //assume
   double screenHeight = 600.0; //assume
   double shortestSide = 600; //assume

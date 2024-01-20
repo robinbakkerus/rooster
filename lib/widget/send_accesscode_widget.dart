@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
@@ -51,7 +51,7 @@ class _SendAccessCodeWidgetState extends State<SendAccessCodeWidget>
 
   void _onFirstnameChanged(String value) async {
     if (_allTrainers.isEmpty) {
-      _allTrainers = await FirestoreHelper.instance.getAllTrainers();
+      _allTrainers = await Dbs.instance.getAllTrainers();
     }
 
     if (value.isNotEmpty) {
@@ -75,7 +75,7 @@ class _SendAccessCodeWidgetState extends State<SendAccessCodeWidget>
           _foundTrainerByFirstname =
               'gevonden, email is verstuurd!\nja kan het scherm sluiten.';
         });
-        FirestoreHelper.instance.sendEmail(
+        Dbs.instance.sendEmail(
             to: [trainer],
             cc: [],
             subject: 'AccessCode',

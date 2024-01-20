@@ -1,6 +1,20 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 
+List<Trainer> allTrainers = [
+  trainerAnne,
+  trainerPaula,
+  trainerRobin,
+  trainerFried,
+  trainerHuib,
+  trainerJanneke,
+  trainerJeroen,
+  trainerMaria,
+  trainerOlav,
+  trainerPauline,
+  trainerRonald,
+  trainerCyriel,
+];
 Trainer trainerRobin = _buildTrainer(
     'RB', 'Robin Bakkerus', 'ROMA', 'robin.bakkerus@gmail.com', 0, 1, 2, 0, 0,
     roles: 'T,A,S');
@@ -59,6 +73,11 @@ List<TrainerSchema> allSchemas = [
   trainerSchemasPaula,
   trainerSchemasOlav,
   trainerSchemasFried,
+  trainerSchemasAnne,
+  trainerSchemasMaria,
+  trainerSchemasCyriel,
+  trainerSchemasJanneke,
+  trainerSchemasJeroen
 ];
 
 TrainerSchema trainerSchemasRobin = _buildTrainerSchema(trainerRobin);
@@ -143,6 +162,11 @@ List<String> getTrainerItems() {
 }
 
 //---------------- spreadsheets
+List<FsSpreadsheet> allFsSpreadsheets = [
+  spreadSheetJanuari(),
+  spreadSheetFebruari()
+];
+
 FsSpreadsheet spreadSheetJanuari() {
   return FsSpreadsheet(
       year: 2024, month: 1, rows: _januariRows(), isFinal: true);

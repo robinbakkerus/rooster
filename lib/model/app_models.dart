@@ -44,6 +44,12 @@ enum DayPrefEnum {
   saturday;
 }
 
+enum RunMode {
+  prod,
+  acc,
+  dev;
+}
+
 ///-----------------------------------------
 class TrainerPref {
   final String paramName;
