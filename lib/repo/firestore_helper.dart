@@ -275,7 +275,7 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   //-----------------------------------------
   @override
-  Future<FsSpreadsheet> retrieveSpreadsheet(
+  Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month}) async {
     CollectionReference colref = firestore.collection('spreadsheet');
 
@@ -286,7 +286,11 @@ class FirestoreHelper with AppMixin implements Dbs {
       throw error;
     });
 
-    return FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
+    if (snapshot.exists) {
+      return FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
+    } else {
+      return null;
+    }
   }
 
   ///-------- sendEmail

@@ -20,7 +20,7 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
   List<Trainer> _allTrainers = [];
 
   _TrainerProgressPageState() {
-    AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
+    AppEvents.onSpreadsheetReadyEvent(_onReady);
   }
 
   @override
@@ -129,7 +129,7 @@ class _TrainerProgressPageState extends State<TrainerProgressPage>
     );
   }
 
-  void _onReady(AllTrainersDataReadyEvent event) {
+  void _onReady(SpreadsheetReadyEvent event) {
     if (mounted) {
       setState(() {
         _allTrainers = AppData.instance.getAllTrainers();

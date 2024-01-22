@@ -109,17 +109,19 @@ class AppController {
   }
 
   Future<SpreadSheet> generateOrRetrieveSpreadsheet() async {
-    await _getAllTrainerData();
-
     SpreadSheet result;
-    if (AppData.instance.schemaIsFinal()) {
-      result = await _getTheActiveSpreadsheet();
+
+    await _getAllTrainerDataForThisSpreadsheet();
+
+    SpreadSheet? spreadSheet = await _getTheActiveSpreadsheet();
+    if (spreadSheet != null) {
+      result = spreadSheet;
     } else {
       result = _generateTheSpreadsheet();
     }
 
     AppData.instance.setSpreadsheet(result);
-    AppEvents.fireAllTrainerDataReady();
+    AppEvents.fireSpreadsheetReady();
     return result;
   }
 
@@ -133,20 +135,19 @@ class AppController {
   }
 
   ///------------------------------------------------
-  Future<SpreadSheet> _getTheActiveSpreadsheet() async {
-    FsSpreadsheet fsSpreadsheet = await Dbs.instance.retrieveSpreadsheet(
+  Future<SpreadSheet?> _getTheActiveSpreadsheet() async {
+    FsSpreadsheet? fsSpreadsheet = await Dbs.instance.retrieveSpreadsheet(
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
 
-    SpreadSheet spreadSheet = _mapFromFsSpreadsheet(fsSpreadsheet);
-    return spreadSheet;
+    return fsSpreadsheet != null ? _mapFromFsSpreadsheet(fsSpreadsheet) : null;
   }
 
   ///-------------- map spreadsheet
   SpreadSheet _mapFromFsSpreadsheet(FsSpreadsheet fsSpreadsheet) {
-    SpreadSheet spreadSheet = SpreadSheet(
-        year: AppData.instance.getActiveYear(),
-        month: AppData.instance.getActiveMonth());
+    SpreadSheet spreadSheet =
+        SpreadSheet(year: fsSpreadsheet.year, month: fsSpreadsheet.month);
+    spreadSheet.isFinal = fsSpreadsheet.isFinal;
 
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
@@ -178,6 +179,7 @@ class AppController {
   void finalizeSpreadsheet(SpreadSheet spreadSheet) async {
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+    fsSpreadsheet.isFinal = true;
     await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
     await Dbs.instance.saveLastRosterFinal();
     await _mailSpreadsheetIsFinal(spreadSheet);
@@ -188,7 +190,7 @@ class AppController {
     FsSpreadsheet fsSpreadsheet =
         SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
     FsSpreadsheet oldFsSpreadsheet = SpreadsheetGenerator.instance
-        .fsSpreadsheetFrom(AppData.instance.getOldpreadsheet());
+        .fsSpreadsheetFrom(AppData.instance.getOriginalpreadsheet());
     List<SpreedsheetDiff> diffs = _getSpreadsheetDiffs(
         newSpreadsheet: fsSpreadsheet, oldSpreadsheet: oldFsSpreadsheet);
     String html =
@@ -197,6 +199,7 @@ class AppController {
     List<Trainer> toTrainers =
         _getSpreadsheetDiffsEmailRecipients(diffs: diffs);
     await _mailSpreadsheetUpdate(html, to: toTrainers, cc: []);
+    AppEvents.fireSpreadsheetReady();
   }
 
   ///--------------------
@@ -236,7 +239,7 @@ class AppController {
   }
 
   /// ---------- get TrainerData for all trainers
-  Future<List<TrainerData>> _getAllTrainerData() async {
+  Future<List<TrainerData>> _getAllTrainerDataForThisSpreadsheet() async {
     List<Trainer> allTrainers = await Dbs.instance.getAllTrainers();
 
     List<TrainerData> allTrainerData = [];
@@ -247,7 +250,7 @@ class AppController {
     }
 
     AppData.instance.setAllTrainerData(allTrainerData);
-    AppEvents.fireAllTrainerDataReady();
+    AppEvents.fireSpreadsheetReady();
 
     return allTrainerData;
   }

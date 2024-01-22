@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 // ignore: depend_on_referenced_packages
@@ -31,9 +33,11 @@ class AppData {
   List<String> trainerItems = [];
   late ApplyWeightValues applyWeightValues;
 
+  SpreadsheetStatus spreadSheetStatus = SpreadsheetStatus.initial; //asume
+  SpreadsheetStatus _prevSpreadSheetStatus = SpreadsheetStatus.initial; //asume
   // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
-  SpreadSheet _oldSpreadSheet =
+  SpreadSheet _originalSpreadSheet =
       SpreadSheet(year: 2024, month: 1); // to obtain the diffs
 
   String lastSnackbarMsg = '';
@@ -42,8 +46,13 @@ class AppData {
     return _spreadSheet;
   }
 
-  SpreadSheet getOldpreadsheet() {
-    return _oldSpreadSheet;
+  SpreadSheet getOriginalpreadsheet() {
+    return _originalSpreadSheet;
+  }
+
+  bool isSpreadsheetDirty() {
+    return AppData.instance.getSpreadsheet() !=
+        AppData.instance.getOriginalpreadsheet();
   }
 
   DateTime getSpreadsheetDate() {
@@ -52,7 +61,23 @@ class AppData {
 
   void setSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
-    _oldSpreadSheet = spreadSheet.clone();
+    _originalSpreadSheet = spreadSheet.clone();
+
+    spreadSheetStatus = spreadSheet.isFinal
+        ? SpreadsheetStatus.active
+        : SpreadsheetStatus.initial;
+
+    log('${spreadSheet.month} ${spreadSheetStatus.name}');
+  }
+
+  void updateSpreadsheet(SpreadSheet spreadSheet) {
+    _spreadSheet = spreadSheet;
+    if (_spreadSheet != getOriginalpreadsheet()) {
+      _prevSpreadSheetStatus = spreadSheetStatus;
+      spreadSheetStatus = SpreadsheetStatus.dirty;
+    } else {
+      spreadSheetStatus = _prevSpreadSheetStatus;
+    }
   }
 
   TrainerData _trainerData = TrainerData.empty();
@@ -99,11 +124,6 @@ class AppData {
   }
 
   List<DateTime> _activeDates = [];
-
-  bool schemaIsFinal() {
-    DateTime activeDate = AppData.instance.getActiveDate();
-    return !activeDate.isAfter(lastActiveDate);
-  }
 
   // ---
   void setActiveDate(DateTime date) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
 import 'package:rooster/page/overall_availability_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
@@ -48,7 +49,8 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
   }
 
   void _onTap(value) {
-    if (AppData.instance.schemaIsFinal() && value == 3) {
+    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active &&
+        value == 3) {
       wh.showSnackbar(
           'Schema is al definitief: er kunnen geen wijzigingen worden aangebracht',
           color: Colors.orange);

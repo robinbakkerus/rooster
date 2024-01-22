@@ -42,7 +42,7 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
           child: AnimatedTextKit(
             animatedTexts: [
               ScaleAnimatedText('LO',
-                  duration: const Duration(milliseconds: 3000)),
+                  duration: const Duration(milliseconds: 3500)),
             ],
           ),
         ),
@@ -55,7 +55,7 @@ class _SplashPageState extends State<SplashPage> with AppMixin {
           child: AnimatedTextKit(
             animatedTexts: [
               ScaleAnimatedText('NU',
-                  duration: const Duration(milliseconds: 3000)),
+                  duration: const Duration(milliseconds: 3500)),
             ],
           ),
         ),

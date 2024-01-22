@@ -22,7 +22,7 @@ abstract class Dbs {
   Future<LastRosterFinal> saveLastRosterFinal();
   Future<LastRosterFinal?> getLastRosterFinal();
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet);
-  Future<FsSpreadsheet> retrieveSpreadsheet(
+  Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month});
   Future<bool> sendEmail(
       {required List<Trainer> toList,

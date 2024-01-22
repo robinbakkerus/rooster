@@ -24,22 +24,18 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       year: AppData.instance.getActiveYear(),
       month: AppData.instance.getActiveMonth());
 
-  bool _isNew = true;
-  bool _isMutable = false;
-
   Widget _dataGrid = Container();
 
   _SpreadsheetPageState();
 
   @override
   void initState() {
-    AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
+    AppEvents.onSpreadsheetReadyEvent(_onReady);
     AppEvents.onTrainingUpdatedEvent(_onTrainingUpdated);
     AppEvents.onExtraDayUpdatedEvent(_onExtraDayUpdated);
     AppEvents.onSpreadsheetTrainerUpdatedEvent(_onSpreadTrainerUpdated);
 
     _spreadSheet = AppData.instance.getSpreadsheet();
-    _isNew = !AppData.instance.schemaIsFinal();
     _dataGrid = _buildGrid();
 
     super.initState();
@@ -47,6 +43,14 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildBody(),
+      floatingActionButton: _buildFab(),
+    );
+  }
+
+  //---------------------------------
+  Widget _buildBody() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: SafeArea(
@@ -63,13 +67,25 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     );
   }
 
+  //--------------------------------
+  Widget? _buildFab() {
+    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty) {
+      return FloatingActionButton(
+        onPressed: _saveSpreadsheetMutations,
+        hoverColor: Colors.greenAccent,
+        child: const Text('Save'),
+      );
+    } else {
+      return null;
+    }
+  }
+
   //-----------------------
   bool _isEditable() {
-    if (_isNew && _isSupervisor()) {
-      return true;
-    } else {
-      return _isMutable;
-    }
+    return (AppData.instance.spreadSheetStatus == SpreadsheetStatus.opened ||
+        AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty ||
+        (AppData.instance.spreadSheetStatus == SpreadsheetStatus.initial &&
+            AppData.instance.getTrainer().isSupervisor()));
   }
 
   //--------------------------------
@@ -208,7 +224,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   Widget _buildActionButton(BuildContext context) {
-    if (_isNew) {
+    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.initial) {
       return _buildActionButtonsNewSpreadsheet();
     } else {
       return _buildActionButtonPublishedSpreadsheet();
@@ -226,14 +242,12 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   Widget _buildActionButtonPublishedSpreadsheet() {
-    if (!_isMutable) {
+    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
       return OutlinedButton(
-          onPressed: _buildDialogMakeSpreadsheetMutable,
+          onPressed: _buildDialogOpenSpreadsheet,
           child: const Text('Maak schema open voor wijziging(en)'));
     } else {
-      return OutlinedButton(
-          onPressed: _saveSpreadsheetMuations,
-          child: const Text('Voer wijzigingen door'));
+      return Container();
     }
   }
 
@@ -246,17 +260,20 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     _buildDialogConfirm(context, _areProgramFieldSet());
   }
 
-  void _saveSpreadsheetMuations() async {
+  void _saveSpreadsheetMutations() async {
     await AppController.instance.updateSpreadsheet(_spreadSheet);
-    setState(() {
-      _isMutable = false;
-      _dataGrid = _buildGrid();
-    });
+    AppData.instance.spreadSheetStatus =
+        AppData.instance.getOriginalpreadsheet().isFinal
+            ? SpreadsheetStatus.active
+            : SpreadsheetStatus.initial;
     wh.showSnackbar('Wijzigingen zijn doorgevoerd', color: Colors.lightGreen);
+    AppEvents.fireSpreadsheetReady();
   }
 
   void _doFinalizeRoster(BuildContext context) async {
     AppController.instance.finalizeSpreadsheet(_spreadSheet);
+    AppData.instance.spreadSheetStatus = SpreadsheetStatus.active;
+    AppEvents.fireSpreadsheetReady();
     wh.showSnackbar('Training schema is nu definitief!');
   }
 
@@ -284,34 +301,45 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   //--------------------------------
-  void _buildDialogMakeSpreadsheetMutable() async {
-    Widget noButton = TextButton(
-      onPressed: () {
-        Navigator.pop(context, false);
-        // Navigator.of(context, rootNavigator: true)
-        //     .pop(); // dismisses only the dialog and returns nothing
+  void _buildDialogOpenSpreadsheet() async {
+    Widget noButton = _buildYesNoButton('Nee', Colors.red, false);
+    Widget yesButton = _buildYesNoButton('Ja', Colors.green, true);
+
+    AlertDialog alert =
+        _buildAlertDialog(yesButton: yesButton, noButton: noButton);
+    bool dialogResult = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
       },
-      child: const Text(
-        "Nee",
-        style: TextStyle(color: Colors.red),
-      ),
     );
 
-    Widget yesButton = TextButton(
+    setState(() {
+      if (dialogResult == true) {
+        AppData.instance.spreadSheetStatus = SpreadsheetStatus.opened;
+        AppEvents.fireSpreadsheetReady();
+      }
+      _dataGrid = _buildGrid();
+    });
+  }
+
+  //--------------------------------
+  Widget _buildYesNoButton(String text, Color color, bool result) {
+    return TextButton(
       onPressed: () {
-        Navigator.pop(context, true);
-        // Navigator.of(context, rootNavigator: true)
-        //     .pop(); // dismisses only the dialog and returns nothing
+        Navigator.pop(context, result);
       },
-      child: const Text(
-        "Ja",
-        style: TextStyle(color: Colors.green),
+      child: Text(
+        text,
+        style: TextStyle(color: color),
       ),
     );
+  }
 
-    /// set up the AlertDialog
-
-    AlertDialog alert = AlertDialog(
+  //----------------------------------
+  AlertDialog _buildAlertDialog(
+      {required Widget yesButton, required Widget noButton}) {
+    return AlertDialog(
       title: const Text("Trainingschema"),
       content: const SizedBox(
         height: 100,
@@ -328,19 +356,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         noButton,
         yesButton,
       ],
-    ); // show the dialog
-
-    bool dialogResult = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
     );
-
-    setState(() {
-      _isMutable = dialogResult;
-      _dataGrid = _buildGrid();
-    });
   }
 
   //---------------------------------
@@ -436,15 +452,13 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return emptyPrograms.isEmpty;
   }
 
-  void _onReady(AllTrainersDataReadyEvent event) {
+  void _onReady(SpreadsheetReadyEvent event) {
     if (mounted) {
       setState(() {
-        _isNew = !AppData.instance.schemaIsFinal();
-        _isMutable = false;
         _spreadSheet = AppData.instance.getSpreadsheet();
         _dataGrid = _buildGrid();
 
-        if (!_isNew) {
+        if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
           wh.showSnackbar('Schema is al definitief!', color: Colors.orange);
         }
       });
@@ -454,30 +468,27 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   void _onTrainingUpdated(TrainingUpdatedEvent event) {
     if (mounted) {
       _spreadSheet.rows[event.rowIndex].trainingText = event.training;
-      _dataGrid = _buildGrid();
+      AppData.instance.updateSpreadsheet(_spreadSheet);
+      AppEvents.fireSpreadsheetReady();
     }
   }
 
   void _onExtraDayUpdated(ExtraDayUpdatedEvent event) {
-    if (mounted) {
-      setState(() {
-        if (event.text == c.removeExtraSpreadsheetRow) {
-          _removeExtraRow(event);
-        } else {
-          _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
-        }
-        _dataGrid = _buildGrid();
-      });
+    if (event.text == c.removeExtraSpreadsheetRow) {
+      _removeExtraRow(event);
+    } else {
+      _extraRowExists(event) ? _updateExtraRow(event) : _addExtraRow(event);
     }
+    AppData.instance.updateSpreadsheet(_spreadSheet);
+    AppEvents.fireSpreadsheetReady();
   }
 
   void _onSpreadTrainerUpdated(SpreadsheetTrainerUpdatedEvent event) {
     if (mounted) {
-      setState(() {
-        _spreadSheet.rows[event.rowIndex].rowCells[event.colIndex].text =
-            event.text;
-        _dataGrid = _buildGrid();
-      });
+      _spreadSheet.rows[event.rowIndex].rowCells[event.colIndex].text =
+          event.text;
+      AppData.instance.updateSpreadsheet(_spreadSheet);
+      AppEvents.fireSpreadsheetReady();
     }
   }
 
@@ -507,9 +518,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     DateTime date = DateTime(actDate.year, actDate.month, event.dag);
     SheetRow? sheetRow = _spreadSheet.rows
         .firstWhereOrNull((e) => e.date == date && e.isExtraRow);
-    if (sheetRow != null) {
-      _spreadSheet.rows.remove(sheetRow);
-    }
+    _spreadSheet.rows.remove(sheetRow);
   }
 
   bool _extraRowExists(ExtraDayUpdatedEvent event) {

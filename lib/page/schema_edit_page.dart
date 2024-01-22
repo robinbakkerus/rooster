@@ -51,7 +51,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _buildGrid(),
-      floatingActionButton: _getFab(),
+      floatingActionButton: _buildFab(),
     );
   }
 
@@ -130,7 +130,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
         color: color));
   }
 
-  Widget? _getFab() {
+  Widget? _buildFab() {
     if (AppData.instance.isSchemaDirty()) {
       return FloatingActionButton(
         onPressed: _onSaveSchema,
@@ -160,7 +160,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
           'Schema voor $maand aangemaakt, deze wordt nu als ingevuld beschouwd';
     } else {
       msg += 'Schema $maand geopend';
-      if (AppData.instance.schemaIsFinal()) {
+      if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;
       }

@@ -28,7 +28,7 @@ class TrainerUpdatedEvent {
   });
 }
 
-class AllTrainersDataReadyEvent {}
+class SpreadsheetReadyEvent {}
 
 class DatesReadyEvent {}
 
@@ -64,8 +64,6 @@ class TrainerPrefUpdatedEvent {
   );
 }
 
-class SpreadsheetReadyEvent {}
-
 class ErrorEvent {
   final String errMsg;
   ErrorEvent(
@@ -97,8 +95,8 @@ class AppEvents {
   static void fireTrainerUpdated(Trainer trainer) =>
       _sEventBus.fire(TrainerUpdatedEvent(trainer: trainer));
 
-  static void fireAllTrainerDataReady() =>
-      _sEventBus.fire(AllTrainersDataReadyEvent());
+  static void fireSpreadsheetReady() =>
+      _sEventBus.fire(SpreadsheetReadyEvent());
 
   static void fireDatesReady() => _sEventBus.fire(DatesReadyEvent());
 
@@ -114,9 +112,6 @@ class AppEvents {
 
   static void fireTrainerPrefUpdated(String paramName, int newValue) =>
       _sEventBus.fire(TrainerPrefUpdatedEvent(paramName, newValue));
-
-  static void fireSpreadsheetReady() =>
-      _sEventBus.fire(SpreadsheetReadyEvent());
 
   static void fireErrorEvent(String errMsg) =>
       _sEventBus.fire(ErrorEvent(errMsg));
@@ -137,9 +132,8 @@ class AppEvents {
   static void onTrainerUpdatedEvent(OnTrainerUpdatedEventFunc func) =>
       _sEventBus.on<TrainerUpdatedEvent>().listen((event) => func(event));
 
-  static void onAllTrainersAndSchemasReadyEvent(
-          OnAllTrainerDataReadyEventFunc func) =>
-      _sEventBus.on<AllTrainersDataReadyEvent>().listen((event) => func(event));
+  static void onSpreadsheetReadyEvent(OnSpreadsheetReadyEventFunc func) =>
+      _sEventBus.on<SpreadsheetReadyEvent>().listen((event) => func(event));
 
   static void onDatesReadyEvent(OnDatesReadyEventFunc func) =>
       _sEventBus.on<DatesReadyEvent>().listen((event) => func(event));
@@ -159,9 +153,6 @@ class AppEvents {
   static void onTrainerPrefUpdatedEvent(OnTrainerPrefUpdatedEventFunc func) =>
       _sEventBus.on<TrainerPrefUpdatedEvent>().listen((event) => func(event));
 
-  static void onSpreadsheetReadyEvent(OnSpreadsheetReadyEventFunc func) =>
-      _sEventBus.on<SpreadsheetReadyEvent>().listen((event) => func(event));
-
   static void onErrorEvent(OnErrorEventFunc func) =>
       _sEventBus.on<ErrorEvent>().listen((event) => func(event));
 }
@@ -178,8 +169,8 @@ typedef OnSchemaUpdateEventFunc = void Function(SchemaUpdatedEvent event);
 
 typedef OnTrainerUpdatedEventFunc = void Function(TrainerUpdatedEvent event);
 
-typedef OnAllTrainerDataReadyEventFunc = void Function(
-    AllTrainersDataReadyEvent event);
+typedef OnSpreadsheetReadyEventFunc = void Function(
+    SpreadsheetReadyEvent event);
 
 typedef OnDatesReadyEventFunc = void Function(DatesReadyEvent event);
 
@@ -191,8 +182,5 @@ typedef OnSpreadsheetTrainerUpdatedEventFunc = void Function(
 
 typedef OnTrainerPrefUpdatedEventFunc = void Function(
     TrainerPrefUpdatedEvent event);
-
-typedef OnSpreadsheetReadyEventFunc = void Function(
-    SpreadsheetReadyEvent event);
 
 typedef OnErrorEventFunc = void Function(ErrorEvent event);

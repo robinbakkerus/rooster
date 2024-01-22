@@ -117,7 +117,7 @@ class _SpreadsheeDayColumnState extends State<SpreadsheeDayColumn>
 
   bool _isEditable() {
     return AppData.instance.getTrainer().isSupervisor() &&
-        !AppData.instance.schemaIsFinal();
+        AppData.instance.spreadSheetStatus != SpreadsheetStatus.active;
   }
 
   Widget _buildExtraTextField() {

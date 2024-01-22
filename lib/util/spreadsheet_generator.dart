@@ -90,7 +90,8 @@ class SpreadsheetGenerator with AppMixin {
         year: spreadSheet.year,
         month: spreadSheet.month,
         rows: fsRows,
-        isFinal: true);
+        isFinal: spreadSheet.isFinal);
+
     return result;
   }
 

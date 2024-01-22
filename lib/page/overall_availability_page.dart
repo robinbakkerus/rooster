@@ -16,7 +16,7 @@ class OverallAvailabilityPage extends StatefulWidget {
 class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     with AppMixin {
   _OverallAvailabilityPageState() {
-    AppEvents.onAllTrainersAndSchemasReadyEvent(_onReady);
+    AppEvents.onSpreadsheetReadyEvent(_onReady);
   }
 
   @override
@@ -24,7 +24,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     super.initState();
   }
 
-  void _onReady(AllTrainersDataReadyEvent event) {
+  void _onReady(SpreadsheetReadyEvent event) {
     if (mounted) {
       setState(() {});
     }

@@ -50,6 +50,14 @@ enum RunMode {
   dev;
 }
 
+enum SpreadsheetStatus {
+  old,
+  initial,
+  active,
+  opened,
+  dirty;
+}
+
 ///-----------------------------------------
 class TrainerPref {
   final String paramName;
@@ -541,6 +549,7 @@ class ApplyWeightStartValue {
 class SpreadSheet {
   int year = 2024;
   int month = 1;
+  bool isFinal = false;
   List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
   List<SheetRow> rows = [];
 
@@ -555,10 +564,37 @@ class SpreadSheet {
 
   SpreadSheet clone() {
     SpreadSheet result = SpreadSheet(year: year, month: month);
+    result.isFinal = isFinal;
     for (SheetRow row in rows) {
       result.rows.add(row.clone());
     }
     return result;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SpreadSheet &&
+        other.year == year &&
+        other.month == month &&
+        other.isFinal == isFinal &&
+        listEquals(other.header, header) &&
+        listEquals(other.rows, rows);
+  }
+
+  @override
+  int get hashCode {
+    return year.hashCode ^
+        month.hashCode ^
+        isFinal.hashCode ^
+        header.hashCode ^
+        rows.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'SpreadSheet(year: $year, month: $month, isFinal: $isFinal, rows: $rows)';
   }
 }
 
@@ -600,7 +636,28 @@ class SheetRow {
 
   @override
   String toString() {
-    return '$rowIndex, \t $date}';
+    return 'SheetRow(rowIndex: $rowIndex, date: $date, trainingText: $trainingText, isExtraRow: $isExtraRow, rowCells: $rowCells)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SheetRow &&
+        other.rowIndex == rowIndex &&
+        other.date == date &&
+        other.trainingText == trainingText &&
+        other.isExtraRow == isExtraRow &&
+        listEquals(other.rowCells, rowCells);
+  }
+
+  @override
+  int get hashCode {
+    return rowIndex.hashCode ^
+        date.hashCode ^
+        trainingText.hashCode ^
+        isExtraRow.hashCode ^
+        rowCells.hashCode;
   }
 }
 
@@ -631,6 +688,26 @@ class RowCell {
         availableCounts; // we dont need to clone these onea
     result.trainerWeights = trainerWeights; // and this one
     return result;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is RowCell &&
+        other.rowIndex == rowIndex &&
+        other.colIndex == colIndex &&
+        other.text == text;
+  }
+
+  @override
+  int get hashCode {
+    return rowIndex.hashCode ^ colIndex.hashCode ^ text.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'RowCell(rowIndex: $rowIndex, colIndex: $colIndex, trainerWeights: $trainerWeights, text: $text)';
   }
 }
 

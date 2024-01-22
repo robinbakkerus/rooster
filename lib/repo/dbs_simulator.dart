@@ -70,7 +70,7 @@ class Simulator with AppMixin implements Dbs {
   }
 
   @override
-  Future<FsSpreadsheet> retrieveSpreadsheet(
+  Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month}) async {
     FsSpreadsheet? fsSpreadsheet = p.allFsSpreadsheets
         .firstWhereOrNull((e) => e.month == month && e.year == year);

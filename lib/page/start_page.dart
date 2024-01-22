@@ -42,8 +42,9 @@ class _StartPageState extends State<StartPage> {
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
     AppEvents.onErrorEvent(_onErrorEvent);
+    AppEvents.onSpreadsheetReadyEvent(_onSpreadsheetReady);
 
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(milliseconds: 2900), () {
       if (_accessCode.length == 4) {
         _findTrainer(_accessCode);
       } else {
@@ -125,17 +126,21 @@ class _StartPageState extends State<StartPage> {
 
   String _getSpreadstatus() {
     String result = ' : ';
-    if (AppData.instance.schemaIsFinal()) {
+    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
       result += '(actief)';
-    } else {
-      if (AppData.instance
-          .getSpreadsheetDate()
-          .isBefore(DateTime.now().copyWith(day: 1))) {
-        result += '(verlopen)';
-      } else {
-        result += '(onderhanden)';
-      }
+    } else if (AppData.instance.spreadSheetStatus ==
+        SpreadsheetStatus.initial) {
+      result += '(nieuw)';
+    } else if (AppData.instance
+        .getSpreadsheetDate()
+        .isBefore(DateTime.now().copyWith(day: 1))) {
+      result += '(verlopen)';
+    } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.opened) {
+      result += '(geopend)';
+    } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty) {
+      result += '(aangepast)';
     }
+
     return result;
   }
 
@@ -192,6 +197,28 @@ class _StartPageState extends State<StartPage> {
             .isBefore(AppData.instance.lastMonth);
       });
     }
+  }
+
+  void _onSpreadsheetReady(SpreadsheetReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _barTitle = _buildBarTitle();
+      });
+    }
+  }
+
+  void _onDatesReady(DatesReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _barTitle = _buildBarTitle();
+      });
+    }
+  }
+
+  void _onErrorEvent(ErrorEvent event) {
+    setState(() {
+      AppData.instance.stackIndex = PageEnum.errorPage.code;
+    });
   }
 
   Widget _buildPopMenu() {
@@ -348,20 +375,6 @@ class _StartPageState extends State<StartPage> {
   void _toggleActionEnabled(int index) {
     _actionEnabled = [true, true, true, true, true, true, true];
     _actionEnabled[index] = false;
-  }
-
-  void _onDatesReady(DatesReadyEvent event) {
-    if (mounted) {
-      setState(() {
-        _barTitle = _buildBarTitle();
-      });
-    }
-  }
-
-  void _onErrorEvent(ErrorEvent event) {
-    setState(() {
-      AppData.instance.stackIndex = PageEnum.errorPage.code;
-    });
   }
 
   String _checkCookie() {
