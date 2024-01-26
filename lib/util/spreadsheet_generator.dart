@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_mixin.dart';
@@ -29,15 +30,15 @@ class SpreadsheetGenerator with AppMixin {
 
   //-------------
   //
-  List<Trainer> _getTrainersForGroup(Groep groep) {
+  List<Trainer> _getTrainersForGroup(String groupName) {
     return AppData.instance
         .getAllTrainers()
-        .where((trainer) => _availableForGroep(trainer, groep))
+        .where((trainer) => _availableForGroep(trainer, groupName))
         .toList();
   }
 
-  bool _availableForGroep(Trainer trainer, Groep groep) {
-    return trainer.getPrefValue(paramName: groep.name) > 0;
+  bool _availableForGroep(Trainer trainer, String groupName) {
+    return trainer.getPrefValue(paramName: groupName) > 0;
   }
 
   //-------------------------------
@@ -65,8 +66,9 @@ class SpreadsheetGenerator with AppMixin {
 
     // next find the best trainer, first we skip zamo
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
-      for (int groepNr = 0; groepNr < Groep.values.length - 1; groepNr++) {
-        _findSuitableTrainer(rowNr: rowNr, groepNr: groepNr);
+      for (String groupName
+          in SpreadsheetGenerator.instance.getGroupNames(date)) {
+        _findSuitableTrainer(rowNr: rowNr, groupName: groupName, date: date);
       }
     }
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
@@ -80,7 +82,7 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   //----------------
-  FsSpreadsheet fsSpreadsheetFrom(SpreadSheet spreadSheet) {
+  FsSpreadsheet mapFsSpreadsheetFrom(SpreadSheet spreadSheet) {
     List<FsSpreadsheetRow> fsRows = [];
     for (SheetRow sheetRow in spreadSheet.rows) {
       fsRows.add(_mapFromRow(sheetRow));
@@ -108,7 +110,57 @@ class SpreadsheetGenerator with AppMixin {
         rowCells: fsCells);
   }
 
+  //-------------
+  List<ActiveTrainingGroup> generateActiveTrainingGroups() {
+    List<ActiveTrainingGroup> result = [];
+
+    ActiveTrainingGroup activeTrainingGroup = ActiveTrainingGroup(
+        startDate: AppData.instance.getActiveDates().first, groupNames: []);
+
+    for (DateTime date in AppData.instance.getActiveDates()) {
+      List<String> names = getGroupNames(date);
+      if (listEquals(names, activeTrainingGroup.groupNames)) {
+        activeTrainingGroup.endDate = date;
+      } else {
+        activeTrainingGroup =
+            ActiveTrainingGroup(startDate: date, groupNames: names);
+        activeTrainingGroup.endDate = date;
+        result.add(activeTrainingGroup);
+      }
+    }
+
+    return result;
+  }
+
+  List<String> getGroupNames(DateTime date) {
+    List<String> result = [];
+    for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
+      if (trainingGroup.startDate.isBefore(date) &&
+          trainingGroup.endDate.isAfter(date) &&
+          !_isExcluded(trainingGroup, date)) {
+        result.add(trainingGroup.name);
+      }
+    }
+    return result;
+  }
+
+  //--------------------------------
+  int getGroupIndex(String groupName, DateTime dateTime) {
+    List<String> getGroupNames =
+        SpreadsheetGenerator.instance.getGroupNames(dateTime);
+    for (int i = 0; i < getGroupNames.length; i++) {
+      if (getGroupNames[i].toLowerCase() == groupName.toLowerCase()) {
+        return i;
+      }
+    }
+    return -1; // should not happen
+  }
+
   //---- private --
+
+  bool _isExcluded(TrainingGroup trainingGroup, DateTime date) {
+    return trainingGroup.excludeDays.contains(date);
+  }
 
   //------------- first fill the spreadsheet with available trainer data
   List<SheetRow> _getAvailabilityForSpreadsheet(List<Available> availableList) {
@@ -117,9 +169,10 @@ class SpreadsheetGenerator with AppMixin {
     for (Available avail in availableList) {
       SheetRow sheetRow =
           SheetRow(date: avail.date, rowIndex: rowIdx, isExtraRow: false);
-      for (int groepNr = 0; groepNr < Groep.values.length; groepNr++) {
-        RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groepNr);
-        rowCell.availableCounts = avail.counts[groepNr];
+      for (String groupName in getGroupNames(avail.date)) {
+        int groupIndex = getGroupIndex(groupName, avail.date);
+        RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groupIndex);
+        rowCell.availableCounts = avail.counts[groupIndex];
         sheetRow.rowCells.add(rowCell);
       }
       result.add(sheetRow);
@@ -131,15 +184,16 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   Available _genCountsProcessDate(int dateIndex, DateTime date) {
-    Available available = Available(date: date);
+    List<String> groupNames = getGroupNames(date);
+    Available available = Available(date: date, groupCount: groupNames.length);
 
-    for (Groep groep in Groep.values) {
+    for (String groepName in groupNames) {
       AvailableCounts availableCounts = AvailableCounts();
 
-      for (Trainer trainer in _getTrainersForGroup(groep)) {
+      for (Trainer trainer in _getTrainersForGroup(groepName)) {
         TrainerSchema schemas = getSchemaFromAllTrainerData(trainer);
 
-        int groupPref = trainer.getPrefValue(paramName: groep.name);
+        int groupPref = trainer.getPrefValue(paramName: groepName);
         int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
 
         if (schemas.isEmpty()) {
@@ -173,80 +227,85 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   ///---------------
-  void _findSuitableTrainer({required int rowNr, required int groepNr}) {
-    AvailableCounts cnts =
-        _spreadSheet.rows[rowNr].rowCells[groepNr].availableCounts;
+  void _findSuitableTrainer(
+      {required int rowNr, required String groupName, required DateTime date}) {
+    int groupIndex = getGroupIndex(groupName, date);
+    if (_spreadSheet.rows[rowNr].rowCells.length > groupIndex) {
+      AvailableCounts cnts =
+          _spreadSheet.rows[rowNr].rowCells[groupIndex].availableCounts;
 
-    List<TrainerWeight> possibleTrainerWeights =
-        _getPossibleTrainers(cnts, isZamo: false);
+      List<TrainerPlanningRank> possibleTrainerRanks =
+          _getPossibleTrainers(cnts, isZamo: false);
 
-    _applyWeights(possibleTrainerWeights, rowNr: rowNr, groepNr: groepNr);
+      _applyRanks(possibleTrainerRanks,
+          rowNr: rowNr, groepName: groupName, groepNr: groupIndex);
 
-    bool setTrainer = true; //assume
-    if (_isThursdayAndPR(rowNr, groepNr) ||
-        (_isSaturday(rowNr) && !_isSaturdayAndZamo(rowNr, groepNr))) {
-      setTrainer = false;
-    }
+      bool setTrainer = true; //assume
+      if (_isThursdayAndPR(rowNr, groupName) ||
+          (_isSaturday(rowNr) && !_isSaturdayAndZamo(rowNr, groupName))) {
+        setTrainer = false;
+      }
 
-    if (setTrainer) {
-      Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
-          rowNr: rowNr, groepNr: groepNr);
-      _spreadSheet.rows[rowNr].rowCells[groepNr].setTrainer(trainer);
+      if (setTrainer) {
+        Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
+            rowNr: rowNr, groepNr: groupIndex);
+        _spreadSheet.rows[rowNr].rowCells[groupIndex].setTrainer(trainer);
+      }
     }
   }
 
   ///---------------
   void _findSuitableZamoTrainer({required int rowNr}) {
+    int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
     AvailableCounts cnts =
-        _spreadSheet.rows[rowNr].rowCells[Groep.zamo.index].availableCounts;
+        _spreadSheet.rows[rowNr].rowCells[zamoIndex].availableCounts;
 
-    List<TrainerWeight> possibleTrainerWeights =
+    List<TrainerPlanningRank> possibleTrainerRanks =
         _getPossibleTrainers(cnts, isZamo: true);
 
-    _applyZamoWeights(possibleTrainerWeights, rowNr: rowNr);
+    _applyZamoRanks(possibleTrainerRanks, rowNr: rowNr);
 
-    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerWeights,
-        rowNr: rowNr, groepNr: Groep.zamo.index);
-    _spreadSheet.rows[rowNr].rowCells[Groep.zamo.index].setTrainer(trainer);
+    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
+        rowNr: rowNr, groepNr: zamoIndex);
+    _spreadSheet.rows[rowNr].rowCells[zamoIndex].setTrainer(trainer);
   }
 
 //-----------------------
-  List<TrainerWeight> _getPossibleTrainers(AvailableCounts cnts,
+  List<TrainerPlanningRank> _getPossibleTrainers(AvailableCounts cnts,
       {required bool isZamo}) {
-    List<TrainerWeight> result = [];
+    List<TrainerPlanningRank> result = [];
 
     List<Trainer> trainerList = [];
     trainerList.addAll(cnts.available);
     trainerList.addAll(cnts.availableBnye);
     for (Trainer trainer in trainerList) {
-      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo);
-      result.add(TrainerWeight(trainer: trainer, weight: weight));
+      double rank = _getStartRank(trainer: trainer, isZamo: isZamo);
+      result.add(TrainerPlanningRank(trainer: trainer, rank: rank));
     }
 
     trainerList = [];
     trainerList.addAll(cnts.ifNeeded);
     trainerList.addAll(cnts.ifNeededBnye);
     for (Trainer trainer in trainerList) {
-      double weight = _getStartWeight(trainer: trainer, isZamo: isZamo) +
-          AppData.instance.applyWeightValues.onlyIfNeeded;
-      result.add(TrainerWeight(trainer: trainer, weight: weight));
+      double rank = _getStartRank(trainer: trainer, isZamo: isZamo) +
+          AppData.instance.planRankValues.onlyIfNeeded;
+      result.add(TrainerPlanningRank(trainer: trainer, rank: rank));
     }
 
     return result;
   }
 
-  double _getStartWeight({required Trainer trainer, required bool isZamo}) {
-    ApplyWeightStartValue? startVal = isZamo
-        ? AppData.instance.applyWeightValues.startValues
+  double _getStartRank({required Trainer trainer, required bool isZamo}) {
+    PlanRankStartValue? startVal = isZamo
+        ? AppData.instance.planRankValues.startValues
             .firstWhereOrNull((e) => e.trainerPk == trainer.pk)
-        : AppData.instance.applyWeightValues.zamoStartValues
+        : AppData.instance.planRankValues.zamoStartValues
             .firstWhereOrNull((e) => e.trainerPk == trainer.pk);
 
     if (startVal != null) {
       return startVal.value;
     } else {
-      ApplyWeightStartValue? startVal = AppData
-          .instance.applyWeightValues.startValues
+      PlanRankStartValue? startVal = AppData.instance.planRankValues.startValues
           .firstWhereOrNull((e) => e.trainerPk == '*');
       if (startVal != null) {
         return startVal.value;
@@ -256,16 +315,20 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  Trainer _getTrainerFromPossibleList(List<TrainerWeight> possibleTrainers,
-      {required int rowNr, required int groepNr}) {
+  ///-------------------------
+  ///
+  Trainer _getTrainerFromPossibleList(
+      List<TrainerPlanningRank> possibleTrainers,
+      {required int rowNr,
+      required int groepNr}) {
     possibleTrainers = _removeAlreadyScheduled(possibleTrainers, rowNr: rowNr);
     if (possibleTrainers.length == 1) {
       return possibleTrainers.last.trainer;
     } else if (possibleTrainers.length > 1) {
-      possibleTrainers.sort((a, b) => b.weight.compareTo(a.weight));
-      double weight = possibleTrainers.first.weight;
-      List<TrainerWeight> sortedTrainers =
-          possibleTrainers.where((e) => e.weight == weight).toList();
+      possibleTrainers.sort((a, b) => b.rank.compareTo(a.rank));
+      double rank = possibleTrainers.first.rank;
+      List<TrainerPlanningRank> sortedTrainers =
+          possibleTrainers.where((e) => e.rank == rank).toList();
       if (sortedTrainers.length == 1) {
         return sortedTrainers.first.trainer;
       } else {
@@ -277,13 +340,13 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  List<TrainerWeight> _removeAlreadyScheduled(
-      List<TrainerWeight> possibleTrainers,
+  List<TrainerPlanningRank> _removeAlreadyScheduled(
+      List<TrainerPlanningRank> possibleTrainers,
       {required int rowNr}) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
-    List<TrainerWeight> result = [];
+    List<TrainerPlanningRank> result = [];
 
-    for (TrainerWeight tw in possibleTrainers) {
+    for (TrainerPlanningRank tw in possibleTrainers) {
       if (!_alreadyScheduledThisDay(tw.trainer, sheetRow)) {
         result.add(tw);
       }
@@ -300,71 +363,75 @@ class SpreadsheetGenerator with AppMixin {
     return false;
   }
 
-  // here we make weight higher or lower in order to make choice
-  void _applyWeights(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {
-    if (!_isSaturday(rowNr) && !_isThursdayAndPR(rowNr, groepNr)) {
-      _applyOnlyIfNeeded(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
-      _applyDaysNotAvailable(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
-      _applyAlreadyScheduled(trainerWeightList, rowNr: rowNr, groepNr: groepNr);
+  // here we make the rank higher or lower in order to make choice
+  void _applyRanks(List<TrainerPlanningRank> trainerPlanRankList,
+      {required int rowNr, required String groepName, required int groepNr}) {
+    if (!_isSaturday(rowNr) && !_isThursdayAndPR(rowNr, groepName)) {
+      _applyOnlyIfNeeded(trainerPlanRankList,
+          rowNr: rowNr, groepName: groepName);
+      _applyDaysNotAvailable(trainerPlanRankList,
+          rowNr: rowNr, groepNr: groepNr);
+      _applyAlreadyScheduled(trainerPlanRankList,
+          rowNr: rowNr, groupName: groepName);
     }
   }
 
-  void _applyZamoWeights(List<TrainerWeight> trainerWeightList,
+  void _applyZamoRanks(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr}) {
-    _applyDaysNotAvailable(trainerWeightList,
-        rowNr: rowNr, groepNr: Groep.zamo.index);
-    _applyAlreadyZamoScheduled(trainerWeightList, rowNr: rowNr);
+    int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
+    _applyDaysNotAvailable(trainerPlanRankList,
+        rowNr: rowNr, groepNr: zamoIndex);
+    _applyAlreadyZamoScheduled(trainerPlanRankList, rowNr: rowNr);
   }
 
   // if trainer is not available future days its score goes up
-  void _applyOnlyIfNeeded(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
+  void _applyOnlyIfNeeded(List<TrainerPlanningRank> trainerPlanRankList,
+      {required int rowNr, required String groepName}) {
+    for (TrainerPlanningRank tw in trainerPlanRankList) {
       Trainer trainer = tw.trainer;
-      if (_isOnlyIfNeeded(trainer, groepNr)) {
-        tw.weight += AppData.instance.applyWeightValues.onlyIfNeeded;
+      if (_isOnlyIfNeeded(trainer, groepName)) {
+        tw.rank += AppData.instance.planRankValues.onlyIfNeeded;
       }
     }
   }
 
-  bool _isOnlyIfNeeded(Trainer trainer, int groepNr) {
-    return trainer.getPrefValue(paramName: Groep.values[groepNr].name) == 2;
+  bool _isOnlyIfNeeded(Trainer trainer, String groupName) {
+    return trainer.getPrefValue(paramName: groupName) == 2;
   }
 
   // if trainer is not available future days its score goes up
-  void _applyDaysNotAvailable(List<TrainerWeight> trainerWeightList,
+  void _applyDaysNotAvailable(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr, required int groepNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
+    for (TrainerPlanningRank tw in trainerPlanRankList) {
       Trainer trainer = tw.trainer;
       int notAvailCnt =
-          _countDaysNotAvalaible(trainer, rowNr: rowNr, groepNr: groepNr);
+          _countDaysNotAvalaible(trainer, rowNr: rowNr, groupIndex: groepNr);
 
       if (notAvailCnt > 0) {
-        tw.weight += (notAvailCnt * 10);
+        tw.rank += (notAvailCnt * 10);
       }
     }
   }
 
 // if trainer is already scheduled before its score goes down
-  void _applyAlreadyScheduled(List<TrainerWeight> trainerWeightList,
-      {required int rowNr, required int groepNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
+  void _applyAlreadyScheduled(List<TrainerPlanningRank> trainerPlanRankList,
+      {required int rowNr, required String groupName}) {
+    for (TrainerPlanningRank tw in trainerPlanRankList) {
       Trainer trainer = tw.trainer;
-      double applyWeight = _getApplyWeightForAlreadyScheduledDays(trainer,
-          rowNr: rowNr, groepNr: groepNr);
-      tw.weight += applyWeight;
+      double applyRank = _getRankForAlreadyScheduledDays(trainer,
+          rowNr: rowNr, groupName: groupName);
+      tw.rank += applyRank;
     }
   }
 
-  void _applyAlreadyZamoScheduled(List<TrainerWeight> trainerWeightList,
+  void _applyAlreadyZamoScheduled(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr}) {
-    for (TrainerWeight tw in trainerWeightList) {
+    for (TrainerPlanningRank tw in trainerPlanRankList) {
       Trainer trainer = tw.trainer;
 
       double result = 0.0;
       int countDays = 1;
-      List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
+      List<double> values = AppData.instance.planRankValues.alreadyScheduled;
 
       for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
         for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
@@ -379,7 +446,7 @@ class SpreadsheetGenerator with AppMixin {
         countDays++;
       }
 
-      tw.weight += result;
+      tw.rank += result;
     }
   }
 
@@ -393,21 +460,21 @@ class SpreadsheetGenerator with AppMixin {
     return sheetRow.date.weekday == DateTime.saturday;
   }
 
-  bool _isThursdayAndPR(int rowNr, int groepNr) {
+  bool _isThursdayAndPR(int rowNr, String groupName) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     return sheetRow.date.weekday == DateTime.thursday &&
-        groepNr == Groep.pr.index;
+        groupName.toLowerCase() == 'pr';
   }
 
-  bool _isSaturdayAndZamo(int rowNr, int groepNr) {
+  bool _isSaturdayAndZamo(int rowNr, String groupName) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     return sheetRow.date.weekday == DateTime.saturday &&
-        groepNr == Groep.zamo.index;
+        groupName == c.zamoGroup;
   }
 
   // hoe vaak afwezig vanaf dateTime
   int _countDaysNotAvalaible(Trainer trainer,
-      {required int rowNr, required int groepNr}) {
+      {required int rowNr, required int groupIndex}) {
     int result = 0;
 
     DateTime dateTime = _spreadSheet.rows[rowNr].date;
@@ -415,10 +482,12 @@ class SpreadsheetGenerator with AppMixin {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.isAfter(dateTime) &&
           sheetRow.date.weekday != DateTime.saturday) {
-        List<Trainer> allTrainers =
-            sheetRow.rowCells[groepNr].availableCounts.getAllTrainers();
-        if (!allTrainers.contains(trainer)) {
-          result++;
+        if (sheetRow.rowCells.length > groupIndex) {
+          List<Trainer> allTrainers =
+              sheetRow.rowCells[groupIndex].availableCounts.getAllTrainers();
+          if (!allTrainers.contains(trainer)) {
+            result++;
+          }
         }
       }
     }
@@ -427,8 +496,8 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   // how often scheduled in the days before
-  double _getApplyWeightForAlreadyScheduledDays(Trainer trainer,
-      {required int rowNr, required int groepNr}) {
+  double _getRankForAlreadyScheduledDays(Trainer trainer,
+      {required int rowNr, required String groupName}) {
     double result = 0.0;
 
     if (_isSaturday(rowNr)) {
@@ -436,10 +505,11 @@ class SpreadsheetGenerator with AppMixin {
     }
 
     int countDays = 1;
-    List<double> values = AppData.instance.applyWeightValues.alreadyScheduled;
+    List<double> values = AppData.instance.planRankValues.alreadyScheduled;
     for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
       for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
-        if (!_isSaturday(prevRowNr) && !_isThursdayAndPR(prevRowNr, groepNr)) {
+        if (!_isSaturday(prevRowNr) &&
+            !_isThursdayAndPR(prevRowNr, groupName)) {
           Trainer schedTrainer = rowCell.getTrainer();
           if (schedTrainer == trainer) {
             int idx = countDays > values.length - 1 ? 0 : countDays;
@@ -461,15 +531,17 @@ class SpreadsheetGenerator with AppMixin {
 
   void postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
+      int zamoIndex = getGroupIndex(c.zamoGroup, sheetRow.date);
       if (sheetRow.date.weekday == DateTime.saturday) {
         sheetRow.trainingText = AppData.instance.zamoDefaultTraing;
-        String zamoTrainer = sheetRow.rowCells[Groep.zamo.index].text;
-        for (int i = 0; i < Groep.values.length; i++) {
+
+        String zamoTrainer = sheetRow.rowCells[zamoIndex].text;
+        for (int i = 0; i < getGroupNames(sheetRow.date).length; i++) {
           sheetRow.rowCells[i].text = '';
         }
-        sheetRow.rowCells[Groep.zamo.index].text = zamoTrainer;
+        sheetRow.rowCells[zamoIndex].text = zamoTrainer;
       } else {
-        sheetRow.rowCells[Groep.zamo.index].setTrainer(Trainer.empty());
+        sheetRow.rowCells[zamoIndex].setTrainer(Trainer.empty());
       }
     }
   }
@@ -477,7 +549,10 @@ class SpreadsheetGenerator with AppMixin {
   void postProcessThursdayPR() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.thursday) {
-        sheetRow.rowCells[Groep.pr.index].text = '(met R1)';
+        int prIndex = getGroupIndex('pr', sheetRow.date);
+        if (prIndex >= 0) {
+          sheetRow.rowCells[prIndex].text = '(met R1)';
+        }
       }
     }
   }

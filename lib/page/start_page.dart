@@ -37,6 +37,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
+    _getMetaData();
     _accessCode = _checkCookie(); // this may be empty
     AppEvents.onTrainerReadyEvent(_onTrainerReady);
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
@@ -166,14 +167,16 @@ class _StartPageState extends State<StartPage> {
     super.dispose();
   }
 
-  void _onTrainerReady(TrainerReadyEvent event) {
+  void _getMetaData() async {
+    await AppController.instance.getZamoTrainersAndDefaultTraining();
+    await AppController.instance.getTrainerGroups();
+    await AppController.instance.getTrainingItems();
+    await AppController.instance.getPlanRankValues();
+  }
+
+  void _onTrainerReady(TrainerReadyEvent event) async {
     if (mounted) {
-      setState(() {
-        AppController.instance.getZamoTrainersAndDefaultTraining();
-        AppController.instance.getTrainingItems();
-        AppController.instance.getApplyWeightValues();
-        _getTrainerDataIfNeeded();
-      });
+      _getTrainerDataIfNeeded();
     }
   }
 

@@ -19,11 +19,13 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   Trainer _updateTrainer = Trainer.empty();
   final _textCtrl = TextEditingController();
   Widget? _fab;
+  List<Widget> _columnWidgets = [];
 
   _TrainerPrefsPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
     AppEvents.onTrainerUpdatedEvent(_onTrainerUpdated);
     AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdated);
+    AppEvents.onSpreadsheetReadyEvent(_onSpreadsheetReady);
   }
 
   @override
@@ -43,7 +45,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _buildColumnWidgets(),
+        children: _columnWidgets,
       ),
       floatingActionButton: _fab,
     );
@@ -208,8 +210,9 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   List<DataRow> _buildDataRows2() {
     List<DataRow> result = [];
 
-    for (Groep groep in Groep.values) {
-      result.add(DataRow(cells: _buildDataCells(groep.name)));
+    for (String groupName
+        in AppData.instance.activeTrainingGroups[0].groupNames) {
+      result.add(DataRow(cells: _buildDataCells(groupName)));
     }
 
     return result;
@@ -268,6 +271,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
+        _columnWidgets = _buildColumnWidgets();
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = _trainer.copyWith();
         _textCtrl.text = _trainer.email;
@@ -277,11 +281,20 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
+  void _onSpreadsheetReady(SpreadsheetReadyEvent event) {
+    if (mounted) {
+      setState(() {
+        _columnWidgets = _buildColumnWidgets();
+      });
+    }
+  }
+
   void _onTrainerUpdated(TrainerUpdatedEvent event) {
     if (mounted) {
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = event.trainer.copyWith();
+        _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
       });
     }
@@ -291,6 +304,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     if (mounted) {
       setState(() {
         _updateTrainer.setPrefValue(event.paramName, event.newValue);
+        _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
       });
     }

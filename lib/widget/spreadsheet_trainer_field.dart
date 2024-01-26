@@ -4,15 +4,16 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 
 class SpreadsheetTrainerColumn extends StatefulWidget {
   final SheetRow sheetRow;
-  final Groep groep;
+  final String groupName;
   final bool isEditable;
   const SpreadsheetTrainerColumn(
       {required super.key,
       required this.sheetRow,
-      required this.groep,
+      required this.groupName,
       required this.isEditable});
 
   @override
@@ -24,10 +25,14 @@ class SpreadsheetTrainerColumn extends StatefulWidget {
 class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     with AppMixin {
   final _textTextCtrl = TextEditingController();
+  int _groupIndex = 0;
 
   @override
   void initState() {
-    _textTextCtrl.text = widget.sheetRow.rowCells[widget.groep.index].text;
+    List<String> groupNames =
+        SpreadsheetGenerator.instance.getGroupNames(widget.sheetRow.date);
+    _groupIndex = groupNames.indexOf(widget.groupName);
+    _textTextCtrl.text = widget.sheetRow.rowCells[_groupIndex].text;
     super.initState();
   }
 
@@ -39,7 +44,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
 
   @override
   Widget build(BuildContext context) {
-    String txt = widget.sheetRow.rowCells[widget.groep.index].text;
+    String txt = widget.sheetRow.rowCells[_groupIndex].text;
     bool addBorder = txt.isNotEmpty && _isEditable();
     return InkWell(
       onTap: _isEditable() ? () => _dialogBuilder(context) : null,
@@ -117,7 +122,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     setState(() {});
 
     AppEvents.fireSpreadsheetTrainerUpdated(
-        widget.sheetRow.rowIndex, widget.groep.index, value.toString());
+        widget.sheetRow.rowIndex, _groupIndex, value.toString());
 
     Navigator.of(context, rootNavigator: true).pop();
   }
@@ -129,7 +134,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   bool _isSameTrainer() {
-    String name = widget.sheetRow.rowCells[widget.groep.index].text;
+    String name = widget.sheetRow.rowCells[_groupIndex].text;
     Trainer trainer = AppHelper.instance.findTrainerByFirstName(name);
     if (!trainer.isEmpty()) {
       return trainer.pk == AppData.instance.getTrainer().pk;
@@ -156,7 +161,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     return ElevatedButton(
         onPressed: () {
           AppEvents.fireSpreadsheetTrainerUpdated(
-              widget.sheetRow.rowIndex, widget.groep.index, _textTextCtrl.text);
+              widget.sheetRow.rowIndex, _groupIndex, _textTextCtrl.text);
 
           Navigator.of(context, rootNavigator: true)
               .pop(); // dismisses only the dialog and returns nothing

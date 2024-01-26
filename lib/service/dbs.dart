@@ -18,7 +18,7 @@ abstract class Dbs {
   Future<List<String>> getZamoTrainers();
   Future<String> getZamoTrainingDefault();
   Future<List<String>> getTrainingItems();
-  Future<ApplyWeightValues> getApplyWeightValues();
+  Future<PlanRankValues> getApplyWeightValues();
   Future<LastRosterFinal> saveLastRosterFinal();
   Future<LastRosterFinal?> getLastRosterFinal();
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet);
@@ -29,4 +29,6 @@ abstract class Dbs {
       required List<Trainer> ccList,
       required String subject,
       required String html});
+  Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups);
+  Future<List<TrainingGroup>> getTrainingGroups();
 }

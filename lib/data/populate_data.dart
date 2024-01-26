@@ -1,5 +1,16 @@
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
+
+enum Groep {
+  pr,
+  r1,
+  r2,
+  r3,
+  zamo,
+  // bg, // beginners group
+  // st; // summer training group
+}
 
 List<Trainer> allTrainers = [
   trainerAnne,
@@ -47,8 +58,6 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
     String email, int pr, int r1, int r2, int r3, int zaterdag,
     {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
-
-  // email = 'robin.bakkerus@gmail.com';
 
   return Trainer(
       accessCode: accesscode,
@@ -125,19 +134,19 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
 }
 
 // ApplyWeightValues
-ApplyWeightValues getApplyWeightValues() {
-  List<ApplyWeightStartValue> startValues = [];
-  startValues.add(ApplyWeightStartValue(trainerPk: '*', value: 100.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'OB', value: 110.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'FvH', value: 110.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'RV', value: 110.0));
-  List<ApplyWeightStartValue> zamoStartValues = [];
-  startValues.add(ApplyWeightStartValue(trainerPk: '*', value: 0.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'HC', value: 141.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'PG', value: 131.0));
-  startValues.add(ApplyWeightStartValue(trainerPk: 'RV', value: 100.0));
+PlanRankValues getPlanRankValues() {
+  List<PlanRankStartValue> startValues = [];
+  startValues.add(PlanRankStartValue(trainerPk: '*', value: 100.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'OB', value: 110.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'FvH', value: 110.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 110.0));
+  List<PlanRankStartValue> zamoStartValues = [];
+  startValues.add(PlanRankStartValue(trainerPk: '*', value: 0.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'HC', value: 141.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'PG', value: 131.0));
+  startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 100.0));
   List<double> alreadyScheduled = [-10.0, -13.0, -12.0, -11.0];
-  ApplyWeightValues weightValues = ApplyWeightValues(
+  PlanRankValues weightValues = PlanRankValues(
       startValues: startValues,
       zamoStartValues: zamoStartValues,
       onlyIfNeeded: -25,
@@ -163,18 +172,23 @@ List<String> getTrainerItems() {
 
 //---------------- spreadsheets
 List<FsSpreadsheet> allFsSpreadsheets = [
-  spreadSheetJanuari(),
-  spreadSheetFebruari()
+  _spreadSheetJanuari(),
+  _spreadSheetFebruari(),
+  _spreadSheetMarch()
 ];
 
-FsSpreadsheet spreadSheetJanuari() {
+FsSpreadsheet _spreadSheetJanuari() {
   return FsSpreadsheet(
       year: 2024, month: 1, rows: _januariRows(), isFinal: true);
 }
 
-FsSpreadsheet spreadSheetFebruari() {
+FsSpreadsheet _spreadSheetFebruari() {
   return FsSpreadsheet(
       year: 2024, month: 2, rows: _februariRows(), isFinal: true);
+}
+
+FsSpreadsheet _spreadSheetMarch() {
+  return FsSpreadsheet(year: 2024, month: 3, rows: _maartRows(), isFinal: true);
 }
 
 List<FsSpreadsheetRow> _januariRows() {
@@ -348,3 +362,90 @@ List<FsSpreadsheetRow> _februariRows() {
 
   return rows;
 }
+
+List<FsSpreadsheetRow> _maartRows() {
+  List<FsSpreadsheetRow> result = [];
+
+  DateTime start = DateTime(2024, 3, 1);
+  DateTime end = DateTime(2024, 3, 31);
+  int days = end.difference(start).inDays;
+  for (int i = 0; i < days; i++) {
+    DateTime date = start.add(Duration(days: i));
+    if (date.weekday == DateTime.tuesday || date.weekday == DateTime.thursday) {
+      result.add(FsSpreadsheetRow(
+          date: date,
+          trainingText: 'Duurloop',
+          isExtraRow: false,
+          rowCells: ['Olav', 'Janneke', 'Ronald', 'Huib', '']));
+    } else if (date.weekday == DateTime.saturday) {
+      result.add(FsSpreadsheetRow(
+          date: date,
+          trainingText: 'ZamO',
+          isExtraRow: false,
+          rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
+    }
+  }
+
+  return result;
+}
+
+List<TrainingGroup> allTrainingGroups() {
+  List<TrainingGroup> result = [];
+
+  result.add(_buildTrainingGroup('pr', 'PR group 60 min'));
+  result.add(_buildTrainingGroup('r1', 'R1 group 60 min'));
+  result.add(_buildTrainingGroup('r2', 'R2 group 60 min'));
+  result.add(_buildTrainingGroup('r3', 'P3 group 50 min'));
+  result.add(
+      _buildSummerTrainingGroup(AppConstants().summerGroep, 'Zomer training'));
+  result.add(_buildZamoTrainingGroup(AppConstants().zamoGroup, 'ZaMo groep'));
+
+  return result;
+}
+
+TrainingGroup _buildTrainingGroup(String name, String descr) {
+  List<DateTime> excludeDates = [];
+
+  DateTime start = summerStart;
+  DateTime end = summerEnd;
+  int days = end.difference(start).inDays;
+  for (int i = 0; i < days; i++) {
+    DateTime date = start.add(Duration(days: i));
+    if (date.weekday == DateTime.tuesday ||
+        date.weekday == DateTime.thursday ||
+        date.weekday == DateTime.saturday) {
+      excludeDates.add(date);
+    }
+  }
+
+  return TrainingGroup(
+      name: name,
+      description: descr,
+      startDate: DateTime(2024, 1, 1),
+      endDate: DateTime(2099, 1, 1),
+      excludeDays: excludeDates,
+      tiaDays: [DateTime.tuesday, DateTime.thursday]);
+}
+
+TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
+  return TrainingGroup(
+      name: name,
+      description: descr,
+      startDate: DateTime(2024, 1, 1),
+      endDate: DateTime(2099, 1, 1),
+      excludeDays: [],
+      tiaDays: [DateTime.saturday]);
+}
+
+TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
+  return TrainingGroup(
+      name: name,
+      description: descr,
+      startDate: summerStart,
+      endDate: summerEnd,
+      excludeDays: [],
+      tiaDays: [DateTime.saturday]);
+}
+
+DateTime summerStart = DateTime(2024, 3, 18);
+DateTime summerEnd = DateTime(2024, 4, 15);

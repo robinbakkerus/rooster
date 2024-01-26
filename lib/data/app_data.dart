@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 // ignore: depend_on_referenced_packages
@@ -31,7 +29,7 @@ class AppData {
   List<String> zamoTrainers = [];
   String zamoDefaultTraing = '';
   List<String> trainerItems = [];
-  late ApplyWeightValues applyWeightValues;
+  late PlanRankValues planRankValues;
 
   SpreadsheetStatus spreadSheetStatus = SpreadsheetStatus.initial; //asume
   SpreadsheetStatus _prevSpreadSheetStatus = SpreadsheetStatus.initial; //asume
@@ -39,6 +37,9 @@ class AppData {
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
   SpreadSheet _originalSpreadSheet =
       SpreadSheet(year: 2024, month: 1); // to obtain the diffs
+
+  List<TrainingGroup> trainingGroups = [];
+  List<ActiveTrainingGroup> activeTrainingGroups = [];
 
   String lastSnackbarMsg = '';
 
@@ -66,8 +67,6 @@ class AppData {
     spreadSheetStatus = spreadSheet.isFinal
         ? SpreadsheetStatus.active
         : SpreadsheetStatus.initial;
-
-    log('${spreadSheet.month} ${spreadSheetStatus.name}');
   }
 
   void updateSpreadsheet(SpreadSheet spreadSheet) {

@@ -28,9 +28,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _addTrainerSchemas,
               child: const Text('add trainer schemas')),
-          OutlinedButton(
-              onPressed: _saveFsSpreadsheet,
-              child: const Text('Firestore spreadsheet')),
+          // OutlinedButton(
+          //     onPressed: _saveFsSpreadsheet,
+          //     child: const Text('Firestore spreadsheet')),
           OutlinedButton(
               onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
           OutlinedButton(
@@ -43,7 +43,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               onPressed: _sendEmail, child: const Text('Send email')),
           OutlinedButton(onPressed: _testRule, child: const Text('Test rule')),
           OutlinedButton(
-              onPressed: _signUpOrSignIn, child: const Text('SignUp'))
+              onPressed: _signUpOrSignIn, child: const Text('SignUp')),
+          OutlinedButton(
+              onPressed: _addTrainingGroups,
+              child: const Text('Add Training groups')),
         ],
       ),
     );
@@ -101,10 +104,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     }
   }
 
-  void _saveFsSpreadsheet() async {
-    FsSpreadsheet fsSpreadsheet = p.spreadSheetFebruari();
-    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
-  }
+  // void _saveFsSpreadsheet() async {
+  //   FsSpreadsheet fsSpreadsheet = p._spreadSheetFebruari();
+  //   await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+  // }
 
   void _deleteOldLogs() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -122,7 +125,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _addApplyWeightValues() async {
-    ApplyWeightValues weightValues = p.getApplyWeightValues();
+    PlanRankValues weightValues = p.getPlanRankValues();
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference ref = firestore.collection('metadata');
     await ref.doc('apply_weights').set(weightValues.toMap()).then((val) {
@@ -160,5 +163,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           email: trainer.email,
           password: AppHelper.instance.getAuthPassword(trainer));
     }
+  }
+
+  void _addTrainingGroups() async {
+    List<TrainingGroup> groups = p.allTrainingGroups();
+    Dbs.instance.saveTrainingGroups(groups);
   }
 }

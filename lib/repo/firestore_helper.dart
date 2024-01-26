@@ -202,15 +202,15 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///--------------------------------------------
 
   @override
-  Future<ApplyWeightValues> getApplyWeightValues() async {
-    ApplyWeightValues? result;
+  Future<PlanRankValues> getApplyWeightValues() async {
+    PlanRankValues? result;
 
     if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference ref = firestore.collection('metadata');
       await ref.doc('apply_weights').get().then(
         (val) {
           Map<String, dynamic> map = val.data() as Map<String, dynamic>;
-          result = ApplyWeightValues.fromMap(map);
+          result = PlanRankValues.fromMap(map);
         },
         onError: (e) => lp("Error getting weight_values: $e"),
       ).catchError((e) {
@@ -218,7 +218,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         throw e;
       });
     } else {
-      result = p.getApplyWeightValues();
+      result = p.getPlanRankValues();
     }
 
     return result!;
@@ -262,8 +262,8 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///--------------------------
   @override
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet) async {
-    CollectionReference trainerRef = firestore.collection('spreadsheet');
-    await trainerRef
+    CollectionReference colRef = firestore.collection('spreadsheet');
+    await colRef
         .doc(fsSpreadsheet.getID())
         .set(fsSpreadsheet.toMap())
         .then((val) {})
@@ -317,6 +317,42 @@ class FirestoreHelper with AppMixin implements Dbs {
     });
 
     return result;
+  }
+
+  ///--------------------------
+
+  @override
+  Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups) async {
+    CollectionReference colRef =
+        FirebaseFirestore.instance.collection('metadata');
+
+    List<Map<String, dynamic>> groupsMap = [];
+    for (TrainingGroup trainingGroup in trainingGroups) {
+      groupsMap.add(trainingGroup.toMap());
+    }
+    Map<String, dynamic> map = {'groups': groupsMap};
+
+    await colRef.doc('training_groups').set(map).then((val) {}).catchError((e) {
+      lp('Error in saveFsSpreadsheet $e');
+      throw e;
+    });
+  }
+
+  @override
+  Future<List<TrainingGroup>> getTrainingGroups() async {
+    CollectionReference colRef =
+        FirebaseFirestore.instance.collection('metadata');
+
+    DocumentSnapshot snapshot = await colRef.doc('training_groups').get();
+    if (snapshot.exists) {
+      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+      List<dynamic> data = List<dynamic>.from(map['groups'] as List);
+      List<TrainingGroup> r =
+          data.map((e) => TrainingGroup.fromMap(e)).toList();
+      return r;
+    } else {
+      return [];
+    }
   }
 
   ///============ private methods --------
@@ -373,14 +409,5 @@ class FirestoreHelper with AppMixin implements Dbs {
     String id =
         '${AppData.instance.getTrainer().pk}-${DateTime.now().microsecondsSinceEpoch}';
     logsRef.doc(id).set(map);
-  }
-
-  //--
-
-  //-----------------------------------------
-  Future<void> testRule() async {
-    CollectionReference colRef = FirebaseFirestore.instance.collection('test');
-    DocumentSnapshot snapshot = await colRef.doc('test1').get();
-    lp(snapshot.toString());
   }
 }

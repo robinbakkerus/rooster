@@ -4,6 +4,7 @@ import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_trainer_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
@@ -25,6 +26,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       month: AppData.instance.getActiveMonth());
 
   Widget _dataGrid = Container();
+  int _headerLength = 0;
 
   _SpreadsheetPageState();
 
@@ -54,15 +56,10 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _dataGrid,
-            wh.verSpace(10),
-            _buildButtons(),
-          ],
-        ),
+        child: _dataGrid,
+        // wh.verSpace(10),
+        // _buildButtons(),
+        // ],
       ),
     );
   }
@@ -95,30 +92,39 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //--------------------------------------------------------
   Widget _buildGrid() {
+    return ListView.builder(
+      itemCount: AppData.instance.activeTrainingGroups.length + 1,
+      itemBuilder: (context, index) => _buildListViewItem(context, index),
+    );
+  }
+
+  //--------------------------------
+  Widget _buildListViewItem(BuildContext context, int index) {
+    if (index < AppData.instance.activeTrainingGroups.length) {
+      return _buildDataTable(context, index);
+    } else {
+      return _buildButtons();
+    }
+  }
+
+//--------------------------------
+  Widget _buildDataTable(BuildContext context, int index) {
     double colSpace = AppHelper.instance.isWindows() ? 25 : 10;
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Scrollbar(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 30,
-            horizontalMargin: 10,
-            headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lightblue),
-            columnSpacing: colSpace,
-            dataRowMinHeight: 15,
-            dataRowMaxHeight: 30,
-            columns: _buildHeader(),
-            rows: _buildDataRows(),
-          ),
-        ),
-      ),
+    DateTime date = AppData.instance.activeTrainingGroups[index].startDate;
+    return DataTable(
+      headingRowHeight: 30,
+      horizontalMargin: 10,
+      headingRowColor: MaterialStateColor.resolveWith((states) => c.lightblue),
+      columnSpacing: colSpace,
+      dataRowMinHeight: 15,
+      dataRowMaxHeight: 30,
+      columns: _buildHeader(date),
+      rows: _buildDataRows(index),
     );
   }
 
   //-------------------------
-  List<DataColumn> _buildHeader() {
+  List<DataColumn> _buildHeader(DateTime date) {
     List<DataColumn> result = [];
 
     result.add(const DataColumn(
@@ -127,20 +133,29 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         label:
             Text('Training', style: TextStyle(fontStyle: FontStyle.italic))));
 
-    for (Groep groep in Groep.values) {
+    for (String groupName
+        in SpreadsheetGenerator.instance.getGroupNames(date)) {
       result.add(DataColumn(
-          label: Text(groep.name.toUpperCase(),
+          label: Text(groupName,
               style: const TextStyle(fontStyle: FontStyle.italic))));
     }
+
+    _headerLength = result.length;
     return result;
   }
 
-  List<DataRow> _buildDataRows() {
+  List<DataRow> _buildDataRows(int index) {
     List<DataRow> result = [];
 
     _spreadSheet.rows.sort((a, b) => a.date.compareTo(b.date));
+    DateTime startDate = AppData.instance.activeTrainingGroups[index].startDate;
+    DateTime endDate = AppData.instance.activeTrainingGroups[index].endDate!;
 
     for (SheetRow fsRow in _spreadSheet.rows) {
+      if (fsRow.date.isAfter(endDate) || fsRow.date.isBefore(startDate)) {
+        continue;
+      }
+
       MaterialStateColor col =
           MaterialStateColor.resolveWith((states) => Colors.white);
       if (fsRow.isExtraRow) {
@@ -153,7 +168,11 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         col = MaterialStateColor.resolveWith((states) => c.lightBrown);
       }
 
-      DataRow dataRow = DataRow(cells: _buildDataCells(fsRow), color: col);
+      List<DataCell> cells = _buildDataCells(fsRow);
+      if (cells.length != _headerLength) {
+        lp('todo error in _buildDataRows');
+      }
+      DataRow dataRow = DataRow(cells: cells, color: col);
       result.add(dataRow);
     }
 
@@ -166,12 +185,15 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     result.add(_buildDayCell(row));
     result.add(_buildTrainingCell(row));
 
+    List<String> groupNames =
+        SpreadsheetGenerator.instance.getGroupNames(row.date);
+
     if (!row.isExtraRow) {
-      for (int i = 0; i < Groep.values.length; i++) {
-        result.add(_buildTrainerCell(row, Groep.values[i]));
+      for (int i = 0; i < groupNames.length; i++) {
+        result.add(_buildTrainerCell(row, groupNames[i]));
       }
     } else {
-      for (int i = 0; i < Groep.values.length; i++) {
+      for (int i = 0; i < groupNames.length; i++) {
         result.add(const DataCell(Text('')));
       }
     }
@@ -179,11 +201,11 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return result;
   }
 
-  DataCell _buildTrainerCell(SheetRow sheetRow, Groep groep) {
+  DataCell _buildTrainerCell(SheetRow sheetRow, String groupName) {
     return DataCell(SpreadsheetTrainerColumn(
         key: UniqueKey(),
         sheetRow: sheetRow,
-        groep: groep,
+        groupName: groupName,
         isEditable: _isEditable()));
   }
 
@@ -207,18 +229,23 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   Widget _buildButtons() {
-    return Row(
+    return Column(
       children: [
-        wh.horSpace(10),
-        InkWell(
-            onTap: _onShowSpreadsheetInfo,
-            child: const Icon(
-              Icons.info_outline,
-              size: 32,
-              color: Colors.lightBlue,
-            )),
-        wh.horSpace(20),
-        _buildActionButton(context),
+        wh.verSpace(10),
+        Row(
+          children: [
+            wh.horSpace(10),
+            InkWell(
+                onTap: _onShowSpreadsheetInfo,
+                child: const Icon(
+                  Icons.info_outline,
+                  size: 32,
+                  color: Colors.lightBlue,
+                )),
+            wh.horSpace(20),
+            _buildActionButton(context),
+          ],
+        ),
       ],
     );
   }
@@ -270,7 +297,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     AppEvents.fireSpreadsheetReady();
   }
 
-  void _doFinalizeRoster(BuildContext context) async {
+  void _makeSpreadsheetFinal(BuildContext context) async {
     AppController.instance.finalizeSpreadsheet(_spreadSheet);
     AppData.instance.spreadSheetStatus = SpreadsheetStatus.active;
     AppEvents.fireSpreadsheetReady();
@@ -391,14 +418,16 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     int end = forZamo ? len : len - 1;
     for (SheetRow row in _spreadSheet.rows) {
       for (int c = start; c < end; c++) {
-        RowCell cell = row.rowCells[c];
-        String txt = cell.text.replaceAll(' ', '');
-        if (txt.isNotEmpty && !txt.startsWith('(')) {
-          if (counts.containsKey(txt)) {
-            int n = counts[txt]!;
-            counts[txt] = n + 1;
-          } else {
-            counts[txt] = 1;
+        if (!row.isExtraRow) {
+          RowCell cell = row.rowCells[c];
+          String txt = cell.text.replaceAll(' ', '');
+          if (txt.isNotEmpty && !txt.startsWith('(')) {
+            if (counts.containsKey(txt)) {
+              int n = counts[txt]!;
+              counts[txt] = n + 1;
+            } else {
+              counts[txt] = 1;
+            }
           }
         }
       }
@@ -420,7 +449,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     Widget continueButton = TextButton(
       onPressed: allProgramFieldSet
           ? () {
-              _doFinalizeRoster(context);
+              _makeSpreadsheetFinal(context);
 
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing

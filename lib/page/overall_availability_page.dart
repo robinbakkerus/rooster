@@ -4,6 +4,7 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 
 class OverallAvailabilityPage extends StatefulWidget {
   const OverallAvailabilityPage({super.key});
@@ -66,8 +67,12 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     List<DataColumn> result = [];
 
     var headerLabels = ['dag'];
-    for (Groep groep in Groep.values) {
-      headerLabels.add(groep.name.toUpperCase());
+
+    DateTime dateTime = AppData.instance.activeTrainingGroups[0].startDate;
+
+    for (String groupName
+        in SpreadsheetGenerator.instance.getGroupNames(dateTime)) {
+      headerLabels.add(groupName);
     }
 
     for (String label in headerLabels) {
@@ -78,41 +83,49 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return result;
   }
 
+  //----------------------------------
+
   List<DataRow> _buildDataRows() {
     List<DataRow> result = [];
 
     for (int rowIndex = 0;
         rowIndex < AppData.instance.getSpreadsheet().rows.length;
         rowIndex++) {
-      result.add(DataRow(cells: _buildDataCells(rowIndex)));
+      DateTime dateTime = AppData.instance.getSpreadsheet().rows[rowIndex].date;
+      result.add(DataRow(cells: _buildDataCells(rowIndex, dateTime)));
     }
     return result;
   }
 
-  List<DataCell> _buildDataCells(int rowIndex) {
+  //----------------------------------
+  List<DataCell> _buildDataCells(int rowIndex, DateTime dateTime) {
     List<DataCell> result = [];
 
     result.add(_buildDayDataCell(rowIndex));
 
-    for (Groep groep in Groep.values) {
-      result.add(_buildGroupDataCell(rowIndex, groep));
+    for (String groupName
+        in AppData.instance.activeTrainingGroups[0].groupNames) {
+      result.add(_buildGroupDataCell(rowIndex, groupName, dateTime));
     }
 
     return result;
   }
 
+  //----------------------------------
   DataCell _buildDayDataCell(int rowIndex) {
     DateTime dateTime = AppData.instance.getSpreadsheet().rows[rowIndex].date;
     String text = AppHelper.instance.getSimpleDayString(dateTime);
     return DataCell(Text(text));
   }
 
-  DataCell _buildGroupDataCell(int rowIndex, Groep groep) {
+  //----------------------------------
+  DataCell _buildGroupDataCell(
+      int rowIndex, String groupName, DateTime dateTime) {
     AvailableCounts cnts =
-        AppHelper.instance.getAvailableCounts(rowIndex, groep);
+        AppHelper.instance.getAvailableCounts(rowIndex, groupName, dateTime);
 
-    String text =
-        _getSummaryFormattedCounts(cnts, rowIndex: rowIndex, groep: groep);
+    String text = _getSummaryFormattedCounts(cnts,
+        rowIndex: rowIndex, groupName: groupName);
 
     Color color = _buildAvailFieldColor(cnts);
 
@@ -126,13 +139,13 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
         ),
       ),
       onTap: () {
-        _dialogBuilder(context, rowIndex, groep);
+        _dialogBuilder(context, rowIndex, groupName);
       },
     ));
   }
 
   String _getSummaryFormattedCounts(AvailableCounts cnts,
-      {required rowIndex, required Groep groep}) {
+      {required rowIndex, required String groupName}) {
     String result = '${(cnts.available + cnts.availableBnye).length}, '
         '${(cnts.ifNeeded + cnts.ifNeededBnye).length}, ${cnts.notAvailable.length}';
     return result;
@@ -147,7 +160,9 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return c.lightGeen;
   }
 
-  Future<void> _dialogBuilder(BuildContext context, int rowIndex, Groep group) {
+  Future<void> _dialogBuilder(
+      BuildContext context, int rowIndex, String groupName) {
+    DateTime dateTime = AppData.instance.getSpreadsheet().rows[rowIndex].date;
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -163,7 +178,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: _buildAvailDetail(rowIndex, group),
+                  child: _buildAvailDetail(rowIndex, groupName, dateTime),
                 ),
                 ElevatedButton(
                     onPressed: () {
@@ -178,9 +193,9 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     );
   }
 
-  Widget _buildAvailDetail(int rowIndex, Groep group) {
+  Widget _buildAvailDetail(int rowIndex, String groupName, DateTime date) {
     AvailableCounts cnts =
-        AppHelper.instance.getAvailableCounts(rowIndex, group);
+        AppHelper.instance.getAvailableCounts(rowIndex, groupName, date);
 
     List<Widget> colWidgets = [];
 

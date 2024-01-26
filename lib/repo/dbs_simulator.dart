@@ -34,8 +34,8 @@ class Simulator with AppMixin implements Dbs {
   }
 
   @override
-  Future<ApplyWeightValues> getApplyWeightValues() async {
-    return p.getApplyWeightValues();
+  Future<PlanRankValues> getApplyWeightValues() async {
+    return p.getPlanRankValues();
   }
 
   @override
@@ -103,5 +103,13 @@ class Simulator with AppMixin implements Dbs {
       required String subject,
       required String html}) async {
     return true;
+  }
+
+  @override
+  Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups) async {}
+
+  @override
+  Future<List<TrainingGroup>> getTrainingGroups() async {
+    return p.allTrainingGroups();
   }
 }

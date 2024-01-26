@@ -19,4 +19,7 @@ class AppConstants {
 
   final String localNL = 'nl_NL';
   final String localUK = 'en_US';
+
+  final String zamoGroup = 'zamo';
+  final String summerGroep = 'zomer_training';
 }

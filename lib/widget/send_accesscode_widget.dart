@@ -1,10 +1,9 @@
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';
-// ignore: depend_on_referenced_packages
-import 'package:collection/collection.dart';
 
 class SendAccessCodeWidget extends StatefulWidget {
   const SendAccessCodeWidget({super.key});
@@ -65,9 +64,6 @@ class _SendAccessCodeWidgetState extends State<SendAccessCodeWidget>
     }
 
     if (value.length > 2) {
-      for (Trainer t in AppData.instance.getAllTrainers()) {
-        lp('${t.firstName()}.');
-      }
       Trainer? trainer = _allTrainers.firstWhereOrNull(
           (e) => e.firstName().toLowerCase() == value.toLowerCase());
       if (trainer != null) {

@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 import 'package:flutter/foundation.dart';
 
 import 'package:rooster/data/app_data.dart';
@@ -7,13 +5,6 @@ import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 
 //------------------ enum ----------------------
-enum Groep {
-  pr,
-  r1,
-  r2,
-  r3,
-  zamo;
-}
 
 enum LogAction {
   saveSchema,
@@ -232,7 +223,7 @@ class Trainer {
 
   int getPrefValue({required String paramName}) {
     for (TrainerPref pref in prefValues) {
-      if (pref.paramName == paramName) {
+      if (pref.paramName.toLowerCase() == paramName.toLowerCase()) {
         return pref.value;
       }
     }
@@ -401,14 +392,13 @@ class AvailableCounts {
   }
 }
 
-///---------------------------------------------------------------------------
-///
+///------------------------------------------
 class Available {
   DateTime date;
   List<AvailableCounts> counts = [];
 
-  Available({required this.date}) {
-    for (int i = 0; i < Groep.values.length; i++) {
+  Available({required this.date, required int groupCount}) {
+    for (int i = 0; i < groupCount; i++) {
       List<AvailableCounts> counts = [];
       counts.add(AvailableCounts());
     }
@@ -432,16 +422,16 @@ class Available {
   }
 }
 
-///-------- ApplyWeight
+///-------- PlanRankValues
 
-class ApplyWeightValues {
-  List<ApplyWeightStartValue> startValues = [];
-  List<ApplyWeightStartValue> zamoStartValues = [];
+class PlanRankValues {
+  List<PlanRankStartValue> startValues = [];
+  List<PlanRankStartValue> zamoStartValues = [];
   double onlyIfNeeded = -15;
   // the first [0] value is the default value, the [1] value means 1 training day before etc
   List<double> alreadyScheduled = [];
 
-  ApplyWeightValues({
+  PlanRankValues({
     required this.startValues,
     required this.zamoStartValues,
     required this.onlyIfNeeded,
@@ -457,12 +447,12 @@ class ApplyWeightValues {
     };
   }
 
-  factory ApplyWeightValues.fromMap(Map<String, dynamic> map) {
-    return ApplyWeightValues(
-      startValues: List<ApplyWeightStartValue>.from(
-          map['startValues']?.map((x) => ApplyWeightStartValue.fromMap(x))),
-      zamoStartValues: List<ApplyWeightStartValue>.from(
-          map['zamoStartValues']?.map((x) => ApplyWeightStartValue.fromMap(x))),
+  factory PlanRankValues.fromMap(Map<String, dynamic> map) {
+    return PlanRankValues(
+      startValues: List<PlanRankStartValue>.from(
+          map['startValues']?.map((x) => PlanRankStartValue.fromMap(x))),
+      zamoStartValues: List<PlanRankStartValue>.from(
+          map['zamoStartValues']?.map((x) => PlanRankStartValue.fromMap(x))),
       onlyIfNeeded: map['onlyIfNeeded'],
       alreadyScheduled: List<double>.from(map['alreadyScheduled']),
     );
@@ -470,14 +460,14 @@ class ApplyWeightValues {
 
   @override
   String toString() {
-    return 'ApplyWeightValues(startValues: $startValues, zamoStartValues: $zamoStartValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
+    return 'PlanRankValues(startValues: $startValues, zamoStartValues: $zamoStartValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ApplyWeightValues &&
+    return other is PlanRankValues &&
         listEquals(other.startValues, startValues) &&
         listEquals(other.zamoStartValues, zamoStartValues) &&
         other.onlyIfNeeded == onlyIfNeeded &&
@@ -492,13 +482,13 @@ class ApplyWeightValues {
         alreadyScheduled.hashCode;
   }
 
-  ApplyWeightValues copyWith({
-    List<ApplyWeightStartValue>? startValues,
-    List<ApplyWeightStartValue>? zamoStartValues,
+  PlanRankValues copyWith({
+    List<PlanRankStartValue>? startValues,
+    List<PlanRankStartValue>? zamoStartValues,
     double? onlyIfNeeded,
     List<double>? alreadyScheduled,
   }) {
-    return ApplyWeightValues(
+    return PlanRankValues(
       startValues: startValues ?? this.startValues,
       zamoStartValues: zamoStartValues ?? this.zamoStartValues,
       onlyIfNeeded: onlyIfNeeded ?? this.onlyIfNeeded,
@@ -507,12 +497,12 @@ class ApplyWeightValues {
   }
 }
 
-///------------ ApplyWeightStartValue
-class ApplyWeightStartValue {
+///------------ PlanRankStartValue
+class PlanRankStartValue {
   final String trainerPk;
   final double value;
 
-  ApplyWeightStartValue({
+  PlanRankStartValue({
     required this.trainerPk,
     required this.value,
   });
@@ -524,8 +514,8 @@ class ApplyWeightStartValue {
     };
   }
 
-  factory ApplyWeightStartValue.fromMap(Map<String, dynamic> map) {
-    return ApplyWeightStartValue(
+  factory PlanRankStartValue.fromMap(Map<String, dynamic> map) {
+    return PlanRankStartValue(
       trainerPk: map['trainerPk'],
       value: map['value'],
     );
@@ -535,7 +525,7 @@ class ApplyWeightStartValue {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ApplyWeightStartValue &&
+    return other is PlanRankStartValue &&
         other.trainerPk == trainerPk &&
         other.value == value;
   }
@@ -550,7 +540,6 @@ class SpreadSheet {
   int year = 2024;
   int month = 1;
   bool isFinal = false;
-  List<String> header = ['Dag', 'Training', 'PR', 'R1', 'R2', 'R3', 'ZaMo'];
   List<SheetRow> rows = [];
 
   void addRow(SheetRow row) {
@@ -579,17 +568,12 @@ class SpreadSheet {
         other.year == year &&
         other.month == month &&
         other.isFinal == isFinal &&
-        listEquals(other.header, header) &&
         listEquals(other.rows, rows);
   }
 
   @override
   int get hashCode {
-    return year.hashCode ^
-        month.hashCode ^
-        isFinal.hashCode ^
-        header.hashCode ^
-        rows.hashCode;
+    return year.hashCode ^ month.hashCode ^ isFinal.hashCode ^ rows.hashCode;
   }
 
   @override
@@ -612,9 +596,9 @@ class SheetRow {
     required this.isExtraRow,
   });
 
-  Trainer getTrainerByGroup(Groep group) {
+  Trainer getTrainerByGroupIndex(int groupIndex) {
     if (rowCells.isNotEmpty) {
-      return rowCells[group.index].getTrainer();
+      return rowCells[groupIndex].getTrainer();
     } else {
       return Trainer.empty();
     }
@@ -667,7 +651,7 @@ class RowCell {
   final int rowIndex;
   final int colIndex;
   AvailableCounts availableCounts = AvailableCounts();
-  List<TrainerWeight> trainerWeights = [];
+  List<TrainerPlanningRank> trainerRanks = [];
   Trainer _trainer = Trainer.empty();
   String text = '';
 
@@ -686,7 +670,7 @@ class RowCell {
     result.text = text;
     result.availableCounts =
         availableCounts; // we dont need to clone these onea
-    result.trainerWeights = trainerWeights; // and this one
+    result.trainerRanks = trainerRanks; // and this one
     return result;
   }
 
@@ -707,7 +691,7 @@ class RowCell {
 
   @override
   String toString() {
-    return 'RowCell(rowIndex: $rowIndex, colIndex: $colIndex, trainerWeights: $trainerWeights, text: $text)';
+    return 'RowCell(rowIndex: $rowIndex, colIndex: $colIndex, ranks: $trainerRanks, text: $text)';
   }
 }
 
@@ -767,17 +751,17 @@ class LastRosterFinal {
 
 //--------------
 
-class TrainerWeight {
+class TrainerPlanningRank {
   final Trainer trainer;
-  double weight = 100.0;
-  TrainerWeight({
+  double rank = 100.0;
+  TrainerPlanningRank({
     required this.trainer,
-    required this.weight,
+    required this.rank,
   });
 
   @override
   String toString() {
-    return 'TW( ${trainer.firstName()}=$weight';
+    return 'TW( ${trainer.firstName()}=$rank';
   }
 }
 
@@ -900,5 +884,104 @@ class SpreedsheetDiff {
     required this.column,
     required this.oldValue,
     required this.newValue,
+  });
+}
+
+///-------------------------------
+
+class TrainingGroup {
+  final String name;
+  final String description;
+  final DateTime startDate;
+  final DateTime endDate;
+  List<DateTime> excludeDays = [];
+  List<int> tiaDays = []; // take into account weekdays
+
+  TrainingGroup({
+    required this.name,
+    required this.description,
+    required this.startDate,
+    required this.endDate,
+    required this.excludeDays,
+    required this.tiaDays,
+  });
+  TrainingGroup copyWith({
+    String? name,
+    String? description,
+    DateTime? startDate,
+    DateTime? endDate,
+    List<DateTime>? excludeDays,
+    List<int>? tiaDays,
+  }) {
+    return TrainingGroup(
+      name: name ?? this.name,
+      description: description ?? this.description,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      excludeDays: excludeDays ?? this.excludeDays,
+      tiaDays: tiaDays ?? this.tiaDays,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'startDate': startDate.millisecondsSinceEpoch,
+      'endDate': endDate.millisecondsSinceEpoch,
+      'excludeDays': excludeDays.map((x) => x.millisecondsSinceEpoch).toList(),
+      'tiaDays': tiaDays,
+    };
+  }
+
+  factory TrainingGroup.fromMap(Map<String, dynamic> map) {
+    return TrainingGroup(
+      name: map['name'],
+      description: map['description'],
+      startDate: DateTime.fromMillisecondsSinceEpoch(map['startDate']),
+      endDate: DateTime.fromMillisecondsSinceEpoch(map['endDate']),
+      excludeDays: List<DateTime>.from(map['excludeDays']
+          .map((x) => DateTime.fromMillisecondsSinceEpoch(x))),
+      tiaDays: List<int>.from(map['tiaDays']),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, excludeDays: $excludeDays, tiaDays: $tiaDays)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TrainingGroup &&
+        other.name == name &&
+        other.description == description &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        listEquals(other.excludeDays, excludeDays) &&
+        listEquals(other.tiaDays, tiaDays);
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode ^
+        description.hashCode ^
+        startDate.hashCode ^
+        endDate.hashCode ^
+        excludeDays.hashCode ^
+        tiaDays.hashCode;
+  }
+}
+
+///--------------------------------
+class ActiveTrainingGroup {
+  final List<String> groupNames;
+  final DateTime startDate;
+  DateTime? endDate;
+  ActiveTrainingGroup({
+    required this.groupNames,
+    required this.startDate,
   });
 }

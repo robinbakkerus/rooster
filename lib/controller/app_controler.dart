@@ -72,11 +72,18 @@ class AppController {
     AppData.instance.zamoDefaultTraing = defaultTraining;
   }
 
+  // get TrainingGroups
+  Future<void> getTrainerGroups() async {
+    AppData.instance.trainingGroups = await Dbs.instance.getTrainingGroups();
+    AppData.instance.activeTrainingGroups =
+        SpreadsheetGenerator.instance.generateActiveTrainingGroups();
+  }
+
   // get Zamo trainers
-  Future<void> getApplyWeightValues() async {
-    ApplyWeightValues applyWeightValues =
+  Future<void> getPlanRankValues() async {
+    PlanRankValues applyWeightValues =
         await Dbs.instance.getApplyWeightValues();
-    AppData.instance.applyWeightValues = applyWeightValues;
+    AppData.instance.planRankValues = applyWeightValues;
   }
 
   // get trainer_items (to fill combobox)
@@ -120,6 +127,8 @@ class AppController {
       result = _generateTheSpreadsheet();
     }
 
+    AppData.instance.activeTrainingGroups =
+        SpreadsheetGenerator.instance.generateActiveTrainingGroups();
     AppData.instance.setSpreadsheet(result);
     AppEvents.fireSpreadsheetReady();
     return result;
@@ -172,13 +181,14 @@ class AppController {
 
   Available _getAvailable(List<Available> availableList, DateTime date) {
     Available? result = availableList.firstWhereOrNull((e) => e.date == date);
-    return result ?? Available(date: date);
+    int count = SpreadsheetGenerator.instance.getGroupNames(date).length;
+    return result ?? Available(date: date, groupCount: count);
   }
 
   ///--------------------
   void finalizeSpreadsheet(SpreadSheet spreadSheet) async {
     FsSpreadsheet fsSpreadsheet =
-        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+        SpreadsheetGenerator.instance.mapFsSpreadsheetFrom(spreadSheet);
     fsSpreadsheet.isFinal = true;
     await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
     await Dbs.instance.saveLastRosterFinal();
@@ -188,18 +198,28 @@ class AppController {
   ///--------------------
   Future<void> updateSpreadsheet(SpreadSheet spreadSheet) async {
     FsSpreadsheet fsSpreadsheet =
-        SpreadsheetGenerator.instance.fsSpreadsheetFrom(spreadSheet);
+        SpreadsheetGenerator.instance.mapFsSpreadsheetFrom(spreadSheet);
+
+    if (fsSpreadsheet.isFinal) {
+      await _mailSpreadsheetDiffs(fsSpreadsheet, spreadSheet);
+    }
+
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+    AppEvents.fireSpreadsheetReady();
+  }
+
+  Future<void> _mailSpreadsheetDiffs(
+      FsSpreadsheet fsSpreadsheet, SpreadSheet spreadSheet) async {
     FsSpreadsheet oldFsSpreadsheet = SpreadsheetGenerator.instance
-        .fsSpreadsheetFrom(AppData.instance.getOriginalpreadsheet());
+        .mapFsSpreadsheetFrom(AppData.instance.getOriginalpreadsheet());
     List<SpreedsheetDiff> diffs = _getSpreadsheetDiffs(
         newSpreadsheet: fsSpreadsheet, oldSpreadsheet: oldFsSpreadsheet);
     String html =
         _getSpreadsheetDiffsAsHtml(diffs: diffs, spreadSheet: spreadSheet);
-    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+
     List<Trainer> toTrainers =
         _getSpreadsheetDiffsEmailRecipients(diffs: diffs);
     await _mailSpreadsheetUpdate(html, to: toTrainers, cc: []);
-    AppEvents.fireSpreadsheetReady();
   }
 
   ///--------------------
@@ -367,33 +387,56 @@ class AppController {
       {required FsSpreadsheet newSpreadsheet,
       required FsSpreadsheet oldSpreadsheet}) {
     List<SpreedsheetDiff> diffs = [];
-    for (int r = 0; r < newSpreadsheet.rows.length; r++) {
-      FsSpreadsheetRow newRow = newSpreadsheet.rows[r];
-      FsSpreadsheetRow oldRow = oldSpreadsheet.rows[r];
-      if (newRow.trainingText != oldRow.trainingText) {
+    for (FsSpreadsheetRow oldRow in oldSpreadsheet.rows) {
+      FsSpreadsheetRow? newRow = _getCorrSpreadsheetRow(oldRow, newSpreadsheet);
+      if (newRow == null) {
         SpreedsheetDiff diff = SpreedsheetDiff(
-            date: newRow.date,
-            column: 'Training',
+            date: oldRow.date,
+            column: 'column',
             oldValue: oldRow.trainingText,
-            newValue: newRow.trainingText);
+            newValue: 'verwijderd');
         diffs.add(diff);
-      }
-      for (int c = 0; c < newRow.rowCells.length; c++) {
-        String newVal = newRow.rowCells[c];
-        String oldVal = oldRow.rowCells[c];
-        if (newVal != oldVal) {
-          String column = Groep.values[c].name;
-          SpreedsheetDiff diff = SpreedsheetDiff(
-              date: newRow.date,
-              column: column,
-              oldValue: oldVal,
-              newValue: newVal);
-          diffs.add(diff);
-        }
+      } else {
+        _buildDiff(newRow, oldRow, diffs);
       }
     }
 
     return diffs;
+  }
+
+  void _buildDiff(FsSpreadsheetRow newRow, FsSpreadsheetRow oldRow,
+      List<SpreedsheetDiff> diffs) {
+    if (newRow.trainingText != oldRow.trainingText) {
+      SpreedsheetDiff diff = SpreedsheetDiff(
+          date: newRow.date,
+          column: 'Training',
+          oldValue: oldRow.trainingText,
+          newValue: newRow.trainingText);
+      diffs.add(diff);
+    }
+
+    for (int c = 0; c < newRow.rowCells.length; c++) {
+      List<String> groupNames =
+          SpreadsheetGenerator.instance.getGroupNames(newRow.date);
+
+      String newVal = newRow.rowCells[c];
+      String oldVal = oldRow.rowCells[c];
+      if (newVal != oldVal) {
+        String column = groupNames[c];
+        SpreedsheetDiff diff = SpreedsheetDiff(
+            date: newRow.date,
+            column: column,
+            oldValue: oldVal,
+            newValue: newVal);
+        diffs.add(diff);
+      }
+    }
+  }
+
+  //------------------------------------
+  FsSpreadsheetRow? _getCorrSpreadsheetRow(
+      FsSpreadsheetRow oldRow, FsSpreadsheet newSpreadsheet) {
+    return newSpreadsheet.rows.firstWhereOrNull((e) => e.date == oldRow.date);
   }
 
   //--------------------------------------
