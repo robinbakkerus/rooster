@@ -153,7 +153,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _sendAccessCodes() async {
-    for (Trainer trainer in _allTrainers()) {
+    // for (Trainer trainer in _allTrainers()) {
+    for (Trainer trainer in [p.trainerRobin]) {
       String html = _accessCodeHtml(trainer);
       Dbs.instance.sendEmail(
           toList: [trainer], ccList: [], subject: 'Toegangscode', html: html);
@@ -181,6 +182,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     html +=
         'Je kunt vanaf nu verhindering doorgeven via deze url: <b>https://lonutrainingschema.web.app</b> <br>';
     html += 'Je toegangscode is: <b>${trainer.accessCode}</b> <br><br>';
+    html += 'Een korte uitleg vind je hier: <br>';
+    html +=
+        '<b>https://drive.google.com/file/d/1P1VRW5GXnh7jFimqcddL_0VJlvLq3Qrs/view?usp=sharing</b> <br><br>';
+
     html += 'Gr Robin <br>';
     return '$html</div>';
   }
