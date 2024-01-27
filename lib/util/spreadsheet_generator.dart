@@ -132,6 +132,8 @@ class SpreadsheetGenerator with AppMixin {
     return result;
   }
 
+  ///-------------
+  /// returns a list of group names for the given date
   List<String> getGroupNames(DateTime date) {
     List<String> result = [];
     for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {

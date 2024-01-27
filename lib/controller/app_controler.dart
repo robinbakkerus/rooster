@@ -337,20 +337,21 @@ class AppController {
 
   //-------------------------------------
   Future<void> _mailSpreadsheetIsFinal(SpreadSheet spreadSheet) async {
-    String html = _generateSpreadsheetIsFinalHtml(spreadSheet);
-    List<Trainer> toTrainers = AppData.instance.getAllTrainers();
-    toTrainers = [p.trainerRobin]; //todo
+    List<Trainer> toList = AppData.instance.getAllTrainers();
+    for (Trainer trainer in AppData.instance.getAllTrainers()) {
+      toList = [p.trainerRobin]; //todo
+      String html = _generateSpreadsheetIsFinalHtml(spreadSheet, trainer);
+      log(html);
 
-    bool okay = await Dbs.instance.sendEmail(
-        toList: toTrainers,
-        ccList: [],
-        subject: 'Trainingschema definitief',
-        html: html);
+      bool okay = await Dbs.instance.sendEmail(
+          toList: toList,
+          ccList: [],
+          subject: 'Trainingschema definitief',
+          html: html);
 
-    if (okay) {
-      log("email okay");
-    } else {
-      log("!email NOT  okay");
+      if (!okay) {
+        log('!email NOT  okay');
+      }
     }
   }
 
@@ -371,18 +372,36 @@ class AppController {
   }
 
   //-------------------------------------------
-  String _generateSpreadsheetIsFinalHtml(SpreadSheet spreadSheet) {
+  String _generateSpreadsheetIsFinalHtml(
+      SpreadSheet spreadSheet, Trainer trainer) {
     String html = '<div>';
-    html += 'Hallo <br><br>';
+    html += 'Hallo ${trainer.firstName()}<br><br>';
     String maand = AppHelper.instance
         .monthAsString(DateTime(spreadSheet.year, spreadSheet.month, 1));
     html += 'Het trainingschema voor $maand is nu definitief. <br>';
     html +=
         'Deze is zichtbaar op https://public-lonutrainingschemas.web.app <br>';
     html +=
-        'Er kunnen nu geen verhinderingen meer in deze maand worden opgegeven. <br>';
+        'Er kunnen nu geen verhinderingen meer in deze maand worden opgegeven. <br><br>';
+    html += 'Je bent ingedeeld op de volgende dagen: <br>';
+    html += _generateWhenClassifiedHtml(spreadSheet, trainer);
 
     return '$html</div>';
+  }
+
+  //-------------------------------------------
+  String _generateWhenClassifiedHtml(SpreadSheet spreadSheet, Trainer trainer) {
+    String html = '';
+    for (SheetRow row in spreadSheet.rows) {
+      for (RowCell cell in row.rowCells) {
+        if (cell.text == trainer.firstName()) {
+          String dag = AppHelper.instance.weekDayStringFromDate(
+              date: row.date, locale: AppConstants().localNL);
+          html += '$dag<br>';
+        }
+      }
+    }
+    return html;
   }
 
   //------------------------------------
