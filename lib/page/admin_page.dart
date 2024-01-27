@@ -28,9 +28,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _addTrainerSchemas,
               child: const Text('add trainer schemas')),
-          // OutlinedButton(
-          //     onPressed: _saveFsSpreadsheet,
-          //     child: const Text('Firestore spreadsheet')),
+          OutlinedButton(
+              onPressed: _saveFsSpreadsheet,
+              child: const Text('Firestore spreadsheet')),
           OutlinedButton(
               onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
           OutlinedButton(
@@ -104,10 +104,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     }
   }
 
-  // void _saveFsSpreadsheet() async {
-  //   FsSpreadsheet fsSpreadsheet = p._spreadSheetFebruari();
-  //   await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
-  // }
+  void _saveFsSpreadsheet() async {
+    FsSpreadsheet fsSpreadsheet = p.allFsSpreadsheets[1]; //februari
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+  }
 
   void _deleteOldLogs() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;

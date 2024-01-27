@@ -341,7 +341,6 @@ class AppController {
     for (Trainer trainer in AppData.instance.getAllTrainers()) {
       toList = [p.trainerRobin]; //todo
       String html = _generateSpreadsheetIsFinalHtml(spreadSheet, trainer);
-      log(html);
 
       bool okay = await Dbs.instance.sendEmail(
           toList: toList,
@@ -364,9 +363,7 @@ class AppController {
         subject: 'Trainingschema wijziging',
         html: html);
 
-    if (okay) {
-      log("email okay");
-    } else {
+    if (!okay) {
       log("!email NOT  okay");
     }
   }

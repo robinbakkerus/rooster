@@ -2,6 +2,9 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
 
+DateTime summerStart = DateTime(2024, 7, 6);
+DateTime summerEnd = DateTime(2024, 8, 18);
+
 enum Groep {
   pr,
   r1,
@@ -43,15 +46,15 @@ Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
     'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0);
 Trainer trainerPauline = _buildTrainer(
-    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 1, 1, 1);
+    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 2, 1, 1);
 Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
-    'huiblachapelle@icloud.com', 0, 0, 1, 1, 1);
+    'huiblachapelle@icloud.com', 0, 0, 2, 1, 1);
 Trainer trainerRonald = _buildTrainer(
     'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 2, 1, 2, 0, 2);
 Trainer trainerAnne = _buildTrainer(
     'AJ', 'Anne Joustra', 'AKEN', 'a.joustra595242@kpnmail.nl', 0, 0, 1, 1, 0);
 Trainer trainerCyriel = _buildTrainer(
-    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 2, 2, 0);
+    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 1, 2, 0);
 
 // _buildTRainer
 Trainer _buildTrainer(String pk, String fullname, String accesscode,
@@ -446,6 +449,3 @@ TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
       excludeDays: [],
       tiaDays: [DateTime.saturday]);
 }
-
-DateTime summerStart = DateTime(2024, 3, 18);
-DateTime summerEnd = DateTime(2024, 4, 15);
