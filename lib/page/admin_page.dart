@@ -30,18 +30,20 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               child: const Text('add trainer schemas')),
           OutlinedButton(
               onPressed: _saveFsSpreadsheet,
-              child: const Text('Firestore spreadsheet')),
+              child: const Text('Save spreadsheet')),
           OutlinedButton(
               onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
           OutlinedButton(
               onPressed: _addApplyWeightValues,
-              child: const Text('Add ApplyWeightValue(s)')),
+              child: const Text('Add PlanRankValue(s)')),
           OutlinedButton(
               onPressed: _addTrainingItems,
-              child: const Text('Add training items')),
+              child: const Text('Add training combobox items')),
           OutlinedButton(
               onPressed: _sendEmail, child: const Text('Send email')),
-          OutlinedButton(onPressed: _testRule, child: const Text('Test rule')),
+          OutlinedButton(
+              onPressed: _sendAccessCodes,
+              child: const Text('Email accesscodes')),
           OutlinedButton(
               onPressed: _signUpOrSignIn, child: const Text('SignUp')),
           OutlinedButton(
@@ -150,11 +152,12 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         toList: toTrainers, ccList: [], subject: 'subject', html: html);
   }
 
-  void _testRule() async {
-    List<Trainer> toTrainers = [p.trainerRobin];
-    String html = '<p>Test</p>';
-    Dbs.instance.sendEmail(
-        toList: toTrainers, ccList: [], subject: 'subject', html: html);
+  void _sendAccessCodes() async {
+    for (Trainer trainer in _allTrainers()) {
+      String html = _accessCodeHtml(trainer);
+      Dbs.instance.sendEmail(
+          toList: [trainer], ccList: [], subject: 'Toegangscode', html: html);
+    }
   }
 
   void _signUpOrSignIn() async {
@@ -168,5 +171,17 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   void _addTrainingGroups() async {
     List<TrainingGroup> groups = p.allTrainingGroups();
     Dbs.instance.saveTrainingGroups(groups);
+  }
+
+  //------------------ private -------------------------
+
+  String _accessCodeHtml(Trainer trainer) {
+    String html = '<div>';
+    html += 'Hallo ${trainer.firstName()}<br><br>';
+    html +=
+        'Je kunt vanaf nu verhindering doorgeven via deze url: <b>https://lonutrainingschema.web.app</b> <br>';
+    html += 'Je toegangscode is: <b>${trainer.accessCode}</b> <br><br>';
+    html += 'Gr Robin <br>';
+    return '$html</div>';
   }
 }
