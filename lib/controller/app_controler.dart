@@ -30,6 +30,9 @@ class AppController {
   /// find the trainer gived the access code
   Future<bool> findTrainer(String accessCode) async {
     Trainer trainer = await Dbs.instance.findTrainerByAccessCode(accessCode);
+    if (trainer.isEmpty()) {
+      return false;
+    }
 
     bool signInOkay = await AuthHelper.instance.signIn(
         email: trainer.email,

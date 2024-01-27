@@ -60,6 +60,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                                 .copyWith(text: value.toUpperCase());
                           }
                         },
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'accesscode',
