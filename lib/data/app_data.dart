@@ -43,6 +43,8 @@ class AppData {
 
   String lastSnackbarMsg = '';
 
+  List<String> trainingDays = ['dinsdag', 'donderdag', 'zaterdag'];
+
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
   }

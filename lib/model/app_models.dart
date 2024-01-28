@@ -29,12 +29,6 @@ enum PageEnum {
   final int code;
 }
 
-enum DayPrefEnum {
-  tuesday,
-  thursday,
-  saturday;
-}
-
 enum RunMode {
   prod,
   acc,

@@ -198,10 +198,13 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   List<DataRow> _buildDataRows1() {
     List<DataRow> result = [];
 
-    var days = DayPrefEnum.values;
+    var days = AppData.instance.trainingDays;
 
-    for (DayPrefEnum dayEnum in days) {
-      result.add(DataRow(cells: _buildDataCells(dayEnum.name)));
+    for (String dag in days) {
+      if (dag != AppData.instance.trainingDays[2] ||
+          AppData.instance.isZamoTrainer(_trainer.pk)) {
+        result.add(DataRow(cells: _buildDataCells(dag)));
+      }
     }
 
     return result;
@@ -212,7 +215,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
 
     for (String groupName
         in AppData.instance.activeTrainingGroups[0].groupNames) {
-      result.add(DataRow(cells: _buildDataCells(groupName)));
+      if (groupName.toLowerCase() != 'zamo' || //todo hoe maken we dit dynamisch
+          AppData.instance.isZamoTrainer(_trainer.pk)) {
+        result.add(DataRow(cells: _buildDataCells(groupName)));
+      }
     }
 
     return result;
@@ -263,7 +269,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         : 'Fout tijdens aanpassen voorkeuren';
     wh.showSnackbar(msg, color: Colors.lightGreen);
     setState(() {
-      _trainer = _updateTrainer.copyWith();
+      _trainer = _trainer.copyWith();
       _fab = _getFab();
     });
   }
@@ -271,12 +277,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
-        _columnWidgets = _buildColumnWidgets();
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = _trainer.copyWith();
         _textCtrl.text = _trainer.email;
         _textCtrl.text = _trainer.email;
         _fab = _getFab();
+        _columnWidgets = _buildColumnWidgets();
       });
     }
   }
