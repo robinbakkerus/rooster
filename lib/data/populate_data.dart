@@ -67,6 +67,7 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
       pk: pk,
       fullname: fullname,
       email: email,
+      originalEmail: email,
       prefValues: [
         TrainerPref(paramName: AppData.instance.trainingDays[0], value: 1),
         TrainerPref(paramName: AppData.instance.trainingDays[1], value: 1),

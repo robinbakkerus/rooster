@@ -100,6 +100,7 @@ class Trainer {
   final String pk; // this is also the firestore dbs ID
   final String fullname;
   String email;
+  String originalEmail;
   List<TrainerPref> prefValues = [];
   final String roles;
 
@@ -108,6 +109,7 @@ class Trainer {
     required this.pk,
     required this.fullname,
     required this.email,
+    required this.originalEmail,
     required this.prefValues,
     required this.roles,
   });
@@ -117,6 +119,7 @@ class Trainer {
     String? pk,
     String? fullname,
     String? email,
+    String? originalEmail,
     List<TrainerPref>? prefValues,
     String? roles,
   }) {
@@ -125,6 +128,7 @@ class Trainer {
       pk: pk ?? this.pk,
       fullname: fullname ?? this.fullname,
       email: email ?? this.email,
+      originalEmail: originalEmail ?? this.originalEmail,
       prefValues:
           prefValues ?? this.prefValues.map((e) => e.copyWith()).toList(),
       roles: roles ?? this.roles,
@@ -137,6 +141,7 @@ class Trainer {
       'pk': pk,
       'fullname': fullname,
       'email': email,
+      'originalEmail': originalEmail,
       'prefValues': prefValues.map((x) => x.toMap()).toList(),
       'roles': roles,
     };
@@ -148,6 +153,7 @@ class Trainer {
       pk: map['pk'],
       fullname: map['fullname'],
       email: map['email'],
+      originalEmail: map['originalEmail'],
       prefValues: List<TrainerPref>.from(
           map['prefValues']?.map((x) => TrainerPref.fromMap(x))),
       roles: map['roles'],
@@ -156,7 +162,7 @@ class Trainer {
 
   @override
   String toString() {
-    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, prefs: $prefValues, roles: $roles)';
+    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
   }
 
   @override
@@ -168,6 +174,7 @@ class Trainer {
         other.pk == pk &&
         other.fullname == fullname &&
         other.email == email &&
+        other.originalEmail == originalEmail &&
         listEquals(other.prefValues, prefValues) &&
         other.roles == roles;
   }
@@ -178,6 +185,7 @@ class Trainer {
         pk.hashCode ^
         fullname.hashCode ^
         email.hashCode ^
+        originalEmail.hashCode ^
         prefValues.hashCode ^
         roles.hashCode;
   }
@@ -189,6 +197,7 @@ class Trainer {
         pk: '',
         fullname: '',
         email: '',
+        originalEmail: '',
         prefValues: [],
         roles: '');
   }

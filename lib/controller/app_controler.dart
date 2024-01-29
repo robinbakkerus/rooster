@@ -35,7 +35,7 @@ class AppController {
     }
 
     bool signInOkay = await AuthHelper.instance.signIn(
-        email: trainer.email,
+        email: trainer.originalEmail,
         password: AppHelper.instance.getAuthPassword(trainer));
 
     if (signInOkay) {
