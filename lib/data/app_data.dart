@@ -29,7 +29,7 @@ class AppData {
   List<String> zamoTrainers = [];
   String zamoDefaultTraing = '';
   List<String> trainerItems = [];
-  late PlanRankValues planRankValues;
+  late MetaPlanRankValues planRankValues;
 
   SpreadsheetStatus spreadSheetStatus = SpreadsheetStatus.initial; //asume
   SpreadsheetStatus _prevSpreadSheetStatus = SpreadsheetStatus.initial; //asume

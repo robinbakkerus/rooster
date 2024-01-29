@@ -202,15 +202,15 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///--------------------------------------------
 
   @override
-  Future<PlanRankValues> getApplyWeightValues() async {
-    PlanRankValues? result;
+  Future<MetaPlanRankValues> getApplyWeightValues() async {
+    MetaPlanRankValues? result;
 
     if (AppData.instance.runMode != RunMode.dev) {
       CollectionReference ref = firestore.collection('metadata');
       await ref.doc('apply_weights').get().then(
         (val) {
           Map<String, dynamic> map = val.data() as Map<String, dynamic>;
-          result = PlanRankValues.fromMap(map);
+          result = MetaPlanRankValues.fromMap(map);
         },
         onError: (e) => lp("Error getting weight_values: $e"),
       ).catchError((e) {

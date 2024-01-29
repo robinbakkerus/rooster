@@ -84,7 +84,7 @@ class AppController {
 
   // get Zamo trainers
   Future<void> getPlanRankValues() async {
-    PlanRankValues applyWeightValues =
+    MetaPlanRankValues applyWeightValues =
         await Dbs.instance.getApplyWeightValues();
     AppData.instance.planRankValues = applyWeightValues;
   }

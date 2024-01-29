@@ -427,14 +427,14 @@ class Available {
 
 ///-------- PlanRankValues
 
-class PlanRankValues {
+class MetaPlanRankValues {
   List<PlanRankStartValue> startValues = [];
   List<PlanRankStartValue> zamoStartValues = [];
   double onlyIfNeeded = -15;
   // the first [0] value is the default value, the [1] value means 1 training day before etc
   List<double> alreadyScheduled = [];
 
-  PlanRankValues({
+  MetaPlanRankValues({
     required this.startValues,
     required this.zamoStartValues,
     required this.onlyIfNeeded,
@@ -450,8 +450,8 @@ class PlanRankValues {
     };
   }
 
-  factory PlanRankValues.fromMap(Map<String, dynamic> map) {
-    return PlanRankValues(
+  factory MetaPlanRankValues.fromMap(Map<String, dynamic> map) {
+    return MetaPlanRankValues(
       startValues: List<PlanRankStartValue>.from(
           map['startValues']?.map((x) => PlanRankStartValue.fromMap(x))),
       zamoStartValues: List<PlanRankStartValue>.from(
@@ -470,7 +470,7 @@ class PlanRankValues {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is PlanRankValues &&
+    return other is MetaPlanRankValues &&
         listEquals(other.startValues, startValues) &&
         listEquals(other.zamoStartValues, zamoStartValues) &&
         other.onlyIfNeeded == onlyIfNeeded &&
@@ -485,13 +485,13 @@ class PlanRankValues {
         alreadyScheduled.hashCode;
   }
 
-  PlanRankValues copyWith({
+  MetaPlanRankValues copyWith({
     List<PlanRankStartValue>? startValues,
     List<PlanRankStartValue>? zamoStartValues,
     double? onlyIfNeeded,
     List<double>? alreadyScheduled,
   }) {
-    return PlanRankValues(
+    return MetaPlanRankValues(
       startValues: startValues ?? this.startValues,
       zamoStartValues: zamoStartValues ?? this.zamoStartValues,
       onlyIfNeeded: onlyIfNeeded ?? this.onlyIfNeeded,

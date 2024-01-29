@@ -127,7 +127,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _addApplyWeightValues() async {
-    PlanRankValues weightValues = p.getPlanRankValues();
+    MetaPlanRankValues weightValues = p.getPlanRankValues();
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference ref = firestore.collection('metadata');
     await ref.doc('apply_weights').set(weightValues.toMap()).then((val) {

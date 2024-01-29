@@ -138,7 +138,7 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
 }
 
 // ApplyWeightValues
-PlanRankValues getPlanRankValues() {
+MetaPlanRankValues getPlanRankValues() {
   List<PlanRankStartValue> startValues = [];
   startValues.add(PlanRankStartValue(trainerPk: '*', value: 100.0));
   startValues.add(PlanRankStartValue(trainerPk: 'OB', value: 110.0));
@@ -150,7 +150,7 @@ PlanRankValues getPlanRankValues() {
   startValues.add(PlanRankStartValue(trainerPk: 'PG', value: 131.0));
   startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 100.0));
   List<double> alreadyScheduled = [-10.0, -13.0, -12.0, -11.0];
-  PlanRankValues weightValues = PlanRankValues(
+  MetaPlanRankValues weightValues = MetaPlanRankValues(
       startValues: startValues,
       zamoStartValues: zamoStartValues,
       onlyIfNeeded: -25,
