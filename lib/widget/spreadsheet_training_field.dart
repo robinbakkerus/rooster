@@ -27,7 +27,7 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   String _getText() {
-    if (_isExtraRow()) {
+    if (widget.sheetRow.isExtraRow) {
       return widget.sheetRow.trainingText;
     } else {
       if (widget.sheetRow.trainingText.isEmpty) {
@@ -94,17 +94,20 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
                     ),
                   ),
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _training = _textCtrl.text;
-                        AppEvents.fireTrainingUpdatedEvent(
-                            widget.sheetRow.rowIndex, _training);
-                      });
-                      Navigator.of(context, rootNavigator: true)
-                          .pop(); // dismisses only the dialog and returns nothing
-                    },
-                    child: const Text("Close"))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _training = _textCtrl.text;
+                          AppEvents.fireTrainingUpdatedEvent(
+                              widget.sheetRow.rowIndex, _training);
+                        });
+                        Navigator.of(context, rootNavigator: true)
+                            .pop(); // dismisses only the dialog and returns nothing
+                      },
+                      child: const Text('Save')),
+                )
               ],
             ),
           ),
@@ -142,8 +145,6 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
         }).toList(),
         onChanged: _onDropdownSelected);
   }
-
-  bool _isExtraRow() => widget.sheetRow.isExtraRow;
 
   bool isEditable() {
     bool b = (widget.isEditable &&

@@ -210,7 +210,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   DataCell _buildDayCell(SheetRow sheetRow) {
-    return DataCell(SpreadsheeDayColumn(key: UniqueKey(), sheetRow: sheetRow));
+    return DataCell(SpreadsheetDayColumn(key: UniqueKey(), sheetRow: sheetRow));
   }
 
   DataCell _buildTrainingCell(SheetRow sheetRow) {

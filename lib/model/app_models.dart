@@ -598,10 +598,6 @@ class SheetRow {
     }
   }
 
-  String dateStr() {
-    return AppHelper.instance.getDateStringForSpreadsheet(date);
-  }
-
   SheetRow clone() {
     SheetRow result =
         SheetRow(rowIndex: rowIndex, date: date, isExtraRow: isExtraRow);

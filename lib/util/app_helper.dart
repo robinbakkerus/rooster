@@ -14,14 +14,6 @@ class AppHelper with AppMixin {
   AppHelper._();
   static final AppHelper instance = AppHelper._();
 
-  ///----------------------------------------
-  // return something like "Din 9" , which can be used to set label
-  String getSimpleDayString(DateTime dateTime) {
-    String weekday = _getShortWeekDay(dateTime);
-    String day = dateTime.day.toString();
-    return '$weekday $day';
-  }
-
   ///---------------------------------------
   int getActiveDateIndex(DateTime dateTime) {
     for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
@@ -30,21 +22,6 @@ class AppHelper with AppMixin {
       }
     }
     return -1; //this should not be possible
-  }
-
-  ///----------------------------------------
-  // return something like "din1", hence the first occurence
-  String getDateStringForSpreadsheet(DateTime dateTime) {
-    int occurence = 0;
-    for (DateTime dt in AppData.instance.getActiveDates()) {
-      if (dt.weekday == dateTime.weekday) {
-        occurence++;
-        if (dt.day == dateTime.day) {
-          return _getShortWeekDay(dt).toLowerCase() + occurence.toString();
-        }
-      }
-    }
-    return '???';
   }
 
   ///----------------------------------------
@@ -150,8 +127,14 @@ class AppHelper with AppMixin {
     }
   }
 
-  ///-----------------
-  /// return something like: 'din 1'
+  // return something like "Din 9" , which can be used to set label
+  String getSimpleDayString(DateTime dateTime) {
+    String weekday = _getShortWeekDay(dateTime);
+    String day = dateTime.day.toString();
+    return '$weekday $day';
+  }
+
+  /// return something like: 'din 1' or 'vrijdag 1'
   String weekDayStringFromDate(
       {required DateTime date, required String locale, int length = -1}) {
     String weekdayStr = DateFormat.EEEE(locale).format(date);
