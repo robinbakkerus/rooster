@@ -185,6 +185,7 @@ class SpreadsheetGenerator with AppMixin {
     return result;
   }
 
+  //--- here we fill which trainers are (not) available.
   Available _genCountsProcessDate(int dateIndex, DateTime date) {
     List<String> groupNames = getGroupNames(date);
     Available available = Available(date: date, groupCount: groupNames.length);
@@ -193,32 +194,16 @@ class SpreadsheetGenerator with AppMixin {
       AvailableCounts availableCounts = AvailableCounts();
 
       for (Trainer trainer in _getTrainersForGroup(groepName)) {
-        TrainerSchema schemas = getSchemaFromAllTrainerData(trainer);
+        TrainerSchema trainerSchema = getSchemaFromAllTrainerData(trainer);
 
         int groupPref = trainer.getPrefValue(paramName: groepName);
         int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
 
-        if (schemas.isEmpty()) {
-          if (groupPref == 2 || dayPref == 2) {
-            availableCounts.ifNeededBnye.add(trainer);
-          } else if (groupPref == 1 && dayPref == 1) {
-            availableCounts.availableBnye.add(trainer);
-          } else {
-            availableCounts.notAvailableBnye.add(trainer);
-          }
-        } else if (schemas.availableList.length >= dateIndex &&
-            schemas.availableList[dateIndex] == 0) {
-          availableCounts.notAvailable.add(trainer);
-        } else if (schemas.availableList.length >= dateIndex &&
-            schemas.availableList[dateIndex] == 1) {
-          if (groupPref == 2) {
-            availableCounts.ifNeeded.add(trainer);
-          } else {
-            availableCounts.available.add(trainer);
-          }
-        } else if (schemas.availableList.length >= dateIndex &&
-            schemas.availableList[dateIndex] == 2) {
-          availableCounts.ifNeeded.add(trainer);
+        if (trainerSchema.isEmpty()) {
+          _genCountsEmptySchema(groupPref, dayPref, availableCounts, trainer);
+        } else {
+          _genCountsForEnteredSchema(
+              trainerSchema, dateIndex, availableCounts, trainer, groupPref);
         }
       }
 
@@ -226,6 +211,35 @@ class SpreadsheetGenerator with AppMixin {
     }
 
     return available;
+  }
+
+  void _genCountsEmptySchema(int groupPref, int dayPref,
+      AvailableCounts availableCounts, Trainer trainer) {
+    if (groupPref == 2 || dayPref == 2) {
+      availableCounts.ifNeededBnye.add(trainer);
+    } else if (groupPref == 1 && dayPref == 1) {
+      availableCounts.availableBnye.add(trainer);
+    } else {
+      availableCounts.notAvailableBnye.add(trainer);
+    }
+  }
+
+  void _genCountsForEnteredSchema(TrainerSchema trainerSchema, int dateIndex,
+      AvailableCounts availableCounts, Trainer trainer, int groupPref) {
+    if (trainerSchema.availableList.length >= dateIndex &&
+        trainerSchema.availableList[dateIndex] == 0) {
+      availableCounts.notAvailable.add(trainer);
+    } else if (trainerSchema.availableList.length >= dateIndex &&
+        trainerSchema.availableList[dateIndex] == 1) {
+      if (groupPref == 2) {
+        availableCounts.ifNeeded.add(trainer);
+      } else {
+        availableCounts.available.add(trainer);
+      }
+    } else if (trainerSchema.availableList.length >= dateIndex &&
+        trainerSchema.availableList[dateIndex] == 2) {
+      availableCounts.ifNeeded.add(trainer);
+    }
   }
 
   ///---------------

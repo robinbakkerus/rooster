@@ -162,7 +162,7 @@ class Trainer {
 
   @override
   String toString() {
-    return 'Trainer(accessCode: $accessCode, pk: $pk, fullname: $fullname, email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
+    return 'Trainer(pk: $pk, fullname: $fullname, accessCode: $accessCode, email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
   }
 
   @override
@@ -239,7 +239,7 @@ class Trainer {
     for (TrainerPref pref in prefValues) {
       String weekDayStr = AppHelper.instance
           .weekDayStringFromWeekday(
-              weekday: weekday, locale: AppConstants().localUK)
+              weekday: weekday, locale: AppConstants().localNL)
           .toLowerCase();
       if (pref.paramName == weekDayStr) {
         return pref.value;
