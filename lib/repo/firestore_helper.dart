@@ -372,7 +372,6 @@ class FirestoreHelper with AppMixin implements Dbs {
       }
     }
 
-    toList = ['robin.bakkerus@gmail.com']; //todo
     return toList;
   }
 

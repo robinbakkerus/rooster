@@ -1,5 +1,6 @@
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
+import 'package:rooster/data/populate_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
@@ -215,7 +216,8 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
 
     for (String groupName
         in AppData.instance.activeTrainingGroups[0].groupNames) {
-      if (groupName.toLowerCase() != 'zamo' || //todo hoe maken we dit dynamisch
+      if (groupName.toLowerCase() !=
+              Groep.zamo.name || //todo hoe maken we dit dynamisch
           AppData.instance.isZamoTrainer(_trainer.pk)) {
         result.add(DataRow(cells: _buildDataCells(groupName)));
       }
