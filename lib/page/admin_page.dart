@@ -154,7 +154,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
 
   void _sendAccessCodes() async {
     // for (Trainer trainer in _allTrainers()) {
-    for (Trainer trainer in [p.trainerRobin]) {
+    for (Trainer trainer in p.allTrainers) {
       String html = _accessCodeHtml(trainer);
       Dbs.instance.sendEmail(
           toList: [trainer], ccList: [], subject: 'Toegangscode', html: html);
