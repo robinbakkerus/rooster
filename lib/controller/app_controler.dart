@@ -1,19 +1,19 @@
 import 'dart:developer';
-import 'package:intl/intl.dart';
-import 'package:rooster/repo/authentication.dart';
-import 'package:rooster/service/dbs.dart';
-import 'package:rooster/util/app_constants.dart';
-import 'package:universal_html/html.dart' as html;
+
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/authentication.dart';
+import 'package:rooster/service/dbs.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
-import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:collection/collection.dart';
-import 'package:rooster/data/populate_data.dart' as p;
+import 'package:universal_html/html.dart' as html;
 
 class AppController {
   AppController._();
@@ -96,13 +96,14 @@ class AppController {
   }
 
   /// update all modified DaySchema's
-  void updateTrainerSchemas() {
+  Future<bool> updateTrainerSchemas() async {
     TrainerSchema trainerSchemas =
         AppData.instance.getTrainerData().trainerSchemas;
     trainerSchemas.availableList = AppData.instance.newAvailaibleList;
-    Dbs.instance
+    bool result = await Dbs.instance
         .createOrUpdateTrainerSchemas(trainerSchemas, updateSchema: true);
     getTrainerData(trainer: AppData.instance.getTrainer());
+    return result;
   }
 
   ///----- updateTrainer

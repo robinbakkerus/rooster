@@ -142,10 +142,12 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     }
   }
 
-  void _onSaveSchema() {
-    setState(() {
-      AppController.instance.updateTrainerSchemas();
-    });
+  void _onSaveSchema() async {
+    bool result = await AppController.instance.updateTrainerSchemas();
+    if (result) {
+      wh.showSnackbar('Met succes wijzigingen opgeslagen!',
+          color: Colors.lightGreen);
+    }
   }
 
   void _showSnackbar() {
