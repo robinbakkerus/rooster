@@ -110,6 +110,7 @@ class AppController {
   Future<bool> updateTrainer(Trainer trainer) async {
     Trainer updatedTrainer = await Dbs.instance.createOrUpdateTrainer(trainer);
     AppData.instance.setTrainer(updatedTrainer);
+    AppEvents.fireTrainerUpdated(updatedTrainer);
     return true;
   }
 

@@ -270,10 +270,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         ? 'Met succes voorkeuren aangepast'
         : 'Fout tijdens aanpassen voorkeuren';
     wh.showSnackbar(msg, color: Colors.lightGreen);
-    setState(() {
-      _trainer = _trainer.copyWith();
-      _fab = _getFab();
-    });
   }
 
   void _onReady(TrainerDataReadyEvent event) {
