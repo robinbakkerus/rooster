@@ -42,7 +42,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('Vul je accesscode in'),
+                const Text('Vul je toegangscode in'),
                 Container(
                   height: 20,
                 ),
@@ -63,7 +63,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'accesscode',
+                          labelText: 'toeganscode',
                         ),
                       ),
                     ),
@@ -73,7 +73,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                 TextButton(
                     onPressed: _onSendAccessCode,
                     child: const Text(
-                      'Accescode vergeten ?',
+                      'Toegangs vergeten ?',
                       style: TextStyle(color: Colors.red),
                     )),
               ],
@@ -97,7 +97,8 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
     bool flag = await AppController.instance.findTrainer(accesscode);
     _findTriggered = false;
     if (!flag) {
-      final String msg = 'Kan geen trainer met accesscode $accesscode vinden!';
+      final String msg =
+          'Kan geen trainer met toegangscode $accesscode vinden!';
       wh.showSnackbar(msg, color: Colors.orange);
     }
   }
@@ -111,7 +112,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
       child: const Text("CLose"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text('Stuur accesscode'),
+      title: const Text('Stuur toeganscode'),
       content: const SizedBox(
         height: 150,
         child: SendAccessCodeWidget(),
