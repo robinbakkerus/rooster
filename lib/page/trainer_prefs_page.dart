@@ -75,7 +75,9 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     list.add(_readOnlyRow('PK', 'pk'));
     list.add(_readOnlyRow('Naam', 'fullname'));
     list.add(_readOnlyRow('Rollen', 'roles'));
+    list.add(wh.verSpace(10));
     list.add(_accesscodeRow());
+    list.add(wh.verSpace(10));
     list.add(_emailRow());
     list.add(const Divider(
       height: 10,
@@ -122,6 +124,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
             width: c.w25,
             child: TextField(
               controller: _textAccessCodeCtrl,
+              decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Toegangscode 4 letters',
+                  contentPadding: EdgeInsets.all(2)),
               textCapitalization: TextCapitalization.characters,
               onChanged: (value) {
                 if (_textAccessCodeCtrl.text != value.toUpperCase()) {
@@ -158,6 +164,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
             width: c.w25 * 3,
             child: TextField(
               controller: _textEmailCtrl,
+              decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Geef email adres',
+                  contentPadding: EdgeInsets.all(2)),
               textCapitalization: TextCapitalization.characters,
               onChanged: (value) {
                 if (_textEmailCtrl.text != value.toLowerCase()) {
