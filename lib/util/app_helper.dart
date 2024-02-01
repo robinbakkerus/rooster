@@ -228,7 +228,7 @@ class AppHelper with AppMixin {
 
   ///---------------------------------------------
   String getAuthPassword(Trainer trainer) {
-    return 'pwd${trainer.accessCode}!678123';
+    return 'pwd${trainer.originalAccessCode}!678123';
   }
 
   /// -------- private methods --------------------------------

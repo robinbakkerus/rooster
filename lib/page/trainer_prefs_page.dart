@@ -18,7 +18,8 @@ class TrainerPrefsPage extends StatefulWidget {
 class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   Trainer _trainer = Trainer.empty();
   Trainer _updateTrainer = Trainer.empty();
-  final _textCtrl = TextEditingController();
+  final _textEmailCtrl = TextEditingController();
+  final _textAccessCodeCtrl = TextEditingController();
   Widget? _fab;
   List<Widget> _columnWidgets = [];
 
@@ -74,6 +75,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     list.add(_readOnlyRow('PK', 'pk'));
     list.add(_readOnlyRow('Naam', 'fullname'));
     list.add(_readOnlyRow('Rollen', 'roles'));
+    list.add(_accesscodeRow());
     list.add(_emailRow());
     list.add(const Divider(
       height: 10,
@@ -105,6 +107,42 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     );
   }
 
+  Widget _accesscodeRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: c.w1,
+            child: const Text('toeganscode'),
+          ),
+          wh.horSpace(10),
+          SizedBox(
+            width: c.w25,
+            child: TextField(
+              controller: _textAccessCodeCtrl,
+              textCapitalization: TextCapitalization.characters,
+              onChanged: (value) {
+                if (_textAccessCodeCtrl.text != value.toUpperCase()) {
+                  if (value.length > 4) {
+                    value = value.substring(0, 4);
+                  }
+                  _textAccessCodeCtrl.value = _textAccessCodeCtrl.value
+                      .copyWith(text: value.toUpperCase());
+                }
+                _updateTrainer.accessCode = _textAccessCodeCtrl.text;
+                setState(() {
+                  _fab = _getFab();
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _emailRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
@@ -119,14 +157,14 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
           SizedBox(
             width: c.w25 * 3,
             child: TextField(
-              controller: _textCtrl,
+              controller: _textEmailCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: (value) {
-                if (_textCtrl.text != value.toLowerCase()) {
-                  _textCtrl.value =
-                      _textCtrl.value.copyWith(text: value.toLowerCase());
+                if (_textEmailCtrl.text != value.toLowerCase()) {
+                  _textEmailCtrl.value =
+                      _textEmailCtrl.value.copyWith(text: value.toLowerCase());
                 }
-                _updateTrainer.email = _textCtrl.text;
+                _updateTrainer.email = _textEmailCtrl.text;
                 setState(() {
                   _fab = _getFab();
                 });
@@ -277,8 +315,8 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       setState(() {
         _trainer = AppData.instance.getTrainer();
         _updateTrainer = _trainer.copyWith();
-        _textCtrl.text = _trainer.email;
-        _textCtrl.text = _trainer.email;
+        _textEmailCtrl.text = _trainer.email;
+        _textAccessCodeCtrl.text = _trainer.accessCode;
         _fab = _getFab();
         _columnWidgets = _buildColumnWidgets();
       });

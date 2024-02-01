@@ -96,7 +96,8 @@ class TrainerPref {
 ///------------------------------------------
 
 class Trainer {
-  final String accessCode;
+  String accessCode;
+  final String originalAccessCode;
   final String pk; // this is also the firestore dbs ID
   final String fullname;
   String email;
@@ -106,6 +107,7 @@ class Trainer {
 
   Trainer({
     required this.accessCode,
+    required this.originalAccessCode,
     required this.pk,
     required this.fullname,
     required this.email,
@@ -116,6 +118,7 @@ class Trainer {
 
   Trainer copyWith({
     String? accessCode,
+    String? originalAccessCode,
     String? pk,
     String? fullname,
     String? email,
@@ -125,6 +128,7 @@ class Trainer {
   }) {
     return Trainer(
       accessCode: accessCode ?? this.accessCode,
+      originalAccessCode: originalAccessCode ?? this.originalAccessCode,
       pk: pk ?? this.pk,
       fullname: fullname ?? this.fullname,
       email: email ?? this.email,
@@ -138,6 +142,7 @@ class Trainer {
   Map<String, dynamic> toMap() {
     return {
       'accessCode': accessCode,
+      'originalAccessCode': originalAccessCode,
       'pk': pk,
       'fullname': fullname,
       'email': email,
@@ -150,6 +155,7 @@ class Trainer {
   factory Trainer.fromMap(Map<String, dynamic> map) {
     return Trainer(
       accessCode: map['accessCode'],
+      originalAccessCode: map['originalAccessCode'],
       pk: map['pk'],
       fullname: map['fullname'],
       email: map['email'],
@@ -162,7 +168,7 @@ class Trainer {
 
   @override
   String toString() {
-    return 'Trainer(pk: $pk, fullname: $fullname, accessCode: $accessCode, email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
+    return 'Trainer(pk: $pk, fullname: $fullname, accessCode: $accessCode, orgCode: $originalAccessCode email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
   }
 
   @override
@@ -171,6 +177,7 @@ class Trainer {
 
     return other is Trainer &&
         other.accessCode == accessCode &&
+        other.originalAccessCode == originalAccessCode &&
         other.pk == pk &&
         other.fullname == fullname &&
         other.email == email &&
@@ -182,6 +189,7 @@ class Trainer {
   @override
   int get hashCode {
     return accessCode.hashCode ^
+        originalAccessCode.hashCode ^
         pk.hashCode ^
         fullname.hashCode ^
         email.hashCode ^
@@ -194,6 +202,7 @@ class Trainer {
   factory Trainer.empty() {
     return Trainer(
         accessCode: '',
+        originalAccessCode: '',
         pk: '',
         fullname: '',
         email: '',

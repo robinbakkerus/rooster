@@ -64,6 +64,7 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
 
   return Trainer(
       accessCode: accesscode,
+      originalAccessCode: accesscode,
       pk: pk,
       fullname: fullname,
       email: email,
