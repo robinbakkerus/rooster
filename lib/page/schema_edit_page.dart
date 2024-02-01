@@ -17,6 +17,7 @@ class SchemaEditPage extends StatefulWidget {
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<int> _availableList = [];
+  final List<String> _schemaMsgList = [];
 
   _SchemaEditPageState();
 
@@ -35,7 +36,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     }
 
     if (AppData.instance.stackIndex == PageEnum.editSchema.code) {
-      _showSnackbar();
+      _showSnackbarIfNeeded();
     }
   }
 
@@ -150,7 +151,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     }
   }
 
-  void _showSnackbar() {
+  void _showSnackbarIfNeeded() {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
     Color col = Colors.lightBlue;
@@ -168,7 +169,10 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
       }
     }
 
-    wh.showSnackbar(msg, color: col);
+    if (!_schemaMsgList.contains(msg)) {
+      _schemaMsgList.add(msg);
+      wh.showSnackbar(msg, color: col);
+    }
   }
 }
 
