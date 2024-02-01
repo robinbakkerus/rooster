@@ -34,7 +34,7 @@ class Simulator with AppMixin implements Dbs {
   }
 
   @override
-  Future<MetaPlanRankValues> getApplyWeightValues() async {
+  Future<MetaPlanRankValues> getApplyPlanRankValues() async {
     return p.getPlanRankValues();
   }
 

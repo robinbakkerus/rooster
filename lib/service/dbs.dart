@@ -18,7 +18,7 @@ abstract class Dbs {
   Future<List<String>> getZamoTrainers();
   Future<String> getZamoTrainingDefault();
   Future<List<String>> getTrainingItems();
-  Future<MetaPlanRankValues> getApplyWeightValues();
+  Future<MetaPlanRankValues> getApplyPlanRankValues();
   Future<LastRosterFinal> saveLastRosterFinal();
   Future<LastRosterFinal?> getLastRosterFinal();
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet);
