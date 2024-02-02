@@ -242,7 +242,7 @@ class AppController {
     TrainerData result = TrainerData.empty();
 
     Trainer? useTrainer = (trainer == null && trainerPk != null)
-        ? await Dbs.instance.getTrainerById(trainerPk)
+        ? await Dbs.instance.getTrainerByPk(trainerPk)
         : trainer;
 
     result.trainer = useTrainer!;

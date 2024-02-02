@@ -9,7 +9,7 @@ abstract class Dbs {
       : FirestoreHelper.instance;
 
   Future<Trainer> findTrainerByAccessCode(String accessCode);
-  Future<Trainer?> getTrainerById(String trainerPk);
+  Future<Trainer?> getTrainerByPk(String trainerPk);
   Future<TrainerSchema> getTrainerSchema(String trainerSchemaId);
   Future<bool> createOrUpdateTrainerSchemas(TrainerSchema trainerSchemas,
       {required bool updateSchema});

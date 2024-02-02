@@ -54,18 +54,27 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   ///- get trainer, or null if not exists
   @override
-  Future<Trainer?> getTrainerById(String trainerPk) async {
+  Future<Trainer?> getTrainerByPk(String trainerPk) async {
     CollectionReference colRef = _colRef(FsCol.trainer);
     Trainer? trainer;
 
-    await colRef.doc(trainerPk).get().then((DocumentSnapshot snapshot) {
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc(trainerPk).get();
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
+
+    try {
       if (snapshot.exists) {
         var map =
             Map<String, dynamic>.from(snapshot.data() as Map<dynamic, dynamic>);
         map['id'] = trainerPk;
         trainer = Trainer.fromMap(map);
       }
-    });
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
 
     return trainer;
   }
@@ -92,11 +101,13 @@ class FirestoreHelper with AppMixin implements Dbs {
       trainerSchemas.isNew = true;
     }
 
-    await colRef.doc(trainerSchemas.id).set(trainerSchemas.toMap()).then(
-        (value) {
+    try {
+      await colRef.doc(trainerSchemas.id).set(trainerSchemas.toMap());
       result = true;
       _handleSucces(LogAction.modifySchema);
-    }, onError: (e) => _handleError('createOrUpdateTrainerSchemas', e));
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
 
     return result;
   }
@@ -108,20 +119,19 @@ class FirestoreHelper with AppMixin implements Dbs {
     List<Trainer> result = [];
 
     CollectionReference colRef = _colRef(FsCol.trainer);
-    await colRef.get().then(
-      (querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          var map = doc.data() as Map<String, dynamic>;
-          map['id'] = doc.id;
-          Trainer trainer = Trainer.fromMap(map);
-          result.add(trainer);
-        }
-      },
-      onError: (e) => lp("Error completing: $e"),
-    ).catchError((e) {
-      lp('Error in getAllTrainers : $e');
-      throw e;
-    });
+    late QuerySnapshot querySnapshot;
+
+    try {
+      querySnapshot = await colRef.get();
+      for (var doc in querySnapshot.docs) {
+        var map = doc.data() as Map<String, dynamic>;
+        map['id'] = doc.id;
+        Trainer trainer = Trainer.fromMap(map);
+        result.add(trainer);
+      }
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
 
     return result;
   }
@@ -132,12 +142,14 @@ class FirestoreHelper with AppMixin implements Dbs {
     Trainer result = Trainer.empty();
 
     CollectionReference colRef = _colRef(FsCol.trainer);
-    await colRef.doc(trainer.pk).set(trainer.toMap()).then((val) {
+
+    try {
+      await colRef.doc(trainer.pk).set(trainer.toMap());
       result = trainer;
       _handleSucces(LogAction.modifySettings);
-    }).onError((error, stackTrace) {
-      lp('Error in createOrUpdateTrainer $error');
-    });
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
 
     return result;
   }
@@ -149,19 +161,18 @@ class FirestoreHelper with AppMixin implements Dbs {
     List<String> result = [];
 
     CollectionReference colRef = _colRef(FsCol.metadata);
-    await colRef.doc('zamo_trainers').get().then(
-      (val) {
-        Map<String, dynamic> map = val.data()! as Map<String, dynamic>;
-        var list = map['trainers'];
-        for (var pk in list) {
-          result.add(pk.toString());
-        }
-      },
-      onError: (e) => lp("Error completing getZamoTrainers: $e"),
-    ).catchError((e) {
-      lp('Error in getZamoTrainers : $e');
-      throw e;
-    });
+    late DocumentSnapshot querySnapshot;
+
+    try {
+      querySnapshot = await colRef.doc('zamo_trainers').get();
+      Map<String, dynamic> map = querySnapshot.data() as Map<String, dynamic>;
+      var list = map['trainers'];
+      for (var pk in list) {
+        result.add(pk.toString());
+      }
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return result;
   }
@@ -171,9 +182,18 @@ class FirestoreHelper with AppMixin implements Dbs {
   @override
   Future<String> getZamoTrainingDefault() async {
     CollectionReference colRef = _colRef(FsCol.metadata);
-    DocumentSnapshot snapshot = await colRef.doc('zamo_default').get();
-    Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
-    return map['training'];
+    String result = '';
+
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('zamo_default').get();
+      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+      result = map['training'];
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
+
+    return result;
   }
 
   ///--------------------------------------------
@@ -183,16 +203,15 @@ class FirestoreHelper with AppMixin implements Dbs {
     List<String> result = [];
 
     CollectionReference colRef = _colRef(FsCol.metadata);
-    await colRef.doc('training_items').get().then(
-      (val) {
-        Map<String, dynamic> map = val.data() as Map<String, dynamic>;
-        result = List<String>.from(map['items'] as List);
-      },
-      onError: (e) => lp("Error getting trainer_items: $e"),
-    ).catchError((e) {
-      lp('Error in getTrainerItems : $e');
-      throw e;
-    });
+
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('training_items').get();
+      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+      result = List<String>.from(map['items'] as List);
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return result;
   }
@@ -204,16 +223,15 @@ class FirestoreHelper with AppMixin implements Dbs {
     MetaPlanRankValues? result;
 
     CollectionReference colRef = _colRef(FsCol.metadata);
-    await colRef.doc('apply_weights').get().then(
-      (val) {
-        Map<String, dynamic> map = val.data() as Map<String, dynamic>;
-        result = MetaPlanRankValues.fromMap(map);
-      },
-      onError: (e) => lp("Error getting weight_values: $e"),
-    ).catchError((e) {
-      lp('Error in getApplyWeightValues : $e');
-      throw e;
-    });
+
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('apply_weights').get();
+      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+      result = MetaPlanRankValues.fromMap(map);
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return result!;
   }
@@ -228,12 +246,13 @@ class FirestoreHelper with AppMixin implements Dbs {
         month: AppData.instance.getActiveMonth());
 
     CollectionReference colRef = _colRef(FsCol.metadata);
-    await colRef.doc('last_published').set(lrf.toMap()).then((val) {
+
+    try {
+      await colRef.doc('last_published').set(lrf.toMap());
       _handleSucces(LogAction.finalizeSpreadsheet);
-    }).catchError((e) {
-      lp('Error in saveLastRosterFinal $e');
-      throw e;
-    });
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return lrf;
   }
@@ -244,12 +263,14 @@ class FirestoreHelper with AppMixin implements Dbs {
     LastRosterFinal? result;
 
     CollectionReference colRef = _colRef(FsCol.metadata);
-    await colRef.doc('last_published').get().then((val) {
-      result = LastRosterFinal.fromMap(val.data() as Map<String, dynamic>);
-    }).catchError((e) {
-      lp(' Error in getLastRosterFinal $e');
-      throw e;
-    });
+
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('last_published').get();
+      result = LastRosterFinal.fromMap(snapshot.data() as Map<String, dynamic>);
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return result;
   }
@@ -259,34 +280,32 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet) async {
     CollectionReference colRef = _colRef(FsCol.spreadsheet);
 
-    await colRef
-        .doc(fsSpreadsheet.getID())
-        .set(fsSpreadsheet.toMap())
-        .then((val) {})
-        .catchError((e) {
-      lp('Error in saveFsSpreadsheet $e');
-      throw e;
-    });
+    try {
+      await colRef.doc(fsSpreadsheet.getID()).set(fsSpreadsheet.toMap());
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
   }
 
   //-----------------------------------------
   @override
   Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month}) async {
+    FsSpreadsheet? result;
     CollectionReference colRef = _colRef(FsCol.spreadsheet);
 
     String docId = '${year}_$month';
-    DocumentSnapshot snapshot =
-        await colRef.doc(docId).get().catchError((error) {
-      lp(' Error in retrieveSpreadsheet $error');
-      throw error;
-    });
-
-    if (snapshot.exists) {
-      return FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
-    } else {
-      return null;
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc(docId).get();
+      if (snapshot.exists) {
+        result = FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
+      }
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
     }
+
+    return result;
   }
 
   ///-------- sendEmail
@@ -335,18 +354,22 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   @override
   Future<List<TrainingGroup>> getTrainingGroups() async {
+    List<TrainingGroup> result = [];
     CollectionReference colRef = _colRef(FsCol.metadata);
 
-    DocumentSnapshot snapshot = await colRef.doc('training_groups').get();
-    if (snapshot.exists) {
-      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
-      List<dynamic> data = List<dynamic>.from(map['groups'] as List);
-      List<TrainingGroup> r =
-          data.map((e) => TrainingGroup.fromMap(e)).toList();
-      return r;
-    } else {
-      return [];
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('training_groups').get();
+      if (snapshot.exists) {
+        Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+        List<dynamic> data = List<dynamic>.from(map['groups'] as List);
+        result = data.map((e) => TrainingGroup.fromMap(e)).toList();
+      }
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
     }
+
+    return result;
   }
 
   ///============ private methods --------
@@ -375,17 +398,19 @@ class FirestoreHelper with AppMixin implements Dbs {
 
     TrainerSchema trainerSchema = TrainerSchema.empty();
 
-    await colRef.doc(schemaId).get().then((DocumentSnapshot snapshot) {
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc(schemaId).get();
       if (snapshot.exists) {
         var map =
             Map<String, dynamic>.from(snapshot.data() as Map<dynamic, dynamic>);
         map['id'] = schemaId;
         trainerSchema = TrainerSchema.fromMap(map);
         trainerSchema.isNew = false;
-      } else {
-        return [];
       }
-    });
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
 
     return trainerSchema;
   }

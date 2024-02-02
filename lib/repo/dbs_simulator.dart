@@ -44,7 +44,7 @@ class Simulator with AppMixin implements Dbs {
   }
 
   @override
-  Future<Trainer?> getTrainerById(String trainerPk) async {
+  Future<Trainer?> getTrainerByPk(String trainerPk) async {
     Trainer? trainer = p.allTrainers.firstWhereOrNull((e) => e.pk == trainerPk);
     return trainer ?? Trainer.empty();
   }
