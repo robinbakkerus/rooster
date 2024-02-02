@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/authentication.dart';
+import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
@@ -34,11 +35,10 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
           OutlinedButton(
-              onPressed: _addApplyWeightValues,
-              child: const Text('Add PlanRankValue(s)')),
+              onPressed: _deleteOldErrors,
+              child: const Text('Delete old errors')),
           OutlinedButton(
-              onPressed: _addTrainingItems,
-              child: const Text('Add training combobox items')),
+              onPressed: _addMetaData, child: const Text('Add MetaData')),
           OutlinedButton(
               onPressed: _sendEmail, child: const Text('Send email')),
           OutlinedButton(
@@ -46,9 +46,6 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
               child: const Text('Email accesscodes')),
           OutlinedButton(
               onPressed: _signUpOrSignIn, child: const Text('SignUp')),
-          OutlinedButton(
-              onPressed: _addTrainingGroups,
-              child: const Text('Add Training groups')),
         ],
       ),
     );
@@ -112,8 +109,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _deleteOldLogs() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference logRef = firestore.collection('logs');
+    CollectionReference logRef =
+        FirestoreHelper.instance.collectionRef(FsCol.logs);
     bool firstOne =
         true; // dont remove all logs becauce then de whole table is gone
     await logRef.get().then((querySnapshot) {
@@ -126,23 +123,19 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     });
   }
 
-  void _addApplyWeightValues() async {
-    MetaPlanRankValues weightValues = p.getPlanRankValues();
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference ref = firestore.collection('metadata');
-    await ref.doc('apply_weights').set(weightValues.toMap()).then((val) {
-      lp('weights added ');
-    }).onError((error, stackTrace) => lp(error.toString()));
-  }
-
-  void _addTrainingItems() async {
-    List<String> items = p.getTrainerItems();
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference ref = firestore.collection('metadata');
-    var map = {'items': items};
-    await ref.doc('training_items').set(map).then((val) {
-      lp('training items added ');
-    }).onError((error, stackTrace) => lp(error.toString()));
+  void _deleteOldErrors() async {
+    CollectionReference logRef =
+        FirestoreHelper.instance.collectionRef(FsCol.error);
+    bool firstOne =
+        true; // dont remove all logs becauce then de whole table is gone
+    await logRef.get().then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (!firstOne) {
+          doc.reference.delete();
+        }
+        firstOne = false;
+      }
+    });
   }
 
   void _sendEmail() async {
@@ -169,7 +162,28 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     }
   }
 
-  void _addTrainingGroups() async {
+  void _addMetaData() async {
+    await _addPlanRankValues();
+    await _addTrainingItems();
+    await _addTrainingGroups();
+  }
+
+  Future<void> _addPlanRankValues() async {
+    MetaPlanRankValues planRankValues = p.getPlanRankValues();
+    await FirestoreHelper.instance.savePlanRankValues(planRankValues);
+  }
+
+  Future<void> _addTrainingItems() async {
+    List<String> items = p.getTrainerItems();
+    CollectionReference ref =
+        FirestoreHelper.instance.collectionRef(FsCol.metadata);
+    var map = {'items': items};
+    await ref.doc('training_items').set(map).then((val) {
+      lp('training items added ');
+    }).onError((error, stackTrace) => lp(error.toString()));
+  }
+
+  Future<void> _addTrainingGroups() async {
     List<TrainingGroup> groups = p.allTrainingGroups();
     Dbs.instance.saveTrainingGroups(groups);
   }

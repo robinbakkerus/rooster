@@ -28,7 +28,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   /// find Trainer
   @override
   Future<Trainer> findTrainerByAccessCode(String accessCode) async {
-    CollectionReference colRef = _colRef(FsCol.trainer);
+    CollectionReference colRef = collectionRef(FsCol.trainer);
     Trainer trainer = Trainer.empty();
 
     late QuerySnapshot querySnapshot;
@@ -55,7 +55,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///- get trainer, or null if not exists
   @override
   Future<Trainer?> getTrainerByPk(String trainerPk) async {
-    CollectionReference colRef = _colRef(FsCol.trainer);
+    CollectionReference colRef = collectionRef(FsCol.trainer);
     Trainer? trainer;
 
     late DocumentSnapshot snapshot;
@@ -92,7 +92,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       {required bool updateSchema}) async {
     bool result = false;
 
-    CollectionReference colRef = _colRef(FsCol.schemas);
+    CollectionReference colRef = collectionRef(FsCol.schemas);
 
     if (updateSchema) {
       trainerSchemas.modified = DateTime.now();
@@ -118,7 +118,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<List<Trainer>> getAllTrainers() async {
     List<Trainer> result = [];
 
-    CollectionReference colRef = _colRef(FsCol.trainer);
+    CollectionReference colRef = collectionRef(FsCol.trainer);
     late QuerySnapshot querySnapshot;
 
     try {
@@ -141,7 +141,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<Trainer> createOrUpdateTrainer(trainer) async {
     Trainer result = Trainer.empty();
 
-    CollectionReference colRef = _colRef(FsCol.trainer);
+    CollectionReference colRef = collectionRef(FsCol.trainer);
 
     try {
       await colRef.doc(trainer.pk).set(trainer.toMap());
@@ -160,7 +160,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<List<String>> getZamoTrainers() async {
     List<String> result = [];
 
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
     late DocumentSnapshot querySnapshot;
 
     try {
@@ -181,7 +181,7 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   @override
   Future<String> getZamoTrainingDefault() async {
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
     String result = '';
 
     late DocumentSnapshot snapshot;
@@ -202,7 +202,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<List<String>> getTrainingItems() async {
     List<String> result = [];
 
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     late DocumentSnapshot snapshot;
     try {
@@ -222,11 +222,11 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<MetaPlanRankValues> getApplyPlanRankValues() async {
     MetaPlanRankValues? result;
 
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     late DocumentSnapshot snapshot;
     try {
-      snapshot = await colRef.doc('apply_weights').get();
+      snapshot = await colRef.doc('rank_values').get();
       Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
       result = MetaPlanRankValues.fromMap(map);
     } catch (ex, stackTrace) {
@@ -234,6 +234,19 @@ class FirestoreHelper with AppMixin implements Dbs {
     }
 
     return result!;
+  }
+
+  ///--------------------------------------------
+
+  @override
+  Future<void> savePlanRankValues(MetaPlanRankValues planRankValues) async {
+    CollectionReference colRef = collectionRef(FsCol.metadata);
+
+    try {
+      await colRef.doc('rank_values').set(planRankValues.toMap());
+    } catch (ex, stackTrace) {
+      _handleError(ex, stackTrace);
+    }
   }
 
   ///--------------------------
@@ -245,7 +258,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
 
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     try {
       await colRef.doc('last_published').set(lrf.toMap());
@@ -262,7 +275,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<LastRosterFinal?> getLastRosterFinal() async {
     LastRosterFinal? result;
 
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     late DocumentSnapshot snapshot;
     try {
@@ -278,7 +291,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   ///--------------------------
   @override
   Future<void> saveFsSpreadsheet(FsSpreadsheet fsSpreadsheet) async {
-    CollectionReference colRef = _colRef(FsCol.spreadsheet);
+    CollectionReference colRef = collectionRef(FsCol.spreadsheet);
 
     try {
       await colRef.doc(fsSpreadsheet.getID()).set(fsSpreadsheet.toMap());
@@ -292,7 +305,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month}) async {
     FsSpreadsheet? result;
-    CollectionReference colRef = _colRef(FsCol.spreadsheet);
+    CollectionReference colRef = collectionRef(FsCol.spreadsheet);
 
     String docId = '${year}_$month';
     late DocumentSnapshot snapshot;
@@ -316,7 +329,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       required String subject,
       required String html}) async {
     bool result = false;
-    CollectionReference colRef = _colRef(FsCol.mail);
+    CollectionReference colRef = collectionRef(FsCol.mail);
 
     Map<String, dynamic> map = {};
     map['to'] = _buildEmailAdresList(toList);
@@ -338,7 +351,7 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   @override
   Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups) async {
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     List<Map<String, dynamic>> groupsMap = [];
     for (TrainingGroup trainingGroup in trainingGroups) {
@@ -355,7 +368,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   @override
   Future<List<TrainingGroup>> getTrainingGroups() async {
     List<TrainingGroup> result = [];
-    CollectionReference colRef = _colRef(FsCol.metadata);
+    CollectionReference colRef = collectionRef(FsCol.metadata);
 
     late DocumentSnapshot snapshot;
     try {
@@ -394,7 +407,7 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   ///-- get schema's for trainer
   Future<TrainerSchema> _getTheTrainerSchema(String schemaId) async {
-    CollectionReference colRef = _colRef(FsCol.schemas);
+    CollectionReference colRef = collectionRef(FsCol.schemas);
 
     TrainerSchema trainerSchema = TrainerSchema.empty();
 
@@ -416,7 +429,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   void _saveError(String errMsg, String trace) {
-    CollectionReference colRef = _colRef(FsCol.error);
+    CollectionReference colRef = collectionRef(FsCol.error);
 
     Map<String, dynamic> map = {
       'at': DateTime.now(),
@@ -459,7 +472,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       'action': logAction.index
     };
 
-    CollectionReference colRef = _colRef(FsCol.logs);
+    CollectionReference colRef = collectionRef(FsCol.logs);
     String id = _uniqueDocId();
     colRef.doc(id).set(map);
   }
@@ -472,7 +485,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   ///--------------------------------------------
-  CollectionReference _colRef(FsCol fsCol) {
+  CollectionReference collectionRef(FsCol fsCol) {
     String collectionName = AppData.instance.runMode == RunMode.prod
         ? fsCol.name
         : '${fsCol.name}_acc';

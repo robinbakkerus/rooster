@@ -5,6 +5,10 @@ service cloud.firestore {
       allow read, write : if true;
 	  }
   
+    match /error_acc/{PublicDoc} {
+      allow read, write : if true;
+	  }
+  
 	  match /mail/{PublicDoc} {
       allow read, write : if true;
     }

@@ -31,4 +31,5 @@ abstract class Dbs {
       required String html});
   Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups);
   Future<List<TrainingGroup>> getTrainingGroups();
+  Future<void> savePlanRankValues(MetaPlanRankValues planRankValues);
 }

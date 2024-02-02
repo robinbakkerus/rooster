@@ -728,7 +728,7 @@ class LastRosterFinal {
 
   factory LastRosterFinal.fromMap(Map<String, dynamic> map) {
     return LastRosterFinal(
-      at: DateTime.fromMillisecondsSinceEpoch(map['at']),
+      at: AppHelper.instance.parseDateTime(map['at'])!,
       by: map['by'],
       year: map['year'],
       month: map['month'],

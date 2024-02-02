@@ -112,4 +112,7 @@ class Simulator with AppMixin implements Dbs {
   Future<List<TrainingGroup>> getTrainingGroups() async {
     return p.allTrainingGroups();
   }
+
+  @override
+  Future<void> savePlanRankValues(MetaPlanRankValues planRankValues) async {}
 }
