@@ -207,14 +207,6 @@ class AppHelper with AppMixin {
   }
 
   ///---------------------------------------------
-  List<Trainer> getAllSupervisors() {
-    return AppData.instance
-        .getAllTrainers()
-        .where((e) => e.isSupervisor())
-        .toList();
-  }
-
-  ///---------------------------------------------
   Trainer findTrainerByFirstName(String name) {
     Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull(
         (e) => e.firstName().toLowerCase() == name.toLowerCase());
@@ -229,6 +221,19 @@ class AppHelper with AppMixin {
   ///---------------------------------------------
   String getAuthPassword(Trainer trainer) {
     return 'pwd${trainer.originalAccessCode}!678123';
+  }
+
+  ///---------------------------------------------
+  List<Trainer> getAllAdmins() {
+    return AppData.instance.getAllTrainers().where((t) => t.isAdmin()).toList();
+  }
+
+  ///---------------------------------------------
+  List<Trainer> getAllSupervisors() {
+    return AppData.instance
+        .getAllTrainers()
+        .where((t) => t.isSupervisor())
+        .toList();
   }
 
   /// -------- private methods --------------------------------

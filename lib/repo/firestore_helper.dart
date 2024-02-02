@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rooster/data/app_data.dart';
+import 'package:rooster/data/populate_data.dart' as p;
+import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/dbs_simulator.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';
-import 'package:rooster/data/populate_data.dart' as p;
+import 'package:stack_trace/stack_trace.dart';
 
 enum FsCol {
   logs,
@@ -16,6 +17,8 @@ enum FsCol {
   error;
 }
 
+final Trainer adminTrainer = p.trainerRobin;
+
 class FirestoreHelper with AppMixin implements Dbs {
   FirestoreHelper._();
   static final FirestoreHelper instance = FirestoreHelper._();
@@ -26,19 +29,25 @@ class FirestoreHelper with AppMixin implements Dbs {
   @override
   Future<Trainer> findTrainerByAccessCode(String accessCode) async {
     CollectionReference colRef = _colRef(FsCol.trainer);
-
     Trainer trainer = Trainer.empty();
 
-    await colRef
-        .where('accessCode', isEqualTo: accessCode)
-        .get()
-        .then((querySnapshot) {
+    late QuerySnapshot querySnapshot;
+    try {
+      querySnapshot =
+          await colRef.where('accessCode', isEqualTo: accessCode).get();
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
+
+    try {
       if (querySnapshot.size > 0) {
         var map = Map<String, dynamic>.from(
             querySnapshot.docs[0].data() as Map<dynamic, dynamic>);
         trainer = Trainer.fromMap(map);
       }
-    });
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+    }
 
     return trainer;
   }
@@ -87,7 +96,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         (value) {
       result = true;
       _handleSucces(LogAction.modifySchema);
-    }, onError: (e) => _updateError("$e"));
+    }, onError: (e) => _handleError('createOrUpdateTrainerSchemas', e));
 
     return result;
   }
@@ -362,11 +371,11 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   ///-- get schema's for trainer
   Future<TrainerSchema> _getTheTrainerSchema(String schemaId) async {
-    CollectionReference schemaRef = _colRef(FsCol.schemas);
+    CollectionReference colRef = _colRef(FsCol.schemas);
 
     TrainerSchema trainerSchema = TrainerSchema.empty();
 
-    await schemaRef.doc(schemaId).get().then((DocumentSnapshot snapshot) {
+    await colRef.doc(schemaId).get().then((DocumentSnapshot snapshot) {
       if (snapshot.exists) {
         var map =
             Map<String, dynamic>.from(snapshot.data() as Map<dynamic, dynamic>);
@@ -381,8 +390,42 @@ class FirestoreHelper with AppMixin implements Dbs {
     return trainerSchema;
   }
 
+  void _saveError(String errMsg, String trace) {
+    CollectionReference colRef = _colRef(FsCol.error);
+
+    Map<String, dynamic> map = {
+      'at': DateTime.now(),
+      'err': errMsg,
+      'trace': trace,
+    };
+
+    String id = _uniqueDocId();
+    colRef.doc(id).set(map);
+  }
+
   ///--------------------------------------------
-  void _updateError(Object? ex) {}
+  void _handleError(Object? ex, StackTrace stackTrace) {
+    String traceMsg = _buildTraceMsg(stackTrace);
+    _saveError(ex.toString(), traceMsg);
+
+    String html = '<div>Error detected: $ex <br> $traceMsg</div>';
+    sendEmail(toList: [adminTrainer], ccList: [], subject: 'Error', html: html);
+
+    AppEvents.fireErrorEvent(ex.toString());
+  }
+
+  String _buildTraceMsg(StackTrace stackTrace) {
+    String traceMsg = '';
+    Trace trace = Trace.from(stackTrace).terse;
+    List<Frame> frames = trace.frames;
+    for (Frame frame in frames) {
+      String s = frame.toString();
+      if (s.contains('rooster')) {
+        traceMsg += '$s;';
+      }
+    }
+    return traceMsg;
+  }
 
   ///----------------
   void _handleSucces(LogAction logAction) {
@@ -391,10 +434,16 @@ class FirestoreHelper with AppMixin implements Dbs {
       'action': logAction.index
     };
 
-    CollectionReference logsRef = firestore.collection('logs');
+    CollectionReference colRef = _colRef(FsCol.logs);
+    String id = _uniqueDocId();
+    colRef.doc(id).set(map);
+  }
+
+  ///----------------
+  String _uniqueDocId() {
     String id =
         '${AppData.instance.getTrainer().pk}-${DateTime.now().microsecondsSinceEpoch}';
-    logsRef.doc(id).set(map);
+    return id;
   }
 
   ///--------------------------------------------
