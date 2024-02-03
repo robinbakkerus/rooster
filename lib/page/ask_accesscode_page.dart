@@ -112,7 +112,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
       child: const Text("CLose"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text('Stuur toeganscode'),
+      title: const Text('Stuur toegangscode'),
       content: const SizedBox(
         height: 150,
         child: SendAccessCodeWidget(),
