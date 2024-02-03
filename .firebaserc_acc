@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "lonutrainingschema"
+  },
+  "targets": {
+    "lonutrainingschema": {
+      "hosting": {
+        "acc": [
+          "acc-lonutrainingschemas"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
+

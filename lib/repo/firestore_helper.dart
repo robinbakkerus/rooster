@@ -17,7 +17,7 @@ enum FsCol {
   error;
 }
 
-final Trainer adminTrainer = p.trainerRobin;
+final Trainer administrator = p.trainerRobin;
 
 class FirestoreHelper with AppMixin implements Dbs {
   FirestoreHelper._();
@@ -36,7 +36,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       querySnapshot =
           await colRef.where('accessCode', isEqualTo: accessCode).get();
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     try {
@@ -46,7 +46,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         trainer = Trainer.fromMap(map);
       }
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     return trainer;
@@ -62,7 +62,7 @@ class FirestoreHelper with AppMixin implements Dbs {
     try {
       snapshot = await colRef.doc(trainerPk).get();
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     try {
@@ -73,7 +73,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         trainer = Trainer.fromMap(map);
       }
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     return trainer;
@@ -106,7 +106,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       result = true;
       _handleSucces(LogAction.modifySchema);
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     return result;
@@ -130,7 +130,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         result.add(trainer);
       }
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     return result;
@@ -148,7 +148,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       result = trainer;
       _handleSucces(LogAction.modifySettings);
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
 
     return result;
@@ -171,7 +171,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         result.add(pk.toString());
       }
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -190,7 +190,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
       result = map['training'];
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -210,7 +210,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
       result = List<String>.from(map['items'] as List);
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -230,7 +230,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
       result = MetaPlanRankValues.fromMap(map);
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result!;
@@ -245,7 +245,7 @@ class FirestoreHelper with AppMixin implements Dbs {
     try {
       await colRef.doc('rank_values').set(planRankValues.toMap());
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
   }
 
@@ -264,7 +264,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       await colRef.doc('last_published').set(lrf.toMap());
       _handleSucces(LogAction.finalizeSpreadsheet);
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return lrf;
@@ -282,7 +282,7 @@ class FirestoreHelper with AppMixin implements Dbs {
       snapshot = await colRef.doc('last_published').get();
       result = LastRosterFinal.fromMap(snapshot.data() as Map<String, dynamic>);
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -296,7 +296,7 @@ class FirestoreHelper with AppMixin implements Dbs {
     try {
       await colRef.doc(fsSpreadsheet.getID()).set(fsSpreadsheet.toMap());
     } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
+      handleError(e, stackTrace);
     }
   }
 
@@ -315,7 +315,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         result = FsSpreadsheet.fromMap(snapshot.data() as Map<String, dynamic>);
       }
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -379,7 +379,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         result = data.map((e) => TrainingGroup.fromMap(e)).toList();
       }
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return result;
@@ -402,6 +402,10 @@ class FirestoreHelper with AppMixin implements Dbs {
       }
     }
 
+    if (AppData.instance.runMode != RunMode.prod) {
+      toList = [administrator.email];
+    }
+
     return toList;
   }
 
@@ -422,7 +426,7 @@ class FirestoreHelper with AppMixin implements Dbs {
         trainerSchema.isNew = false;
       }
     } catch (ex, stackTrace) {
-      _handleError(ex, stackTrace);
+      handleError(ex, stackTrace);
     }
 
     return trainerSchema;
@@ -442,12 +446,13 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   ///--------------------------------------------
-  void _handleError(Object? ex, StackTrace stackTrace) {
+  void handleError(Object? ex, StackTrace stackTrace) {
     String traceMsg = _buildTraceMsg(stackTrace);
     _saveError(ex.toString(), traceMsg);
 
     String html = '<div>Error detected: $ex <br> $traceMsg</div>';
-    sendEmail(toList: [adminTrainer], ccList: [], subject: 'Error', html: html);
+    sendEmail(
+        toList: [administrator], ccList: [], subject: 'Error', html: html);
 
     AppEvents.fireErrorEvent(ex.toString());
   }

@@ -22,4 +22,5 @@ class AppConstants {
 
   final String zamoGroup = 'zamo';
   final String summerGroep = 'zomer_training';
+  final String startersGroep = 'SG';
 }

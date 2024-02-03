@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class SpreadsheetGenerator with AppMixin {
@@ -55,17 +56,29 @@ class SpreadsheetGenerator with AppMixin {
 
   //------------------------------------------
   SpreadSheet generateSpreadsheet(
-      List<Available> availableList, DateTime date) {
+      List<Available> availableList, DateTime dateTime) {
     _spreadSheet = SpreadSheet(
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
 
+    try {
+      _doGenerateSpreadsheet(availableList, dateTime);
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
+    }
+
+    return _spreadSheet;
+  }
+
+  void _doGenerateSpreadsheet(
+      List<Available> availableList, DateTime dateTime) {
     // first fill the spreadsheet with available trainer data
     List<SheetRow> sheetRows = _getAvailabilityForSpreadsheet(availableList);
     _spreadSheet.rows = sheetRows;
 
     // next find the best trainer, first we skip zamo
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
+      DateTime date = _spreadSheet.rows[rowNr].date;
       for (String groupName
           in SpreadsheetGenerator.instance.getGroupNames(date)) {
         _findSuitableTrainer(rowNr: rowNr, groupName: groupName, date: date);
@@ -78,7 +91,6 @@ class SpreadsheetGenerator with AppMixin {
     }
 
     postProcessSpreadsheet();
-    return _spreadSheet;
   }
 
   //----------------
@@ -148,20 +160,30 @@ class SpreadsheetGenerator with AppMixin {
 
   //--------------------------------
   int getGroupIndex(String groupName, DateTime dateTime) {
-    List<String> getGroupNames =
+    List<String> groupNames =
         SpreadsheetGenerator.instance.getGroupNames(dateTime);
-    for (int i = 0; i < getGroupNames.length; i++) {
-      if (getGroupNames[i].toLowerCase() == groupName.toLowerCase()) {
+    for (int i = 0; i < groupNames.length; i++) {
+      if (groupNames[i].toLowerCase() == groupName.toLowerCase()) {
         return i;
       }
     }
-    return -1; // should not happen
+    return -1;
   }
 
   //---- private --
 
   bool _isExcluded(TrainingGroup trainingGroup, DateTime date) {
-    return trainingGroup.excludeDays.contains(date);
+    if (trainingGroup.excludePeriods.isEmpty) {
+      return false;
+    }
+    for (ExcludePeriod excludePeriod in trainingGroup.excludePeriods) {
+      if (date.isAfter(excludePeriod.fromDate) &&
+          date.isBefore(excludePeriod.toDate)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   //------------- first fill the spreadsheet with available trainer data
@@ -173,9 +195,11 @@ class SpreadsheetGenerator with AppMixin {
           SheetRow(date: avail.date, rowIndex: rowIdx, isExtraRow: false);
       for (String groupName in getGroupNames(avail.date)) {
         int groupIndex = getGroupIndex(groupName, avail.date);
-        RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groupIndex);
-        rowCell.availableCounts = avail.counts[groupIndex];
-        sheetRow.rowCells.add(rowCell);
+        if (groupIndex >= 0) {
+          RowCell rowCell = RowCell(rowIndex: rowIdx, colIndex: groupIndex);
+          rowCell.availableCounts = avail.counts[groupIndex];
+          sheetRow.rowCells.add(rowCell);
+        }
       }
       result.add(sheetRow);
 
@@ -246,7 +270,9 @@ class SpreadsheetGenerator with AppMixin {
   void _findSuitableTrainer(
       {required int rowNr, required String groupName, required DateTime date}) {
     int groupIndex = getGroupIndex(groupName, date);
-    if (_spreadSheet.rows[rowNr].rowCells.length > groupIndex) {
+
+    if (_spreadSheet.rows[rowNr].rowCells.length > groupIndex &&
+        groupIndex >= 0) {
       AvailableCounts cnts =
           _spreadSheet.rows[rowNr].rowCells[groupIndex].availableCounts;
 
@@ -273,17 +299,19 @@ class SpreadsheetGenerator with AppMixin {
   ///---------------
   void _findSuitableZamoTrainer({required int rowNr}) {
     int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
-    AvailableCounts cnts =
-        _spreadSheet.rows[rowNr].rowCells[zamoIndex].availableCounts;
+    if (zamoIndex >= 0) {
+      AvailableCounts cnts =
+          _spreadSheet.rows[rowNr].rowCells[zamoIndex].availableCounts;
 
-    List<TrainerPlanningRank> possibleTrainerRanks =
-        _getPossibleTrainers(cnts, isZamo: true);
+      List<TrainerPlanningRank> possibleTrainerRanks =
+          _getPossibleTrainers(cnts, isZamo: true);
 
-    _applyZamoRanks(possibleTrainerRanks, rowNr: rowNr);
+      _applyZamoRanks(possibleTrainerRanks, rowNr: rowNr);
 
-    Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
-        rowNr: rowNr, groepNr: zamoIndex);
-    _spreadSheet.rows[rowNr].rowCells[zamoIndex].setTrainer(trainer);
+      Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
+          rowNr: rowNr, groepNr: zamoIndex);
+      _spreadSheet.rows[rowNr].rowCells[zamoIndex].setTrainer(trainer);
+    }
   }
 
 //-----------------------
@@ -395,9 +423,11 @@ class SpreadsheetGenerator with AppMixin {
   void _applyZamoRanks(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr}) {
     int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
-    _applyDaysNotAvailable(trainerPlanRankList,
-        rowNr: rowNr, groepNr: zamoIndex);
-    _applyAlreadyZamoScheduled(trainerPlanRankList, rowNr: rowNr);
+    if (zamoIndex >= 0) {
+      _applyDaysNotAvailable(trainerPlanRankList,
+          rowNr: rowNr, groepNr: zamoIndex);
+      _applyAlreadyZamoScheduled(trainerPlanRankList, rowNr: rowNr);
+    }
   }
 
   // if trainer is not available future days its score goes up
@@ -548,7 +578,7 @@ class SpreadsheetGenerator with AppMixin {
   void postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       int zamoIndex = getGroupIndex(c.zamoGroup, sheetRow.date);
-      if (sheetRow.date.weekday == DateTime.saturday) {
+      if (sheetRow.date.weekday == DateTime.saturday && zamoIndex >= 0) {
         sheetRow.trainingText = AppData.instance.zamoDefaultTraing;
 
         String zamoTrainer = sheetRow.rowCells[zamoIndex].text;

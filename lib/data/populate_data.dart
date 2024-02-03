@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
@@ -11,6 +13,7 @@ enum Groep {
   r2,
   r3,
   zamo,
+  SG;
   // bg, // beginners group
   // st; // summer training group
 }
@@ -29,36 +32,36 @@ List<Trainer> allTrainers = [
   trainerRonald,
   trainerCyriel,
 ];
-Trainer trainerRobin = _buildTrainer(
-    'RB', 'Robin Bakkerus', 'ROMA', 'robin.bakkerus@gmail.com', 0, 1, 2, 0, 0,
+Trainer trainerRobin = _buildTrainer('RB', 'Robin Bakkerus', 'ROMA',
+    'robin.bakkerus@gmail.com', 0, 1, 2, 0, 0, 0,
     roles: 'T,A,S');
 Trainer trainerPaula = _buildTrainer(
-    'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0);
+    'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0, 0);
 Trainer trainerOlav = _buildTrainer(
-    'OB', 'Olav Boiten', 'OSLO', 'olav.boiten@gmail.com', 1, 0, 0, 0, 0);
+    'OB', 'Olav Boiten', 'OSLO', 'olav.boiten@gmail.com', 1, 0, 0, 0, 0, 0);
 Trainer trainerFried = _buildTrainer(
-    'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 0);
-Trainer trainerMaria = _buildTrainer(
-    'MvH', 'Maria van Hout', 'METS', 'maria.vanhout@onsnet.nu', 0, 0, 1, 1, 0);
+    'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 1, 0);
+Trainer trainerMaria = _buildTrainer('MvH', 'Maria van Hout', 'METS',
+    'maria.vanhout@onsnet.nu', 0, 0, 1, 1, 1, 0);
 Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
-    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 0,
+    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 1, 0,
     roles: 'T,S');
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
-    'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0);
+    'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0, 0);
 Trainer trainerPauline = _buildTrainer(
-    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 2, 1, 1);
+    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 2, 1, 1, 1);
 Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
-    'huiblachapelle@icloud.com', 0, 0, 2, 1, 1);
+    'huiblachapelle@icloud.com', 0, 0, 2, 1, 1, 1);
 Trainer trainerRonald = _buildTrainer(
-    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 2, 1, 2, 0, 2);
-Trainer trainerAnne = _buildTrainer(
-    'AJ', 'Anne Joustra', 'AKEN', 'a.joustra595242@kpnmail.nl', 0, 0, 1, 1, 0);
+    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 2, 1, 2, 0, 1, 2);
+Trainer trainerAnne = _buildTrainer('AJ', 'Anne Joustra', 'AKEN',
+    'a.joustra595242@kpnmail.nl', 0, 0, 1, 1, 1, 0);
 Trainer trainerCyriel = _buildTrainer(
-    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 1, 2, 0);
+    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 1, 2, 0, 0);
 
 // _buildTRainer
 Trainer _buildTrainer(String pk, String fullname, String accesscode,
-    String email, int pr, int r1, int r2, int r3, int zaterdag,
+    String email, int pr, int r1, int r2, int r3, int sg, int zaterdag,
     {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
 
@@ -77,7 +80,8 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
         TrainerPref(paramName: Groep.r1.name, value: r1),
         TrainerPref(paramName: Groep.r2.name, value: r2),
         TrainerPref(paramName: Groep.r3.name, value: r3),
-        TrainerPref(paramName: Groep.zamo.name, value: zamo)
+        TrainerPref(paramName: Groep.zamo.name, value: zamo),
+        TrainerPref(paramName: Groep.SG.name, value: zamo)
       ],
       roles: roles);
 }
@@ -404,32 +408,25 @@ List<TrainingGroup> allTrainingGroups() {
   result.add(
       _buildSummerTrainingGroup(AppConstants().summerGroep, 'Zomer training'));
   result.add(_buildZamoTrainingGroup(AppConstants().zamoGroup, 'ZaMo groep'));
+  result
+      .add(_buildStartersGroup(AppConstants().startersGroep, 'Starters groep'));
 
   return result;
 }
 
 TrainingGroup _buildTrainingGroup(String name, String descr) {
-  List<DateTime> excludeDates = [];
+  List<ExcludePeriod> excludeDates = [];
 
-  DateTime start = summerStart;
-  DateTime end = summerEnd;
-  int days = end.difference(start).inDays;
-  for (int i = 0; i < days; i++) {
-    DateTime date = start.add(Duration(days: i));
-    if (date.weekday == DateTime.tuesday ||
-        date.weekday == DateTime.thursday ||
-        date.weekday == DateTime.saturday) {
-      excludeDates.add(date);
-    }
-  }
+  excludeDates.add(ExcludePeriod(fromDate: summerStart, toDate: summerEnd));
 
   return TrainingGroup(
       name: name,
       description: descr,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
-      excludeDays: excludeDates,
-      tiaDays: [DateTime.tuesday, DateTime.thursday]);
+      excludePeriods: excludeDates,
+      tiaDays: [DateTime.tuesday, DateTime.thursday],
+      trainerPks: ['*']);
 }
 
 TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
@@ -438,8 +435,9 @@ TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
       description: descr,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
-      excludeDays: [],
-      tiaDays: [DateTime.saturday]);
+      excludePeriods: [],
+      tiaDays: [DateTime.saturday],
+      trainerPks: ['HC', 'PG', 'RV']);
 }
 
 TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
@@ -448,6 +446,21 @@ TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
       description: descr,
       startDate: summerStart,
       endDate: summerEnd,
-      excludeDays: [],
-      tiaDays: [DateTime.saturday]);
+      excludePeriods: [],
+      tiaDays: [DateTime.saturday],
+      trainerPks: ['HC', 'RV', 'FvH', 'MvH', 'RB']);
+}
+
+TrainingGroup _buildStartersGroup(String name, String descr) {
+  DateTime startDate = DateTime(2024, 3, 1);
+  DateTime endDate = DateTime(2024, 4, 30);
+
+  return TrainingGroup(
+      name: name,
+      description: descr,
+      startDate: startDate,
+      endDate: endDate,
+      excludePeriods: [],
+      tiaDays: [DateTime.tuesday, DateTime.thursday],
+      trainerPks: ['HC', 'RV', 'FvH', 'MvH', 'PG']);
 }

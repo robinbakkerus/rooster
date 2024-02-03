@@ -104,7 +104,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _saveFsSpreadsheet() async {
-    FsSpreadsheet fsSpreadsheet = p.allFsSpreadsheets[1]; //februari
+    FsSpreadsheet fsSpreadsheet = p.allFsSpreadsheets[0]; //januari
+    await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+    fsSpreadsheet = p.allFsSpreadsheets[1]; //februari
     await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
   }
 

@@ -136,12 +136,23 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     for (String groupName
         in SpreadsheetGenerator.instance.getGroupNames(date)) {
       result.add(DataColumn(
-          label: Text(groupName,
+          label: Text(_formatHeader(groupName),
               style: const TextStyle(fontStyle: FontStyle.italic))));
     }
 
     _headerLength = result.length;
     return result;
+  }
+
+  //------------------------------
+  String _formatHeader(String header) {
+    if (header.length < 3) {
+      return header.toUpperCase();
+    } else if (header.toLowerCase() == 'zamo') {
+      return 'ZaMo';
+    } else {
+      return header;
+    }
   }
 
   List<DataRow> _buildDataRows(int index) {
