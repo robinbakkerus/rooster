@@ -450,7 +450,11 @@ class FirestoreHelper with AppMixin implements Dbs {
     String traceMsg = _buildTraceMsg(stackTrace);
     _saveError(ex.toString(), traceMsg);
 
-    String html = '<div>Error detected: $ex <br> $traceMsg</div>';
+    String by = AppData.instance.getTrainer().isEmpty()
+        ? ''
+        : ' by ${AppData.instance.getTrainer().pk}';
+
+    String html = '<div>Error detected $by : $ex <br> $traceMsg</div>';
     sendEmail(
         toList: [administrator], ccList: [], subject: 'Error', html: html);
 
