@@ -57,6 +57,12 @@ class DefaultFirebaseOptions {
     authDomain: 'lonutrainingschema.firebaseapp.com',
     storageBucket: 'lonutrainingschema.appspot.com',
     measurementId: 'G-1RB3CKPE51',
+    androidClientId: '',
+    appGroupId: '',
+    databaseURL: '',
+    deepLinkURLScheme: '',
+    iosBundleId: '',
+    iosClientId: '',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

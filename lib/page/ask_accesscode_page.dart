@@ -73,7 +73,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                 TextButton(
                     onPressed: _onSendAccessCode,
                     child: const Text(
-                      'Toegangs vergeten ?',
+                      'Toegangscode vergeten ?',
                       style: TextStyle(color: Colors.red),
                     )),
               ],

@@ -407,9 +407,9 @@ List<TrainingGroup> allTrainingGroups() {
   result.add(_buildTrainingGroup('r3', 'P3 group 50 min'));
   result.add(
       _buildSummerTrainingGroup(AppConstants().summerGroep, 'Zomer training'));
-  result.add(_buildZamoTrainingGroup(AppConstants().zamoGroup, 'ZaMo groep'));
   result
       .add(_buildStartersGroup(AppConstants().startersGroep, 'Starters groep'));
+  result.add(_buildZamoTrainingGroup(AppConstants().zamoGroup, 'ZaMo groep'));
 
   return result;
 }

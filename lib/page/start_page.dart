@@ -63,15 +63,15 @@ class _StartPageState extends State<StartPage> {
       appBar: _showTabBar() ? _appBar() : null,
       body: IndexedStack(
         index: _getStackIndex(),
-        children: const [
+        children: [
           SplashPage(), //0
-          AskAccessCodePage(), //1
-          SchemaEditPage(), //2
-          TrainerPrefsPage(), //3
-          ViewAllSchemasPage(), //4
-          HelpPage(), //5
-          AdminPage(), //6
-          AppErrorPage(), //7
+          const AskAccessCodePage(), //1
+          const SchemaEditPage(), //2
+          const TrainerPrefsPage(), //3
+          const ViewAllSchemasPage(), //4
+          const HelpPage(), //5
+          const AdminPage(), //6
+          const AppErrorPage(), //7
         ],
       ),
     );

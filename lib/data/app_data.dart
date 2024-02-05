@@ -1,3 +1,4 @@
+import 'package:rooster/data/app_version.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 // ignore: depend_on_referenced_packages
@@ -13,7 +14,7 @@ class AppData {
   void _initialize() {}
 
   /// these contains the current active values
-  RunMode runMode = RunMode.prod;
+  RunMode runMode = appRunModus;
 
   double screenWidth = 600.0; //assume
   double screenHeight = 600.0; //assume
