@@ -1,16 +1,52 @@
 {
-  "projects": {
-    "default": "lonutrainingschema"
-  },
+  "projects": {},
   "targets": {
     "lonutrainingschema": {
       "hosting": {
         "acc": [
           "acc-lonutrainingschemas"
+        ],
+        "prod": [
+          "lonutrainingschema"
         ]
       }
     }
   },
-  "etags": {}
+  "etags": {},
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": [
+    {
+      "target": "prod",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "acc",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }
-

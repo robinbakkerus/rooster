@@ -1,4 +1,3 @@
-# Ask for confirmation
 
 $global:modus = $null
 
@@ -15,17 +14,17 @@ Function askModus{
     }
     
 }
-Function copyFiles {
-    $dest = ".\firebase.json"
-    $src = $dest + "." +  $global:modus
-    Write-host "Copy $src to $dest" 
-    [System.IO.File]::Copy($src, $dest, $true);
+# Function copyFiles {
+#     $dest = ".\firebase.json"
+#     $src = $dest + "." +  $global:modus
+#     Write-host "Copy $src to $dest" 
+#     [System.IO.File]::Copy($src, $dest, $true);
 
-    $dest = ".\.firebaserc"
-    $src = $dest + "." +  $global:modus
-    Write-host "Copy $src to $dest" 
-    [System.IO.File]::Copy($src, $dest, $true);
-}
+#     $dest = ".\.firebaserc"
+#     $src = $dest + "." +  $global:modus
+#     Write-host "Copy $src to $dest" 
+#     [System.IO.File]::Copy($src, $dest, $true);
+# }
 
 Function writeRunModeFile {
     Write-host "Write file ..." 
@@ -41,16 +40,19 @@ String appVersion = '{1}';
 
 "@ -f $mode, $date
 
-    $code | Out-File -FilePath .\lib\data\app_version.dart
+    $filename = ".\lib\data\app_version.dart"
+    [IO.File]::WriteAllLines($filename, $code)
 }
 
 Function runFirebaseScripts{
     Write-host "Run scripts ..." 
     flutter clean
     flutter build web
+    Remove-Item '.firebase'
+    firebase deploy --only hosting:$global:modus
 }
 
 askModus;
-copyFiles;
+# copyFiles;
 writeRunModeFile;
 runFirebaseScripts
