@@ -179,9 +179,9 @@ class _SelectDayWidgetState extends State<SelectDayWidget> with AppMixin {
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       _showRemoveButton ? _buildRemoveExtraRowButton(context) : Container(),
       wh.horSpace(10),
-      _buildCancelButton(context),
-      wh.horSpace(10),
       _buildSaveButton(context),
+      wh.horSpace(10),
+      _buildCancelButton(context),
     ]);
   }
 
