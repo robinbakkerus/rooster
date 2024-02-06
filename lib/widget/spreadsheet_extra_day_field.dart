@@ -29,6 +29,10 @@ class _SpreadsheetDayColumnState extends State<SpreadsheetDayColumn>
 
   @override
   Widget build(BuildContext context) {
+    EdgeInsets insets = AppHelper.instance.isWindows()
+        ? const EdgeInsets.fromLTRB(5, 2, 5, 2)
+        : const EdgeInsets.fromLTRB(2, 2, 2, 2);
+
     Decoration? decoration =
         _isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
@@ -36,7 +40,7 @@ class _SpreadsheetDayColumnState extends State<SpreadsheetDayColumn>
       child: Container(
           decoration: decoration,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
+            padding: insets,
             child: Text(
               AppHelper.instance.getSimpleDayString(widget.sheetRow.date),
               overflow: TextOverflow.ellipsis,

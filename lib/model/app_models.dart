@@ -23,9 +23,11 @@ enum PageEnum {
   editSchema(2),
   trainerSettings(3),
   spreadSheet(4),
-  helpPage(5),
-  adminPage(6),
-  errorPage(7);
+  progess(5),
+  availability(6),
+  helpPage(7),
+  adminPage(8),
+  errorPage(9);
 
   const PageEnum(this.code);
   final int code;

@@ -6,6 +6,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
+import 'package:rooster/widget/spreadsheet_top_buttons.dart';
 import 'package:rooster/widget/spreadsheet_trainer_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +39,13 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     AppEvents.onSpreadsheetTrainerUpdatedEvent(_onSpreadTrainerUpdated);
 
     _spreadSheet = AppData.instance.getSpreadsheet();
-    _dataGrid = _buildGrid();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _dataGrid = _buildGrid(context);
     return Scaffold(
       body: _buildBody(),
       floatingActionButton: _buildFab(),
@@ -53,14 +54,10 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //---------------------------------
   Widget _buildBody() {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: SafeArea(
-        child: _dataGrid,
-        // wh.verSpace(10),
-        // _buildButtons(),
-        // ],
-      ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal, child: _dataGrid),
     );
   }
 
@@ -90,21 +87,20 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return AppData.instance.getTrainer().isSupervisor();
   }
 
-  //--------------------------------------------------------
-  Widget _buildGrid() {
-    return ListView.builder(
-      itemCount: AppData.instance.activeTrainingGroups.length + 1,
-      itemBuilder: (context, index) => _buildListViewItem(context, index),
-    );
-  }
+  Widget _buildGrid(BuildContext context) {
+    List<Widget> rows = [];
+    rows.add(const SpreadsheetTopButtons(index: 0));
 
-  //--------------------------------
-  Widget _buildListViewItem(BuildContext context, int index) {
-    if (index < AppData.instance.activeTrainingGroups.length) {
-      return _buildDataTable(context, index);
-    } else {
-      return _buildButtons();
+    for (int i = 0; i < AppData.instance.activeTrainingGroups.length; i++) {
+      rows.add(_buildDataTable(context, i));
     }
+    rows.add(_buildButtons());
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: rows,
+    );
   }
 
 //--------------------------------
@@ -241,9 +237,11 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   Widget _buildButtons() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         wh.verSpace(10),
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             wh.horSpace(10),
             InkWell(
@@ -357,7 +355,6 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         AppData.instance.spreadSheetStatus = SpreadsheetStatus.opened;
         AppEvents.fireSpreadsheetReady();
       }
-      _dataGrid = _buildGrid();
     });
   }
 
@@ -496,7 +493,6 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     if (mounted) {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
-        _dataGrid = _buildGrid();
 
         if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
           wh.showSnackbar('Schema is al definitief!', color: Colors.orange);

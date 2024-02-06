@@ -4,13 +4,11 @@ import 'package:event_bus/event_bus.dart';
 
 import 'package:rooster/model/app_models.dart';
 
-enum ShowPage { editSchema, createSchema, admin }
-
 /*
  * All Events are maintainded here.
  */
 class ShowPageEvent {
-  ShowPage page;
+  PageEnum page;
   ShowPageEvent(this.page);
 }
 
@@ -83,7 +81,7 @@ class AppEvents {
   /*
   * The methods below are just convenience shortcuts to make it easier for the client to use.
   */
-  static void fireShowPage(ShowPage page) =>
+  static void fireShowPage(PageEnum page) =>
       _sEventBus.fire(ShowPageEvent(page));
 
   static void fireTrainerReady() => _sEventBus.fire(TrainerReadyEvent());

@@ -1,20 +1,22 @@
 import 'dart:async';
-import 'package:rooster/page/error_page.dart';
-import 'package:rooster/util/app_helper.dart';
-import 'package:universal_html/html.dart' as html;
 
+import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/page/admin_page.dart';
 import 'package:rooster/page/ask_accesscode_page.dart';
+import 'package:rooster/page/error_page.dart';
 import 'package:rooster/page/help_page.dart';
+import 'package:rooster/page/overall_availability_page.dart';
 import 'package:rooster/page/schema_edit_page.dart';
 import 'package:rooster/page/splash_page.dart';
+import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_prefs_page.dart';
-import 'package:rooster/page/view_all_schemas_page.dart';
-import 'package:flutter/material.dart';
+import 'package:rooster/page/trainer_progress_page.dart';
+import 'package:rooster/util/app_helper.dart';
+import 'package:universal_html/html.dart' as html;
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
@@ -44,6 +46,7 @@ class _StartPageState extends State<StartPage> {
     AppEvents.onDatesReadyEvent(_onDatesReady);
     AppEvents.onErrorEvent(_onErrorEvent);
     AppEvents.onSpreadsheetReadyEvent(_onSpreadsheetReady);
+    AppEvents.onShowPage(_onShowPage);
 
     Timer(const Duration(milliseconds: 2900), () {
       if (_accessCode.length == 4) {
@@ -68,10 +71,12 @@ class _StartPageState extends State<StartPage> {
           const AskAccessCodePage(), //1
           const SchemaEditPage(), //2
           const TrainerPrefsPage(), //3
-          const ViewAllSchemasPage(), //4
-          const HelpPage(), //5
-          const AdminPage(), //6
-          const AppErrorPage(), //7
+          const SpreadsheetPage(), //4
+          const TrainerProgressPage(), //5
+          const OverallAvailabilityPage(), //6
+          const HelpPage(), //7
+          const AdminPage(), //8
+          const AppErrorPage(), //9
         ],
       ),
     );
@@ -210,6 +215,14 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
+  void _onShowPage(ShowPageEvent event) {
+    if (mounted) {
+      setState(() {
+        _setStackIndex(event.page.code);
+      });
+    }
+  }
+
   void _onDatesReady(DatesReadyEvent event) {
     if (mounted) {
       setState(() {
@@ -227,35 +240,35 @@ class _StartPageState extends State<StartPage> {
   Widget _buildPopMenu() {
     return PopupMenuButton(
       onSelected: (value) {
-        if (value == '2') {
+        if (value == PageEnum.editSchema.code.toString()) {
           _gotoEditSchemas();
-        } else if (value == '3') {
+        } else if (value == PageEnum.trainerSettings.code.toString()) {
           _gotoTrainerSettings();
-        } else if (value == '4') {
+        } else if (value == PageEnum.spreadSheet.code.toString()) {
           _gotoSpreadsheet();
-        } else if (value == '5') {
+        } else if (value == PageEnum.helpPage.code.toString()) {
           _gotoHelpPage();
-        } else if (value == '6') {
+        } else if (value == PageEnum.adminPage.code.toString()) {
           _gotoAdminPage();
         }
       },
       itemBuilder: (BuildContext bc) {
         return [
-          const PopupMenuItem(
-            value: '2',
-            child: Text("Trainer verhinderingen"),
+          PopupMenuItem(
+            value: PageEnum.editSchema.code.toString(),
+            child: const Text("Trainer verhinderingen"),
           ),
-          const PopupMenuItem(
-            value: '3',
-            child: Text("Trainer settings"),
+          PopupMenuItem(
+            value: PageEnum.trainerSettings.code.toString(),
+            child: const Text("Trainer settings"),
           ),
-          const PopupMenuItem(
-            value: '0',
-            child: Text("-----"),
+          PopupMenuItem(
+            value: PageEnum.splashPage.code.toString(),
+            child: const Text("-----"),
           ),
-          const PopupMenuItem(
-            value: '4',
-            child: Text("Spreadsheet & voortgang"),
+          PopupMenuItem(
+            value: PageEnum.spreadSheet.code.toString(),
+            child: const Text("Spreadsheet & voortgang"),
           ),
           _adminPopup(),
         ];
@@ -265,9 +278,9 @@ class _StartPageState extends State<StartPage> {
 
   PopupMenuItem _adminPopup() {
     if (AppData.instance.getTrainer().isAdmin()) {
-      return const PopupMenuItem(
-        value: '6',
-        child: Text("Admin pagina"),
+      return PopupMenuItem(
+        value: PageEnum.adminPage.code.toString(),
+        child: const Text("Admin pagina"),
       );
     } else {
       return const PopupMenuItem(
@@ -335,48 +348,48 @@ class _StartPageState extends State<StartPage> {
 
   void _gotoEditSchemas() {
     setState(() {
-      _setStackIndex(2);
+      _setStackIndex(PageEnum.editSchema.code);
       _barTitle = _buildBarTitle();
-      _toggleActionEnabled(2);
+      _toggleActionEnabled(PageEnum.editSchema.code);
     });
   }
 
   void _gotoSpreadsheet() async {
     await AppController.instance.generateOrRetrieveSpreadsheet();
     setState(() {
-      _setStackIndex(4);
+      _setStackIndex(PageEnum.spreadSheet.code);
       _barTitle = _buildBarTitle();
-      _toggleActionEnabled(4);
+      _toggleActionEnabled(PageEnum.spreadSheet.code);
     });
   }
 
   void _gotoTrainerSettings() {
     setState(() {
-      _setStackIndex(3);
+      _setStackIndex(PageEnum.trainerSettings.code);
       _barTitle = _buildBarTitle();
       AppEvents.fireSchemaUpdated();
-      _toggleActionEnabled(3);
+      _toggleActionEnabled(PageEnum.trainerSettings.code);
     });
   }
 
   void _gotoHelpPage() {
     setState(() {
-      _setStackIndex(5);
+      _setStackIndex(PageEnum.helpPage.code);
       _barTitle = _buildBarTitle();
-      _toggleActionEnabled(5);
+      _toggleActionEnabled(PageEnum.helpPage.code);
     });
   }
 
   void _gotoAdminPage() {
     setState(() {
-      _setStackIndex(6);
+      _setStackIndex(PageEnum.adminPage.code);
       _barTitle = _buildBarTitle();
-      _toggleActionEnabled(6);
+      _toggleActionEnabled(PageEnum.adminPage.code);
     });
   }
 
   void _toggleActionEnabled(int index) {
-    _actionEnabled = [true, true, true, true, true, true, true];
+    _actionEnabled = [true, true, true, true, true, true, true, true, true];
     _actionEnabled[index] = false;
   }
 

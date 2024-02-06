@@ -63,7 +63,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'toeganscode',
+                          labelText: 'toegangscode',
                         ),
                       ),
                     ),

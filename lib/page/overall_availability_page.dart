@@ -5,6 +5,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
+import 'package:rooster/widget/spreadsheet_top_buttons.dart';
 
 class OverallAvailabilityPage extends StatefulWidget {
   const OverallAvailabilityPage({super.key});
@@ -16,6 +17,8 @@ class OverallAvailabilityPage extends StatefulWidget {
 
 class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     with AppMixin {
+  Widget _grid = Container();
+
   _OverallAvailabilityPageState() {
     AppEvents.onSpreadsheetReadyEvent(_onReady);
   }
@@ -27,7 +30,9 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
 
   void _onReady(SpreadsheetReadyEvent event) {
     if (mounted) {
-      setState(() {});
+      setState(() {
+        _grid = _buildGrid();
+      });
     }
   }
 
@@ -35,30 +40,40 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: _buildGrid(),
+      child: _grid,
     );
   }
 
   Widget _buildGrid() {
-    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Scrollbar(
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 30,
-            horizontalMargin: 10,
-            headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lightblue),
-            columnSpacing: colSpace,
-            dataRowMinHeight: 15,
-            dataRowMaxHeight: 30,
-            columns: _buildHeader(),
-            rows: _buildDataRows(),
-          ),
-        ),
+            scrollDirection: Axis.horizontal, child: _buildChild()),
       ),
+    );
+  }
+
+  ///------------------------------------------------
+  Widget _buildChild() {
+    List<Widget> rows = [];
+    rows.add(const SpreadsheetTopButtons(index: 2));
+    rows.add(_buildDataTable());
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
+  }
+
+//--------------------------
+  DataTable _buildDataTable() {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return DataTable(
+      headingRowHeight: 30,
+      horizontalMargin: 10,
+      headingRowColor: MaterialStateColor.resolveWith((states) => c.lightblue),
+      columnSpacing: colSpace,
+      dataRowMinHeight: 15,
+      dataRowMaxHeight: 30,
+      columns: _buildHeader(),
+      rows: _buildDataRows(),
     );
   }
 
