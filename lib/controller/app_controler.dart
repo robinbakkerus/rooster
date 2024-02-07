@@ -13,6 +13,7 @@ import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
+import 'package:rooster/widget/busy_indicator.dart';
 import 'package:universal_html/html.dart' as html;
 
 class AppController {
@@ -121,6 +122,7 @@ class AppController {
   }
 
   Future<SpreadSheet> generateOrRetrieveSpreadsheet() async {
+    LoadingIndicatorDialog().show();
     SpreadSheet result;
 
     await _getAllTrainerDataForThisSpreadsheet();

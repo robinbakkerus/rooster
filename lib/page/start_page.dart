@@ -16,6 +16,7 @@ import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_prefs_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
 import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/widget/busy_indicator.dart';
 import 'package:universal_html/html.dart' as html;
 
 class StartPage extends StatefulWidget {
@@ -208,6 +209,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _onSpreadsheetReady(SpreadsheetReadyEvent event) {
+    LoadingIndicatorDialog().dismiss();
     if (mounted) {
       setState(() {
         _barTitle = _buildBarTitle();
@@ -323,7 +325,7 @@ class _StartPageState extends State<StartPage> {
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
     if (_getStackIndex() == PageEnum.spreadSheet.code) {
-      AppController.instance.generateOrRetrieveSpreadsheet();
+      _gotoSpreadsheet();
     }
   }
 
@@ -342,7 +344,7 @@ class _StartPageState extends State<StartPage> {
         .getTrainerData(trainer: AppData.instance.getTrainer());
 
     if (_getStackIndex() == PageEnum.spreadSheet.code) {
-      AppController.instance.generateOrRetrieveSpreadsheet();
+      _gotoSpreadsheet();
     }
   }
 

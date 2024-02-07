@@ -3,6 +3,7 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/page/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:rooster/service/navigation_service.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/widget/widget_helper.dart';
 import 'firebase_options.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
     bool isWindows = platform == TargetPlatform.windows;
 
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       scrollBehavior: isWindows
           ? const MaterialScrollBehavior()
               .copyWith(dragDevices: {PointerDeviceKind.mouse})
