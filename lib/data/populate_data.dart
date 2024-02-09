@@ -7,7 +7,7 @@ import 'package:rooster/util/app_constants.dart';
 DateTime summerStart = DateTime(2024, 7, 6);
 DateTime summerEnd = DateTime(2024, 8, 18);
 List<ExcludeDay> excludeDays = [
-  ExcludeDay(dateTime: DateTime(2024, 3, 12), description: 'Mei vakantie')
+  ExcludeDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
 ];
 
 enum Groep {
