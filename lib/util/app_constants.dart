@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 
+enum Groep {
+  pr,
+  r1,
+  r2,
+  r3,
+  zamo,
+  sg,
+  zomer;
+}
+
 class AppConstants {
   final Color lightYellow = const Color(0xffF4E9CA);
   final Color lightGeen = const Color(0xffE3ECE3);
@@ -25,8 +35,4 @@ class AppConstants {
 
   final String localNL = 'nl_NL';
   final String localUK = 'en_US';
-
-  final String zamoGroup = 'zamo';
-  final String summerGroep = 'zomer_training';
-  final String startersGroep = 'SG';
 }

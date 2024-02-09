@@ -172,6 +172,8 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
       } else if (AppHelper.instance.isDateExcluded(fsRow.date)) {
         col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
+      } else if (fsRow.date.weekday == DateTime.tuesday) {
+        col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
       } else if (fsRow.date.weekday == DateTime.thursday) {
         col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
       } else if (fsRow.date.weekday == DateTime.saturday) {

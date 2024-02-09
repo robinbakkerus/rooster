@@ -10,17 +10,6 @@ List<ExcludeDay> excludeDays = [
   ExcludeDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
 ];
 
-enum Groep {
-  pr,
-  r1,
-  r2,
-  r3,
-  zamo,
-  SG;
-  // bg, // beginners group
-  // st; // summer training group
-}
-
 List<Trainer> allTrainers = [
   trainerAnne,
   trainerPaula,
@@ -36,35 +25,45 @@ List<Trainer> allTrainers = [
   trainerCyriel,
 ];
 Trainer trainerRobin = _buildTrainer('RB', 'Robin Bakkerus', 'ROMA',
-    'robin.bakkerus@gmail.com', 0, 1, 2, 0, 1, 0,
+    'robin.bakkerus@gmail.com', 0, 1, 2, 0, 1, 1, 0,
     roles: 'T,A,S');
-Trainer trainerPaula = _buildTrainer(
-    'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0, 0);
+Trainer trainerPaula = _buildTrainer('PvA', 'Paula van Agt', 'PACO',
+    'paulavanagt8@gmail.com', 0, 0, 1, 1, 0, 0, 0);
 Trainer trainerOlav = _buildTrainer(
-    'OB', 'Olav Boiten', 'OSLO', 'olav.boiten@gmail.com', 1, 0, 0, 0, 0, 0);
-Trainer trainerFried = _buildTrainer(
-    'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 1, 0);
+    'OB', 'Olav Boiten', 'OSLO', 'olav.boiten@gmail.com', 1, 0, 0, 0, 0, 0, 0);
+Trainer trainerFried = _buildTrainer('FvH', 'Fried van Hoek', 'FARO',
+    'hoek1947@kpnmail.nl', 0, 2, 1, 1, 1, 1, 0);
 Trainer trainerMaria = _buildTrainer('MvH', 'Maria van Hout', 'METS',
-    'maria.vanhout@onsnet.nu', 0, 0, 1, 0, 0, 0);
+    'maria.vanhout@onsnet.nu', 0, 0, 1, 0, 0, 1, 0);
 Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
-    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 1, 0,
+    'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 1, 0, 0,
     roles: 'T,S');
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
-    'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0, 0);
+    'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0, 0, 0);
 Trainer trainerPauline = _buildTrainer(
-    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 0, 1, 1, 1);
+    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 0, 1, 1, 0, 1);
 Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
-    'huiblachapelle@icloud.com', 0, 0, 2, 1, 1, 1);
-Trainer trainerRonald = _buildTrainer(
-    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 0, 1, 2, 0, 1, 1);
+    'huiblachapelle@icloud.com', 0, 0, 2, 1, 1, 1, 1);
+Trainer trainerRonald = _buildTrainer('RV', 'Ronald Vissers', 'ROME',
+    'rc.vissers@gmail.com', 0, 1, 2, 0, 1, 1, 1);
 Trainer trainerAnne = _buildTrainer('AJ', 'Anne Joustra', 'AKEN',
-    'a.joustra595242@kpnmail.nl', 0, 0, 0, 1, 1, 0);
-Trainer trainerCyriel = _buildTrainer(
-    'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 1, 2, 0, 0);
+    'a.joustra595242@kpnmail.nl', 0, 0, 0, 1, 1, 0, 0);
+Trainer trainerCyriel = _buildTrainer('CD', 'Cyriel Douven', 'CALI',
+    'cyrieldouven@gmail.com', 0, 0, 1, 2, 0, 0, 0);
 
 // _buildTRainer
-Trainer _buildTrainer(String pk, String fullname, String accesscode,
-    String email, int pr, int r1, int r2, int r3, int sg, int zaterdag,
+Trainer _buildTrainer(
+    String pk,
+    String fullname,
+    String accesscode,
+    String email,
+    int pr,
+    int r1,
+    int r2,
+    int r3,
+    int sg,
+    int zomer,
+    int zaterdag,
     {String roles = 'T'}) {
   int zamo = (zaterdag > 0) ? 1 : 0;
 
@@ -84,7 +83,8 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
         TrainerPref(paramName: Groep.r2.name, value: r2),
         TrainerPref(paramName: Groep.r3.name, value: r3),
         TrainerPref(paramName: Groep.zamo.name, value: zamo),
-        TrainerPref(paramName: Groep.SG.name, value: sg)
+        TrainerPref(paramName: Groep.sg.name, value: sg),
+        TrainerPref(paramName: Groep.zomer.name, value: zomer),
       ],
       roles: roles);
 }
@@ -408,11 +408,9 @@ List<TrainingGroup> allTrainingGroups() {
   result.add(_buildTrainingGroup('r1', 'R1 group 60 min'));
   result.add(_buildTrainingGroup('r2', 'R2 group 60 min'));
   result.add(_buildTrainingGroup('r3', 'P3 group 50 min'));
-  result.add(
-      _buildSummerTrainingGroup(AppConstants().summerGroep, 'Zomer training'));
-  result
-      .add(_buildStartersGroup(AppConstants().startersGroep, 'Starters groep'));
-  result.add(_buildZamoTrainingGroup(AppConstants().zamoGroup, 'ZaMo groep'));
+  result.add(_buildSummerTrainingGroup(Groep.zomer.name, 'Zomer training'));
+  result.add(_buildStartersGroup(Groep.sg.name, 'Starters groep'));
+  result.add(_buildZamoTrainingGroup(Groep.zamo.name, 'ZaMo groep'));
 
   return result;
 }
@@ -452,7 +450,7 @@ TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
     startDate: summerStart,
     endDate: summerEnd,
     excludePeriods: [],
-    trainingDays: [DateTime.saturday],
+    trainingDays: [DateTime.tuesday, DateTime.thursday],
     defaultTrainingText: 'Zomertraining',
   );
 }

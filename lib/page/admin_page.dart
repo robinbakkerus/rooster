@@ -186,9 +186,11 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     CollectionReference ref =
         FirestoreHelper.instance.collectionRef(FsCol.metadata);
     var map = {'items': items};
-    await ref.doc('training_items').set(map).then((val) {
-      lp('training items added ');
-    }).onError((error, stackTrace) => lp(error.toString()));
+    await ref
+        .doc('training_items')
+        .set(map)
+        .then((val) {})
+        .onError((error, stackTrace) => lp(error.toString()));
   }
 
   Future<void> _addTrainingGroups() async {

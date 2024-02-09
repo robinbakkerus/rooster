@@ -157,8 +157,8 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   bool _isZamoTrainerOnSaturday() {
     return widget.isEditable &&
         widget.sheetRow.date.weekday == DateTime.saturday &&
-        AppData.instance.isTrainerForGroup(
-            AppData.instance.getTrainer(), AppConstants().zamoGroup);
+        AppData.instance
+            .isTrainerForGroup(AppData.instance.getTrainer(), Groep.zamo.name);
   }
 
   void _onDropdownSelected(Object? value) {

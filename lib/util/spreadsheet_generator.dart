@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
@@ -49,7 +50,7 @@ class SpreadsheetGenerator with AppMixin {
 
     for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
       DateTime date = AppData.instance.getActiveDates()[i];
-      result.add(_genAvailableForDate(i, date));
+      result.add(_genAvailableCountsForDate(i, date));
     }
 
     return result;
@@ -244,7 +245,7 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   //--- here we fill which trainers are (not) available.
-  Available _genAvailableForDate(int dateIndex, DateTime date) {
+  Available _genAvailableCountsForDate(int dateIndex, DateTime date) {
     List<String> groupNames = getGroupNames(date);
     Available available = Available(date: date, groupCount: groupNames.length);
 
@@ -549,7 +550,7 @@ class SpreadsheetGenerator with AppMixin {
   bool _isSaturdayAndZamo(int rowNr, String groupName) {
     SheetRow sheetRow = _spreadSheet.rows[rowNr];
     return sheetRow.date.weekday == DateTime.saturday &&
-        groupName == c.zamoGroup;
+        groupName == Groep.zamo.name;
   }
 
   // hoe vaak afwezig vanaf dateTime
@@ -614,10 +615,10 @@ class SpreadsheetGenerator with AppMixin {
   ///-----------------------------
   void _postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
-      int zamoIndex = getGroupIndex(c.zamoGroup, sheetRow.date);
+      int zamoIndex = getGroupIndex(Groep.zamo.name, sheetRow.date);
       if (sheetRow.date.weekday == DateTime.saturday && zamoIndex >= 0) {
         TrainingGroup? zamoGroup =
-            AppHelper.instance.getTrainingGroupByName(c.zamoGroup);
+            AppHelper.instance.getTrainingGroupByName(Groep.zamo.name);
 
         sheetRow.trainingText =
             zamoGroup != null ? zamoGroup.defaultTrainingText : '';
