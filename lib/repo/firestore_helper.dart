@@ -325,6 +325,42 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   @override
+  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays) async {
+    CollectionReference colRef = collectionRef(FsCol.metadata);
+
+    List<Map<String, dynamic>> excludeDaysMap = [];
+    for (ExcludeDay excDay in excludeDays) {
+      excludeDaysMap.add(excDay.toMap());
+    }
+    Map<String, dynamic> map = {'days': excludeDaysMap};
+
+    await colRef.doc('exclude_days').set(map).then((val) {}).catchError((e) {
+      lp('Error in saveExcludeDays $e');
+      throw e;
+    });
+  }
+
+  @override
+  Future<List<ExcludeDay>> getExcludeDays() async {
+    List<ExcludeDay> result = [];
+    CollectionReference colRef = collectionRef(FsCol.metadata);
+
+    late DocumentSnapshot snapshot;
+    try {
+      snapshot = await colRef.doc('exclude_days').get();
+      if (snapshot.exists) {
+        Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+        List<dynamic> data = List<dynamic>.from(map['days'] as List);
+        result = data.map((e) => ExcludeDay.fromMap(e)).toList();
+      }
+    } catch (ex, stackTrace) {
+      handleError(ex, stackTrace);
+    }
+
+    return result;
+  }
+
+  @override
   Future<List<TrainingGroup>> getTrainingGroups() async {
     List<TrainingGroup> result = [];
     CollectionReference colRef = collectionRef(FsCol.metadata);

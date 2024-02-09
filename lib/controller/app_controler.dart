@@ -81,6 +81,11 @@ class AppController {
     AppData.instance.planRankValues = applyWeightValues;
   }
 
+  Future<void> getExcludeDays() async {
+    List<ExcludeDay> excludeDays = await Dbs.instance.getExcludeDays();
+    AppData.instance.excludeDays = excludeDays;
+  }
+
   // get trainer_items (to fill combobox)
   Future<void> getTrainingItems() async {
     List<String> trainerItems = await Dbs.instance.getTrainingItems();
@@ -134,10 +139,8 @@ class AppController {
 
   ///------------------------------------------------
   SpreadSheet _generateTheSpreadsheet() {
-    List<Available> availableList =
-        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
     SpreadSheet spreadSheet = SpreadsheetGenerator.instance
-        .generateSpreadsheet(availableList, AppData.instance.getActiveDate());
+        .generateSpreadsheet(AppData.instance.getActiveDate());
     return spreadSheet;
   }
 

@@ -177,6 +177,7 @@ class _StartPageState extends State<StartPage> {
     await AppController.instance.getTrainerGroups();
     await AppController.instance.getTrainingItems();
     await AppController.instance.getPlanRankValues();
+    await AppController.instance.getExcludeDays();
   }
 
   void _onTrainerReady(TrainerReadyEvent event) async {

@@ -165,25 +165,31 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   void _addMetaData() async {
-    // await _addPlanRankValues();
-    // await _addTrainingItems();
+    await _addPlanRankValues();
+    await _addTrainingItems();
+    await _addExcludeDays();
     await _addTrainingGroups();
   }
 
-  // Future<void> _addPlanRankValues() async {
-  //   MetaPlanRankValues planRankValues = p.getPlanRankValues();
-  //   await FirestoreHelper.instance.savePlanRankValues(planRankValues);
-  // }
+  Future<void> _addPlanRankValues() async {
+    MetaPlanRankValues planRankValues = p.getPlanRankValues();
+    await FirestoreHelper.instance.savePlanRankValues(planRankValues);
+  }
 
-  // Future<void> _addTrainingItems() async {
-  //   List<String> items = p.getTrainerItems();
-  //   CollectionReference ref =
-  //       FirestoreHelper.instance.collectionRef(FsCol.metadata);
-  //   var map = {'items': items};
-  //   await ref.doc('training_items').set(map).then((val) {
-  //     lp('training items added ');
-  //   }).onError((error, stackTrace) => lp(error.toString()));
-  // }
+  Future<void> _addExcludeDays() async {
+    List<ExcludeDay> excludeDays = p.excludeDays;
+    await FirestoreHelper.instance.saveExcludeDays(excludeDays);
+  }
+
+  Future<void> _addTrainingItems() async {
+    List<String> items = p.getTrainerItems();
+    CollectionReference ref =
+        FirestoreHelper.instance.collectionRef(FsCol.metadata);
+    var map = {'items': items};
+    await ref.doc('training_items').set(map).then((val) {
+      lp('training items added ');
+    }).onError((error, stackTrace) => lp(error.toString()));
+  }
 
   Future<void> _addTrainingGroups() async {
     List<TrainingGroup> groups = p.allTrainingGroups();

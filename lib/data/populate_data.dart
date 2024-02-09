@@ -6,6 +6,9 @@ import 'package:rooster/util/app_constants.dart';
 
 DateTime summerStart = DateTime(2024, 7, 6);
 DateTime summerEnd = DateTime(2024, 8, 18);
+List<ExcludeDay> excludeDays = [
+  ExcludeDay(dateTime: DateTime(2024, 3, 12), description: 'Mei vakantie')
+];
 
 enum Groep {
   pr,
@@ -417,9 +420,6 @@ List<TrainingGroup> allTrainingGroups() {
 TrainingGroup _buildTrainingGroup(String name, String descr) {
   List<ExcludePeriod> excludePeriods = [];
   excludePeriods.add(ExcludePeriod(fromDate: summerStart, toDate: summerEnd));
-  List<ExcludeDay> excludeDays = [];
-  excludeDays.add(
-      ExcludeDay(data: DateTime(2024, 5, 30), description: 'Mei vakantie'));
 
   return TrainingGroup(
       name: name,
@@ -428,7 +428,6 @@ TrainingGroup _buildTrainingGroup(String name, String descr) {
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
       excludePeriods: excludePeriods,
-      excludeDays: excludeDays,
       trainingDays: [DateTime.tuesday, DateTime.thursday],
       defaultTrainingText: '*');
 }
@@ -441,7 +440,6 @@ TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
       excludePeriods: [],
-      excludeDays: [],
       trainingDays: [DateTime.saturday],
       defaultTrainingText: 'ZaMo start 9 uur Donkervoort');
 }
@@ -454,7 +452,6 @@ TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
     startDate: summerStart,
     endDate: summerEnd,
     excludePeriods: [],
-    excludeDays: [],
     trainingDays: [DateTime.saturday],
     defaultTrainingText: 'Zomertraining',
   );
@@ -471,7 +468,6 @@ TrainingGroup _buildStartersGroup(String name, String descr) {
       startDate: startDate,
       endDate: endDate,
       excludePeriods: [],
-      excludeDays: [],
       trainingDays: [DateTime.tuesday],
       defaultTrainingText: '*');
 }

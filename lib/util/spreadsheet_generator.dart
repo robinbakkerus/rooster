@@ -49,21 +49,20 @@ class SpreadsheetGenerator with AppMixin {
 
     for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
       DateTime date = AppData.instance.getActiveDates()[i];
-      result.add(_genCountsProcessDate(i, date));
+      result.add(_genAvailableForDate(i, date));
     }
 
     return result;
   }
 
   //------------------------------------------
-  SpreadSheet generateSpreadsheet(
-      List<Available> availableList, DateTime dateTime) {
+  SpreadSheet generateSpreadsheet(DateTime dateTime) {
     _spreadSheet = SpreadSheet(
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth());
 
     try {
-      _doGenerateSpreadsheet(availableList, dateTime);
+      _doGenerateSpreadsheet(dateTime);
     } catch (ex, stackTrace) {
       FirestoreHelper.instance.handleError(ex, stackTrace);
     }
@@ -71,10 +70,9 @@ class SpreadsheetGenerator with AppMixin {
     return _spreadSheet;
   }
 
-  void _doGenerateSpreadsheet(
-      List<Available> availableList, DateTime dateTime) {
+  void _doGenerateSpreadsheet(DateTime dateTime) {
     // first fill the spreadsheet with available trainer data
-    List<SheetRow> sheetRows = _getAvailabilityForSpreadsheet(availableList);
+    List<SheetRow> sheetRows = _generateSheetRows();
     _spreadSheet.rows = sheetRows;
 
     // next find the best trainer, first we skip zamo
@@ -84,13 +82,14 @@ class SpreadsheetGenerator with AppMixin {
       List<String> groupNames =
           SpreadsheetGenerator.instance.getGroupNames(date);
       for (String groupName in groupNames) {
-        if (!_skipForGroupname(date, groupName)) {
+        if (!_skipForGroupname(date, groupName) &&
+            !AppHelper.instance.isDateExcluded(date)) {
           _findSuitableTrainer(rowNr: rowNr, groupName: groupName, date: date);
         }
       }
     }
 
-    postProcessSpreadsheet();
+    _postProcessSpreadsheet();
   }
 
   //----------------
@@ -162,7 +161,7 @@ class SpreadsheetGenerator with AppMixin {
     for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
       if (trainingGroup.startDate.isBefore(date) &&
           trainingGroup.endDate.isAfter(date) &&
-          !_isExcluded(trainingGroup, date)) {
+          !_isExcludedForPeriod(trainingGroup, date)) {
         result.add(trainingGroup.name);
       }
     }
@@ -199,10 +198,12 @@ class SpreadsheetGenerator with AppMixin {
 
   //---- private --
 
-  bool _isExcluded(TrainingGroup trainingGroup, DateTime date) {
+  ///----------------
+  bool _isExcludedForPeriod(TrainingGroup trainingGroup, DateTime date) {
     if (trainingGroup.excludePeriods.isEmpty) {
       return false;
     }
+
     for (ExcludePeriod excludePeriod in trainingGroup.excludePeriods) {
       if (date.isAfter(excludePeriod.fromDate) &&
           date.isBefore(excludePeriod.toDate)) {
@@ -213,13 +214,18 @@ class SpreadsheetGenerator with AppMixin {
     return false;
   }
 
-  //------------- first fill the spreadsheet with available trainer data
-  List<SheetRow> _getAvailabilityForSpreadsheet(List<Available> availableList) {
+  ///--------------------------------
+  /// build rows and first fill the spreadsheet with available trainer data
+  List<SheetRow> _generateSheetRows() {
+    List<Available> availableList =
+        SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
+
     List<SheetRow> result = [];
     int rowIdx = 0;
     for (Available avail in availableList) {
       SheetRow sheetRow =
           SheetRow(date: avail.date, rowIndex: rowIdx, isExtraRow: false);
+
       for (String groupName in getGroupNames(avail.date)) {
         int groupIndex = getGroupIndex(groupName, avail.date);
         if (groupIndex >= 0) {
@@ -228,6 +234,7 @@ class SpreadsheetGenerator with AppMixin {
           sheetRow.rowCells.add(rowCell);
         }
       }
+
       result.add(sheetRow);
 
       rowIdx++;
@@ -237,7 +244,7 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   //--- here we fill which trainers are (not) available.
-  Available _genCountsProcessDate(int dateIndex, DateTime date) {
+  Available _genAvailableForDate(int dateIndex, DateTime date) {
     List<String> groupNames = getGroupNames(date);
     Available available = Available(date: date, groupCount: groupNames.length);
 
@@ -597,12 +604,15 @@ class SpreadsheetGenerator with AppMixin {
     return result;
   }
 
-  void postProcessSpreadsheet() {
-    postProcessZamo();
-    postProcessThursdayPR();
+  ///-----------------------------
+  void _postProcessSpreadsheet() {
+    _postProcessZamo();
+    _postProcessThursdayPR();
+    _postProcessExcludedDays();
   }
 
-  void postProcessZamo() {
+  ///-----------------------------
+  void _postProcessZamo() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       int zamoIndex = getGroupIndex(c.zamoGroup, sheetRow.date);
       if (sheetRow.date.weekday == DateTime.saturday && zamoIndex >= 0) {
@@ -614,16 +624,32 @@ class SpreadsheetGenerator with AppMixin {
 
         String zamoTrainer = sheetRow.rowCells[zamoIndex].text;
         for (int i = 0; i < getGroupNames(sheetRow.date).length; i++) {
-          sheetRow.rowCells[i].text = '';
+          if (sheetRow.rowCells.length > i) {
+            sheetRow.rowCells[i].text = '';
+          }
         }
         sheetRow.rowCells[zamoIndex].text = zamoTrainer;
       } else {
-        sheetRow.rowCells[zamoIndex].setTrainer(Trainer.empty());
+        if (sheetRow.rowCells.length > zamoIndex) {
+          sheetRow.rowCells[zamoIndex].setTrainer(Trainer.empty());
+        }
       }
     }
   }
 
-  void postProcessThursdayPR() {
+  ///----------------------------
+  void _postProcessExcludedDays() {
+    for (SheetRow sheetRow in _spreadSheet.rows) {
+      if (AppHelper.instance.isDateExcluded(sheetRow.date)) {
+        ExcludeDay? excludeDay = AppData.instance.excludeDays
+            .firstWhereOrNull((e) => e.dateTime == sheetRow.date);
+        sheetRow.trainingText = excludeDay!.description;
+      }
+    }
+  }
+
+  ///-----------------------------
+  void _postProcessThursdayPR() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (sheetRow.date.weekday == DateTime.thursday) {
         int prIndex = getGroupIndex('pr', sheetRow.date);

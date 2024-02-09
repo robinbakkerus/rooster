@@ -929,7 +929,6 @@ class TrainingGroup {
   final TrainingGroupType type;
   List<int> trainingDays = []; // take into account weekdays
   List<ExcludePeriod> excludePeriods = [];
-  List<ExcludeDay> excludeDays = [];
   String defaultTrainingText;
 
   TrainingGroup({
@@ -940,7 +939,6 @@ class TrainingGroup {
     required this.type,
     required this.trainingDays,
     required this.excludePeriods,
-    required this.excludeDays,
     required this.defaultTrainingText,
   });
 
@@ -963,7 +961,6 @@ class TrainingGroup {
       type: type ?? this.type,
       trainingDays: trainingDays ?? this.trainingDays,
       excludePeriods: excludePeriods ?? this.excludePeriods,
-      excludeDays: excludeDays ?? this.excludeDays,
       defaultTrainingText: defaultTrainingText ?? this.defaultTrainingText,
     );
   }
@@ -977,7 +974,6 @@ class TrainingGroup {
       'type': type.toMap(),
       'trainingDays': trainingDays,
       'excludePeriods': excludePeriods.map((x) => x.toMap()).toList(),
-      'excludeDays': excludeDays.map((x) => x.toMap()).toList(),
       'defaultTrainingText': defaultTrainingText,
     };
   }
@@ -992,8 +988,6 @@ class TrainingGroup {
       trainingDays: List<int>.from(map['trainingDays']),
       excludePeriods: List<ExcludePeriod>.from(
           map['excludePeriods']?.map((x) => ExcludePeriod.fromMap(x))),
-      excludeDays: List<ExcludeDay>.from(
-          map['excludeDays']?.map((x) => ExcludeDay.fromMap(x))),
       defaultTrainingText: map['defaultTrainingText'],
     );
   }
@@ -1002,7 +996,7 @@ class TrainingGroup {
       TrainingGroup.fromMap(json.decode(source));
   @override
   String toString() {
-    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays, excludePeriods: $excludePeriods, excludeDays: $excludeDays, defaultTrainingText: $defaultTrainingText)';
+    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays, excludePeriods: $excludePeriods, defaultTrainingText: $defaultTrainingText)';
   }
 
   @override
@@ -1017,7 +1011,6 @@ class TrainingGroup {
         other.type == type &&
         listEquals(other.trainingDays, trainingDays) &&
         listEquals(other.excludePeriods, excludePeriods) &&
-        listEquals(other.excludeDays, excludeDays) &&
         other.defaultTrainingText == defaultTrainingText;
   }
 
@@ -1030,7 +1023,6 @@ class TrainingGroup {
         type.hashCode ^
         trainingDays.hashCode ^
         excludePeriods.hashCode ^
-        excludeDays.hashCode ^
         defaultTrainingText.hashCode;
   }
 }
@@ -1084,33 +1076,33 @@ class ExcludePeriod {
 
 ///--------------------------------
 class ExcludeDay {
-  final DateTime data;
+  final DateTime dateTime;
   final String description;
 
   ExcludeDay({
-    required this.data,
+    required this.dateTime,
     required this.description,
   });
   ExcludeDay copyWith({
-    DateTime? data,
+    DateTime? dateTime,
     String? description,
   }) {
     return ExcludeDay(
-      data: data ?? this.data,
+      dateTime: dateTime ?? this.dateTime,
       description: description ?? this.description,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'data': data.millisecondsSinceEpoch,
+      'dateTime': dateTime.millisecondsSinceEpoch,
       'description': description,
     };
   }
 
   factory ExcludeDay.fromMap(Map<String, dynamic> map) {
     return ExcludeDay(
-      data: DateTime.fromMillisecondsSinceEpoch(map['data']),
+      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
       description: map['description'],
     );
   }
@@ -1118,18 +1110,18 @@ class ExcludeDay {
   factory ExcludeDay.fromJson(String source) =>
       ExcludeDay.fromMap(json.decode(source));
   @override
-  String toString() => 'ExcludeDay(data: $data, description: $description)';
+  String toString() => 'ExcludeDay(data: $dateTime, description: $description)';
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is ExcludeDay &&
-        other.data == data &&
+        other.dateTime == dateTime &&
         other.description == description;
   }
 
   @override
-  int get hashCode => data.hashCode ^ description.hashCode;
+  int get hashCode => dateTime.hashCode ^ description.hashCode;
 }
 
 ///--------------------------------

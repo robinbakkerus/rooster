@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 
@@ -72,18 +73,23 @@ class AppHelper with AppMixin {
   ///----------------------------------------//------------------
   AvailableCounts getAvailableCounts(
       int rowIndex, String groupName, DateTime dateTime) {
-    int groupIndex =
-        SpreadsheetGenerator.instance.getGroupIndex(groupName, dateTime);
-    SpreadSheet spreadsheet = AppData.instance.getSpreadsheet();
-    if (rowIndex < spreadsheet.rows.length - 1) {
-      SheetRow sheetRow = spreadsheet.rows[rowIndex];
-      if (!sheetRow.isExtraRow) {
-        return AppData.instance
-            .getSpreadsheet()
-            .rows[rowIndex]
-            .rowCells[groupIndex]
-            .availableCounts;
+    try {
+      int groupIndex =
+          SpreadsheetGenerator.instance.getGroupIndex(groupName, dateTime);
+
+      if (groupIndex >= 0) {
+        SpreadSheet spreadsheet = AppData.instance.getSpreadsheet();
+        if (rowIndex < spreadsheet.rows.length - 1) {
+          SheetRow sheetRow = spreadsheet.rows[rowIndex];
+          if (!sheetRow.isExtraRow &&
+              spreadsheet.rows[rowIndex].rowCells.length > groupIndex) {
+            return spreadsheet
+                .rows[rowIndex].rowCells[groupIndex].availableCounts;
+          }
+        }
       }
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
     }
 
     return AvailableCounts();
@@ -175,6 +181,13 @@ class AppHelper with AppMixin {
       }
     }
     return -1; //not possible
+  }
+
+  ///-----------------------------------
+  bool isDateExcluded(DateTime date) {
+    ExcludeDay? excludeDay = AppData.instance.excludeDays
+        .firstWhereOrNull((e) => e.dateTime == date);
+    return excludeDay != null ? true : false;
   }
 
   ///-----------------

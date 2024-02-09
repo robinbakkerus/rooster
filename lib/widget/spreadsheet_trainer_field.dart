@@ -32,7 +32,10 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     List<String> groupNames =
         SpreadsheetGenerator.instance.getGroupNames(widget.sheetRow.date);
     _groupIndex = groupNames.indexOf(widget.groupName);
-    _textTextCtrl.text = widget.sheetRow.rowCells[_groupIndex].text;
+    if (widget.sheetRow.rowCells.length > _groupIndex) {
+      _textTextCtrl.text = widget.sheetRow.rowCells[_groupIndex].text;
+    }
+
     super.initState();
   }
 
@@ -44,21 +47,26 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
 
   @override
   Widget build(BuildContext context) {
-    String txt = widget.sheetRow.rowCells[_groupIndex].text;
-    bool addBorder = txt.isNotEmpty && _isEditable();
-    return InkWell(
-      onTap: _isEditable() ? () => _dialogBuilder(context) : null,
-      child: Container(
-          decoration:
-              addBorder ? BoxDecoration(border: Border.all(width: 0.1)) : null,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
-            child: Text(
-              txt,
-              overflow: TextOverflow.ellipsis,
-            ),
-          )),
-    );
+    if (widget.sheetRow.rowCells.length > _groupIndex) {
+      String txt = widget.sheetRow.rowCells[_groupIndex].text;
+      bool addBorder = txt.isNotEmpty && _isEditable();
+      return InkWell(
+        onTap: _isEditable() ? () => _dialogBuilder(context) : null,
+        child: Container(
+            decoration: addBorder
+                ? BoxDecoration(border: Border.all(width: 0.1))
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
+              child: Text(
+                txt,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )),
+      );
+    } else {
+      return Container();
+    }
   }
 
   Future<void> _dialogBuilder(BuildContext context) {

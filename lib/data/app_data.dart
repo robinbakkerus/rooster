@@ -29,6 +29,7 @@ class AppData {
   int stackIndex = 0;
   List<String> trainerItems = [];
   late MetaPlanRankValues planRankValues;
+  late List<ExcludeDay> excludeDays;
 
   SpreadsheetStatus spreadSheetStatus = SpreadsheetStatus.initial; //asume
   SpreadsheetStatus _prevSpreadSheetStatus = SpreadsheetStatus.initial; //asume

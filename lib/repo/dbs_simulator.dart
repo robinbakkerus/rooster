@@ -105,4 +105,12 @@ class Simulator with AppMixin implements Dbs {
 
   @override
   Future<void> savePlanRankValues(MetaPlanRankValues planRankValues) async {}
+
+  @override
+  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays) async {}
+
+  @override
+  Future<List<ExcludeDay>> getExcludeDays() async {
+    return p.excludeDays;
+  }
 }
