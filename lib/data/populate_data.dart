@@ -33,7 +33,7 @@ List<Trainer> allTrainers = [
   trainerCyriel,
 ];
 Trainer trainerRobin = _buildTrainer('RB', 'Robin Bakkerus', 'ROMA',
-    'robin.bakkerus@gmail.com', 0, 1, 2, 0, 0, 0,
+    'robin.bakkerus@gmail.com', 0, 1, 2, 0, 1, 0,
     roles: 'T,A,S');
 Trainer trainerPaula = _buildTrainer(
     'PvA', 'Paula van Agt', 'PACO', 'paulavanagt8@gmail.com', 0, 0, 1, 1, 0, 0);
@@ -42,20 +42,20 @@ Trainer trainerOlav = _buildTrainer(
 Trainer trainerFried = _buildTrainer(
     'FvH', 'Fried van Hoek', 'FARO', 'hoek1947@kpnmail.nl', 0, 2, 1, 1, 1, 0);
 Trainer trainerMaria = _buildTrainer('MvH', 'Maria van Hout', 'METS',
-    'maria.vanhout@onsnet.nu', 0, 0, 1, 1, 1, 0);
+    'maria.vanhout@onsnet.nu', 0, 0, 1, 0, 0, 0);
 Trainer trainerJeroen = _buildTrainer('JL', 'Jeroen Lathouwers', 'JENA',
     'jeroen.lathouwers@upcmail.nl', 2, 1, 0, 0, 1, 0,
     roles: 'T,S');
 Trainer trainerJanneke = _buildTrainer('JK', 'Janneke Kemkers', 'JAVA',
     'janneke.kempers85@gmail.com', 0, 0, 0, 0, 0, 0);
 Trainer trainerPauline = _buildTrainer(
-    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 2, 1, 1, 1);
+    'PG', 'Pauline Geenen', 'PILA', 'g.geenen@on.nl', 0, 0, 0, 1, 1, 1);
 Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
     'huiblachapelle@icloud.com', 0, 0, 2, 1, 1, 1);
 Trainer trainerRonald = _buildTrainer(
-    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 2, 1, 2, 0, 1, 2);
+    'RV', 'Ronald Vissers', 'ROME', 'rc.vissers@gmail.com', 0, 1, 2, 0, 1, 1);
 Trainer trainerAnne = _buildTrainer('AJ', 'Anne Joustra', 'AKEN',
-    'a.joustra595242@kpnmail.nl', 0, 0, 1, 1, 1, 0);
+    'a.joustra595242@kpnmail.nl', 0, 0, 0, 1, 1, 0);
 Trainer trainerCyriel = _buildTrainer(
     'CD', 'Cyriel Douven', 'CALI', 'cyrieldouven@gmail.com', 0, 0, 1, 2, 0, 0);
 
@@ -73,15 +73,15 @@ Trainer _buildTrainer(String pk, String fullname, String accesscode,
       email: email,
       originalEmail: email,
       prefValues: [
-        TrainerPref(paramName: AppData.instance.trainingDays[0], value: 1),
-        TrainerPref(paramName: AppData.instance.trainingDays[1], value: 1),
-        TrainerPref(paramName: AppData.instance.trainingDays[2], value: zamo),
+        TrainerPref(paramName: 'dinsdag', value: 1),
+        TrainerPref(paramName: 'donderdag', value: 1),
+        TrainerPref(paramName: 'zaterdag', value: zamo),
         TrainerPref(paramName: Groep.pr.name, value: pr),
         TrainerPref(paramName: Groep.r1.name, value: r1),
         TrainerPref(paramName: Groep.r2.name, value: r2),
         TrainerPref(paramName: Groep.r3.name, value: r3),
         TrainerPref(paramName: Groep.zamo.name, value: zamo),
-        TrainerPref(paramName: Groep.SG.name, value: zamo)
+        TrainerPref(paramName: Groep.SG.name, value: sg)
       ],
       roles: roles);
 }
@@ -415,52 +415,63 @@ List<TrainingGroup> allTrainingGroups() {
 }
 
 TrainingGroup _buildTrainingGroup(String name, String descr) {
-  List<ExcludePeriod> excludeDates = [];
-
-  excludeDates.add(ExcludePeriod(fromDate: summerStart, toDate: summerEnd));
+  List<ExcludePeriod> excludePeriods = [];
+  excludePeriods.add(ExcludePeriod(fromDate: summerStart, toDate: summerEnd));
+  List<ExcludeDay> excludeDays = [];
+  excludeDays.add(
+      ExcludeDay(data: DateTime(2024, 5, 30), description: 'Mei vakantie'));
 
   return TrainingGroup(
       name: name,
       description: descr,
+      type: TrainingGroupType.regular,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
-      excludePeriods: excludeDates,
-      tiaDays: [DateTime.tuesday, DateTime.thursday],
-      trainerPks: ['*']);
+      excludePeriods: excludePeriods,
+      excludeDays: excludeDays,
+      trainingDays: [DateTime.tuesday, DateTime.thursday],
+      defaultTrainingText: '*');
 }
 
 TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
   return TrainingGroup(
       name: name,
       description: descr,
+      type: TrainingGroupType.special,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
       excludePeriods: [],
-      tiaDays: [DateTime.saturday],
-      trainerPks: ['HC', 'PG', 'RV']);
+      excludeDays: [],
+      trainingDays: [DateTime.saturday],
+      defaultTrainingText: 'ZaMo start 9 uur Donkervoort');
 }
 
 TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
   return TrainingGroup(
-      name: name,
-      description: descr,
-      startDate: summerStart,
-      endDate: summerEnd,
-      excludePeriods: [],
-      tiaDays: [DateTime.saturday],
-      trainerPks: ['HC', 'RV', 'FvH', 'MvH', 'RB']);
+    name: name,
+    description: descr,
+    type: TrainingGroupType.special,
+    startDate: summerStart,
+    endDate: summerEnd,
+    excludePeriods: [],
+    excludeDays: [],
+    trainingDays: [DateTime.saturday],
+    defaultTrainingText: 'Zomertraining',
+  );
 }
 
 TrainingGroup _buildStartersGroup(String name, String descr) {
   DateTime startDate = DateTime(2024, 3, 1);
-  DateTime endDate = DateTime(2024, 4, 30);
+  DateTime endDate = DateTime(2024, 5, 31);
 
   return TrainingGroup(
       name: name,
       description: descr,
+      type: TrainingGroupType.special,
       startDate: startDate,
       endDate: endDate,
       excludePeriods: [],
-      tiaDays: [DateTime.tuesday, DateTime.thursday],
-      trainerPks: ['HC', 'RV', 'FvH', 'MvH', 'PG']);
+      excludeDays: [],
+      trainingDays: [DateTime.tuesday],
+      defaultTrainingText: '*');
 }

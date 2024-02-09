@@ -60,16 +60,6 @@ class Simulator with AppMixin implements Dbs {
   }
 
   @override
-  Future<List<String>> getZamoTrainers() async {
-    return ['HC', 'PG', 'RV'];
-  }
-
-  @override
-  Future<String> getZamoTrainingDefault() async {
-    return 'Zamo start ';
-  }
-
-  @override
   Future<FsSpreadsheet?> retrieveSpreadsheet(
       {required int year, required int month}) async {
     FsSpreadsheet? fsSpreadsheet = p.allFsSpreadsheets

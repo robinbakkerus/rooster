@@ -1,11 +1,11 @@
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
-import 'package:rooster/data/populate_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
 class TrainerPrefsPage extends StatefulWidget {
@@ -61,12 +61,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       padding: EdgeInsets.only(left: 20, top: 10),
       child: Text('Voorkeur dagen'),
     ));
-    list.add(_buildGrid1());
+    list.add(_buildGridForPrefDays());
     list.add(const Padding(
       padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
       child: Text('Voorkeur groepen'),
     ));
-    list.add(_buildGrid2());
+    list.add(_buildGridForPrefGroups());
     return list;
   }
 
@@ -192,7 +192,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   }
 
   ///------------------------------------------------
-  Widget _buildGrid1() {
+  Widget _buildGridForPrefDays() {
     double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
     return Scrollbar(
       child: Padding(
@@ -208,7 +208,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
             dataRowMinHeight: 25,
             dataRowMaxHeight: 40,
             columns: _buildHeader(),
-            rows: _buildDataRows1(),
+            rows: _buildDataRowsForPrefDays(),
           ),
         ),
       ),
@@ -216,7 +216,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   }
 
   ///------------------------------------------------
-  Widget _buildGrid2() {
+  Widget _buildGridForPrefGroups() {
     double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
     return Scrollbar(
       child: Padding(
@@ -232,7 +232,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
             dataRowMinHeight: 25,
             dataRowMaxHeight: 40,
             columns: _buildHeader(),
-            rows: _buildDataRows2(),
+            rows: _buildDataRowsForPrefGroups(),
           ),
         ),
       ),
@@ -244,14 +244,14 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return wh.buildYesNoIfNeededHeader();
   }
 
-  List<DataRow> _buildDataRows1() {
+  //-------------------------
+  List<DataRow> _buildDataRowsForPrefDays() {
     List<DataRow> result = [];
 
-    var days = AppData.instance.trainingDays;
+    var days = SpreadsheetGenerator.instance.getTrainingDays(locale: c.localNL);
 
     for (String dag in days) {
-      if (dag != AppData.instance.trainingDays[2] ||
-          AppData.instance.isZamoTrainer(_trainer.pk)) {
+      if (_addRowForPrefDay(dag)) {
         result.add(DataRow(cells: _buildDataCells(dag)));
       }
     }
@@ -259,14 +259,20 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return result;
   }
 
-  List<DataRow> _buildDataRows2() {
+  ///-------------------------
+  bool _addRowForPrefDay(String dag) {
+    int weekday =
+        AppHelper.instance.weekdayFromString(weekday: dag, locale: c.localNL);
+    return AppData.instance.getTrainer().getDayPrefValue(weekday: weekday) > 0;
+  }
+
+  //-------------------------
+  List<DataRow> _buildDataRowsForPrefGroups() {
     List<DataRow> result = [];
 
     for (String groupName
         in AppData.instance.activeTrainingGroups[0].groupNames) {
-      if (groupName.toLowerCase() !=
-              Groep.zamo.name || //todo hoe maken we dit dynamisch
-          AppData.instance.isZamoTrainer(_trainer.pk)) {
+      if (_addRowForPrefGroup(groupName)) {
         result.add(DataRow(cells: _buildDataCells(groupName)));
       }
     }
@@ -274,6 +280,20 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return result;
   }
 
+  ///-------------------------
+  bool _addRowForPrefGroup(String groupName) {
+    TrainingGroup? trainingGroup =
+        AppHelper.instance.getTrainingGroupByName(groupName);
+    if (trainingGroup != null &&
+        trainingGroup.type == TrainingGroupType.regular) {
+      return true;
+    } else {
+      return AppData.instance
+          .isTrainerForGroup(AppData.instance.getTrainer(), groupName);
+    }
+  }
+
+  //-------------------------
   List<DataCell> _buildDataCells(String paramName) {
     List<DataCell> result = [];
 
@@ -285,6 +305,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return result;
   }
 
+  //-------------------------
   DataCell _buildRadioButtonDataCell(
       String paramName, int rbValue, Color color) {
     int value = _updateTrainer.getPrefValue(paramName: paramName);
@@ -296,6 +317,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         value: value));
   }
 
+  ///------------------------------------------------
   Widget? _getFab() {
     if (_isDirty()) {
       return FloatingActionButton(
@@ -308,10 +330,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
+  ///------------------------------------------------
   bool _isDirty() {
     return _trainer != _updateTrainer;
   }
 
+  ///------------------------------------------------
   void _onSaveTrainer() async {
     bool okay = await AppController.instance.updateTrainer(_updateTrainer);
     String msg = okay
@@ -320,6 +344,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     wh.showSnackbar(msg, color: Colors.lightGreen);
   }
 
+  ///------------------------------------------------
   void _onReady(TrainerDataReadyEvent event) {
     if (mounted) {
       setState(() {
@@ -333,6 +358,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
+  ///------------------------------------------------
   void _onSpreadsheetReady(SpreadsheetReadyEvent event) {
     if (mounted) {
       setState(() {
@@ -341,6 +367,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
+  ///------------------------------------------------
   void _onTrainerUpdated(TrainerUpdatedEvent event) {
     if (mounted) {
       setState(() {
@@ -352,6 +379,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
+  ///------------------------------------------------
   void _onTrainerPrefUpdated(TrainerPrefUpdatedEvent event) {
     if (mounted) {
       setState(() {

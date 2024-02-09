@@ -2,6 +2,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/util/app_constants.dart';
 
 class SpreadsheetTrainingColumn extends StatefulWidget {
   final SheetRow sheetRow;
@@ -47,9 +48,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   @override
   Widget build(BuildContext context) {
     Decoration? decoration =
-        isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
+        _isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
     return InkWell(
-      onTap: isEditable()
+      onTap: _isEditable()
           ? () => _buildEditTrainingDialog(context)
           : () => _buildReadOnlyDialog(context),
       child: Container(
@@ -146,13 +147,18 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
         onChanged: _onDropdownSelected);
   }
 
-  bool isEditable() {
-    bool b = (widget.isEditable &&
-            AppData.instance.getTrainer().isSupervisor()) ||
-        (widget.isEditable &&
-            widget.sheetRow.date.weekday == DateTime.saturday &&
-            AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk));
+  bool _isEditable() {
+    bool b =
+        widget.isEditable && AppData.instance.getTrainer().isSupervisor() ||
+            _isZamoTrainerOnSaturday();
     return b;
+  }
+
+  bool _isZamoTrainerOnSaturday() {
+    return widget.isEditable &&
+        widget.sheetRow.date.weekday == DateTime.saturday &&
+        AppData.instance.isTrainerForGroup(
+            AppData.instance.getTrainer(), AppConstants().zamoGroup);
   }
 
   void _onDropdownSelected(Object? value) {

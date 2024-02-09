@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/firestore_helper.dart';
+import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class SpreadsheetGenerator with AppMixin {
@@ -79,18 +80,28 @@ class SpreadsheetGenerator with AppMixin {
     // next find the best trainer, first we skip zamo
     for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
       DateTime date = _spreadSheet.rows[rowNr].date;
-      for (String groupName
-          in SpreadsheetGenerator.instance.getGroupNames(date)) {
-        _findSuitableTrainer(rowNr: rowNr, groupName: groupName, date: date);
-      }
-    }
-    for (int rowNr = 0; rowNr < _spreadSheet.rows.length; rowNr++) {
-      if (_isSaturday(rowNr)) {
-        _findSuitableZamoTrainer(rowNr: rowNr);
+
+      List<String> groupNames =
+          SpreadsheetGenerator.instance.getGroupNames(date);
+      for (String groupName in groupNames) {
+        if (!_skipForGroupname(date, groupName)) {
+          _findSuitableTrainer(rowNr: rowNr, groupName: groupName, date: date);
+        }
       }
     }
 
     postProcessSpreadsheet();
+  }
+
+  //----------------
+  bool _skipForGroupname(DateTime date, String groupName) {
+    TrainingGroup? trainingGroup =
+        AppHelper.instance.getTrainingGroupByName(groupName);
+    if (trainingGroup == null) {
+      return true;
+    } else {
+      return !trainingGroup.trainingDays.contains(date.weekday);
+    }
   }
 
   //----------------
@@ -168,6 +179,22 @@ class SpreadsheetGenerator with AppMixin {
       }
     }
     return -1;
+  }
+
+  ///--------------------
+  List<String> getTrainingDays({required String locale}) {
+    List<String> result = [];
+    for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
+      for (var weekday in trainingGroup.trainingDays) {
+        String weekDayStr = AppHelper.instance
+            .weekDayStringFromWeekday(weekday: weekday, locale: c.localNL);
+        if (!result.contains(weekDayStr)) {
+          result.add(weekDayStr);
+        }
+      }
+    }
+
+    return result;
   }
 
   //---- private --
@@ -296,23 +323,23 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  ///---------------
-  void _findSuitableZamoTrainer({required int rowNr}) {
-    int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
-    if (zamoIndex >= 0) {
-      AvailableCounts cnts =
-          _spreadSheet.rows[rowNr].rowCells[zamoIndex].availableCounts;
+  // ///---------------
+  // void _findSuitableZamoTrainer({required int rowNr}) {
+  //   int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
+  //   if (zamoIndex >= 0) {
+  //     AvailableCounts cnts =
+  //         _spreadSheet.rows[rowNr].rowCells[zamoIndex].availableCounts;
 
-      List<TrainerPlanningRank> possibleTrainerRanks =
-          _getPossibleTrainers(cnts, isZamo: true);
+  //     List<TrainerPlanningRank> possibleTrainerRanks =
+  //         _getPossibleTrainers(cnts, isZamo: true);
 
-      _applyZamoRanks(possibleTrainerRanks, rowNr: rowNr);
+  //     _applyZamoRanks(possibleTrainerRanks, rowNr: rowNr);
 
-      Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
-          rowNr: rowNr, groepNr: zamoIndex);
-      _spreadSheet.rows[rowNr].rowCells[zamoIndex].setTrainer(trainer);
-    }
-  }
+  //     Trainer trainer = _getTrainerFromPossibleList(possibleTrainerRanks,
+  //         rowNr: rowNr, groepNr: zamoIndex);
+  //     _spreadSheet.rows[rowNr].rowCells[zamoIndex].setTrainer(trainer);
+  //   }
+  // }
 
 //-----------------------
   List<TrainerPlanningRank> _getPossibleTrainers(AvailableCounts cnts,
@@ -420,15 +447,15 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  void _applyZamoRanks(List<TrainerPlanningRank> trainerPlanRankList,
-      {required int rowNr}) {
-    int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
-    if (zamoIndex >= 0) {
-      _applyDaysNotAvailable(trainerPlanRankList,
-          rowNr: rowNr, groepNr: zamoIndex);
-      _applyAlreadyZamoScheduled(trainerPlanRankList, rowNr: rowNr);
-    }
-  }
+  // void _applyZamoRanks(List<TrainerPlanningRank> trainerPlanRankList,
+  //     {required int rowNr}) {
+  //   int zamoIndex = getGroupIndex(c.zamoGroup, _spreadSheet.rows[rowNr].date);
+  //   if (zamoIndex >= 0) {
+  //     _applyDaysNotAvailable(trainerPlanRankList,
+  //         rowNr: rowNr, groepNr: zamoIndex);
+  //     _applyAlreadyZamoScheduled(trainerPlanRankList, rowNr: rowNr);
+  //   }
+  // }
 
   // if trainer is not available future days its score goes up
   void _applyOnlyIfNeeded(List<TrainerPlanningRank> trainerPlanRankList,
@@ -470,31 +497,31 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  void _applyAlreadyZamoScheduled(List<TrainerPlanningRank> trainerPlanRankList,
-      {required int rowNr}) {
-    for (TrainerPlanningRank tw in trainerPlanRankList) {
-      Trainer trainer = tw.trainer;
+  // void _applyAlreadyZamoScheduled(List<TrainerPlanningRank> trainerPlanRankList,
+  //     {required int rowNr}) {
+  //   for (TrainerPlanningRank tw in trainerPlanRankList) {
+  //     Trainer trainer = tw.trainer;
 
-      double result = 0.0;
-      int countDays = 1;
-      List<double> values = AppData.instance.planRankValues.alreadyScheduled;
+  //     double result = 0.0;
+  //     int countDays = 1;
+  //     List<double> values = AppData.instance.planRankValues.alreadyScheduled;
 
-      for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
-        for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
-          if (_isSaturday(prevRowNr)) {
-            Trainer schedTrainer = rowCell.getTrainer();
-            if (schedTrainer == trainer) {
-              int idx = countDays > values.length - 1 ? 0 : countDays;
-              result += values[idx];
-            }
-          }
-        }
-        countDays++;
-      }
+  //     for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
+  //       for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
+  //         if (_isSaturday(prevRowNr)) {
+  //           Trainer schedTrainer = rowCell.getTrainer();
+  //           if (schedTrainer == trainer) {
+  //             int idx = countDays > values.length - 1 ? 0 : countDays;
+  //             result += values[idx];
+  //           }
+  //         }
+  //       }
+  //       countDays++;
+  //     }
 
-      tw.rank += result;
-    }
-  }
+  //     tw.rank += result;
+  //   }
+  // }
 
   // String _getWeekdayStr(int rowNr) {
   //   SheetRow sheetRow = _spreadSheet.rows[rowNr];
@@ -579,7 +606,11 @@ class SpreadsheetGenerator with AppMixin {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       int zamoIndex = getGroupIndex(c.zamoGroup, sheetRow.date);
       if (sheetRow.date.weekday == DateTime.saturday && zamoIndex >= 0) {
-        sheetRow.trainingText = AppData.instance.zamoDefaultTraing;
+        TrainingGroup? zamoGroup =
+            AppHelper.instance.getTrainingGroupByName(c.zamoGroup);
+
+        sheetRow.trainingText =
+            zamoGroup != null ? zamoGroup.defaultTrainingText : '';
 
         String zamoTrainer = sheetRow.rowCells[zamoIndex].text;
         for (int i = 0; i < getGroupNames(sheetRow.date).length; i++) {

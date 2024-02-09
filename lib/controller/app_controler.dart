@@ -67,15 +67,6 @@ class AppController {
     AppEvents.fireTrainerDataReady();
   }
 
-  // get Zamo trainers
-  Future<void> getZamoTrainersAndDefaultTraining() async {
-    List<String> zamoTrainers = await Dbs.instance.getZamoTrainers();
-    AppData.instance.zamoTrainers = zamoTrainers;
-
-    String defaultTraining = await Dbs.instance.getZamoTrainingDefault();
-    AppData.instance.zamoDefaultTraing = defaultTraining;
-  }
-
   // get TrainingGroups
   Future<void> getTrainerGroups() async {
     AppData.instance.trainingGroups = await Dbs.instance.getTrainingGroups();

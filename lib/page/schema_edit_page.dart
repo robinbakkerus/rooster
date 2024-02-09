@@ -90,9 +90,8 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     for (int dateIndex = 0; dateIndex < _availableList.length; dateIndex++) {
       DateTime date = AppData.instance.getActiveDates()[dateIndex];
 
-      bool addRow = date.weekday != DateTime.saturday ||
-          date.weekday == DateTime.saturday &&
-              AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk);
+      bool addRow = AppHelper.instance
+          .addSchemaEditRow(date, AppData.instance.getTrainer());
 
       if (addRow) {
         result.add(DataRow(

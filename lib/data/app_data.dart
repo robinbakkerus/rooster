@@ -27,8 +27,6 @@ class AppData {
   DateTime firstSpreadDate = DateTime(2024, 1, 1);
 
   int stackIndex = 0;
-  List<String> zamoTrainers = [];
-  String zamoDefaultTraing = '';
   List<String> trainerItems = [];
   late MetaPlanRankValues planRankValues;
 
@@ -43,8 +41,6 @@ class AppData {
   List<ActiveTrainingGroup> activeTrainingGroups = [];
 
   String lastSnackbarMsg = '';
-
-  List<String> trainingDays = ['dinsdag', 'donderdag', 'zaterdag'];
 
   SpreadSheet getSpreadsheet() {
     return _spreadSheet;
@@ -185,8 +181,8 @@ class AppData {
     return false;
   }
 
-  bool isZamoTrainer(String trainerPk) {
-    return zamoTrainers.contains(trainerPk);
+  bool isTrainerForGroup(Trainer trainer, String groupName) {
+    return trainer.getPrefValue(paramName: groupName) > 0;
   }
 
   List<String> maanden = [

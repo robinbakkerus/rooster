@@ -15,8 +15,6 @@ abstract class Dbs {
       {required bool updateSchema});
   Future<List<Trainer>> getAllTrainers();
   Future<Trainer> createOrUpdateTrainer(trainer);
-  Future<List<String>> getZamoTrainers();
-  Future<String> getZamoTrainingDefault();
   Future<List<String>> getTrainingItems();
   Future<MetaPlanRankValues> getApplyPlanRankValues();
   Future<LastRosterFinal> saveLastRosterFinal();

@@ -151,6 +151,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     }
   }
 
+  //------------------------------
   List<DataRow> _buildDataRows(int index) {
     List<DataRow> result = [];
 
@@ -186,6 +187,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return result;
   }
 
+  //------------------------------
   List<DataCell> _buildDataCells(SheetRow row) {
     List<DataCell> result = [];
 
@@ -208,6 +210,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return result;
   }
 
+  //----------------------------
   DataCell _buildTrainerCell(SheetRow sheetRow, String groupName) {
     return DataCell(SpreadsheetTrainerColumn(
         key: UniqueKey(),
@@ -216,10 +219,12 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         isEditable: _isEditable()));
   }
 
+  //----------------------------
   DataCell _buildDayCell(SheetRow sheetRow) {
     return DataCell(SpreadsheetDayColumn(key: UniqueKey(), sheetRow: sheetRow));
   }
 
+  //----------------------------
   DataCell _buildTrainingCell(SheetRow sheetRow) {
     double w = AppHelper.instance.isWindows() || AppHelper.instance.isTablet()
         ? 200
@@ -235,6 +240,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         )));
   }
 
+  //----------------------------
   Widget _buildButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,6 +265,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     );
   }
 
+  //----------------------------
   Widget _buildActionButton(BuildContext context) {
     if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.initial) {
       return _buildActionButtonsNewSpreadsheet();
@@ -267,6 +274,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     }
   }
 
+  //----------------------------
   Widget _buildActionButtonsNewSpreadsheet() {
     if (_isSupervisor()) {
       return OutlinedButton(

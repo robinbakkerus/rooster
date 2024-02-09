@@ -146,6 +146,7 @@ class AppHelper with AppMixin {
   }
 
   /// ------------------------
+  /// return something like: 'vrijdag' if locale is nl
   String weekDayStringFromWeekday(
       {required int weekday, required String locale}) {
     DateTime dateTime = DateTime.now();
@@ -159,6 +160,21 @@ class AppHelper with AppMixin {
     }
 
     return DateFormat.EEEE(locale).format(dateTime);
+  }
+
+  /// ------------------------
+  /// weekdayFromString('dinsdag', 'nl') -> 2
+  int weekdayFromString({required String weekday, required String locale}) {
+    for (int i = 0; i < 7; i++) {
+      DateTime dt = DateTime(AppData.instance.getActiveYear(),
+          AppData.instance.getActiveMonth(), i);
+
+      String weekdayStr = DateFormat.EEEE(locale).format(dt);
+      if (weekdayStr == weekday) {
+        return dt.weekday;
+      }
+    }
+    return -1; //not possible
   }
 
   ///-----------------
@@ -234,6 +250,18 @@ class AppHelper with AppMixin {
         .getAllTrainers()
         .where((t) => t.isSupervisor())
         .toList();
+  }
+
+  ///---------------------------------------------
+  bool addSchemaEditRow(DateTime date, Trainer trainer) {
+    int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
+    return dayPref == 1 || dayPref == 2;
+  }
+
+  ///---------------------------------------------
+  TrainingGroup? getTrainingGroupByName(String groupName) {
+    return AppData.instance.trainingGroups.firstWhereOrNull(
+        (e) => e.name.toLowerCase() == groupName.toLowerCase());
   }
 
   /// -------- private methods --------------------------------

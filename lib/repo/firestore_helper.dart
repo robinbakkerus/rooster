@@ -144,7 +144,8 @@ class FirestoreHelper with AppMixin implements Dbs {
     CollectionReference colRef = collectionRef(FsCol.trainer);
 
     try {
-      await colRef.doc(trainer.pk).set(trainer.toMap());
+      Map<String, dynamic> map = trainer.toMap();
+      await colRef.doc(trainer.pk).set(map);
       result = trainer;
       _handleSucces(LogAction.modifySettings);
     } catch (e, stackTrace) {
@@ -155,49 +156,7 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   ///--------------------------------------------
-
-  @override
-  Future<List<String>> getZamoTrainers() async {
-    List<String> result = [];
-
-    CollectionReference colRef = collectionRef(FsCol.metadata);
-    late DocumentSnapshot querySnapshot;
-
-    try {
-      querySnapshot = await colRef.doc('zamo_trainers').get();
-      Map<String, dynamic> map = querySnapshot.data() as Map<String, dynamic>;
-      var list = map['trainers'];
-      for (var pk in list) {
-        result.add(pk.toString());
-      }
-    } catch (ex, stackTrace) {
-      handleError(ex, stackTrace);
-    }
-
-    return result;
-  }
-
-  ///--------------------------------------------
-
-  @override
-  Future<String> getZamoTrainingDefault() async {
-    CollectionReference colRef = collectionRef(FsCol.metadata);
-    String result = '';
-
-    late DocumentSnapshot snapshot;
-    try {
-      snapshot = await colRef.doc('zamo_default').get();
-      Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
-      result = map['training'];
-    } catch (ex, stackTrace) {
-      handleError(ex, stackTrace);
-    }
-
-    return result;
-  }
-
-  ///--------------------------------------------
-// get list of items used to populate combobox of training items
+  // get list of items used to populate combobox of training items
   @override
   Future<List<String>> getTrainingItems() async {
     List<String> result = [];

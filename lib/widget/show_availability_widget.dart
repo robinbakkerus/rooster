@@ -79,9 +79,8 @@ class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
         dateIndex < AppData.instance.getActiveDates().length;
         dateIndex++) {
       DateTime date = AppData.instance.getActiveDates()[dateIndex];
-      bool addRow = date.weekday != DateTime.saturday ||
-          date.weekday == DateTime.saturday &&
-              AppData.instance.isZamoTrainer(AppData.instance.getTrainer().pk);
+      bool addRow = AppHelper.instance
+          .addSchemaEditRow(date, AppData.instance.getTrainer());
       if (addRow) {
         result.add(DataRow(cells: _buildDataCells(dateIndex)));
       }
