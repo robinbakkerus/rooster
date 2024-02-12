@@ -75,7 +75,7 @@ class _StartPageState extends State<StartPage> {
           const SpreadsheetPage(), //4
           const TrainerProgressPage(), //5
           const OverallAvailabilityPage(), //6
-          const HelpPage(), //7
+          HelpPage(), //7
           const AdminPage(), //8
           const AppErrorPage(), //9
         ],
@@ -271,6 +271,10 @@ class _StartPageState extends State<StartPage> {
           PopupMenuItem(
             value: PageEnum.spreadSheet.code.toString(),
             child: const Text("Spreadsheet & voortgang"),
+          ),
+          PopupMenuItem(
+            value: PageEnum.helpPage.code.toString(),
+            child: const Text("Help"),
           ),
           _adminPopup(),
         ];
