@@ -138,14 +138,14 @@ class _StartPageState extends State<StartPage> {
     } else if (AppData.instance.spreadSheetStatus ==
         SpreadsheetStatus.initial) {
       result += '(nieuw)';
-    } else if (AppData.instance
-        .getSpreadsheetDate()
-        .isBefore(DateTime.now().copyWith(day: 1))) {
-      result += '(verlopen)';
     } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.opened) {
       result += '(geopend)';
     } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty) {
       result += '(aangepast)';
+    } else if (AppData.instance
+        .getSpreadsheetDate()
+        .isBefore(DateTime.now().copyWith(day: 1))) {
+      result += '(verlopen)';
     }
 
     return result;

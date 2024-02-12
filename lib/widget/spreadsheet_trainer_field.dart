@@ -48,18 +48,16 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   @override
   Widget build(BuildContext context) {
     if (widget.sheetRow.rowCells.length > _groupIndex) {
-      String txt = widget.sheetRow.rowCells[_groupIndex].text;
-      bool addBorder = txt.isNotEmpty && _isEditable();
       return InkWell(
-        onTap: _isEditable() ? () => _dialogBuilder(context) : null,
+        onTap: _showDialog() ? () => _dialogBuilder(context) : null,
         child: Container(
-            decoration: addBorder
+            decoration: _showDialog()
                 ? BoxDecoration(border: Border.all(width: 0.1))
                 : null,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
               child: Text(
-                txt,
+                widget.sheetRow.rowCells[_groupIndex].text,
                 overflow: TextOverflow.ellipsis,
               ),
             )),
@@ -69,7 +67,22 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     }
   }
 
+  bool _isSupervisor() => AppData.instance.getTrainer().isSupervisor();
+
+  bool _showDialog() {
+    String txt = widget.sheetRow.rowCells[_groupIndex].text;
+    return txt.isNotEmpty && _isEditable();
+  }
+
   Future<void> _dialogBuilder(BuildContext context) {
+    if (_isSameTrainer() || _isSupervisor()) {
+      return _buildDialogForSupervisorOrOtherTrainer(context);
+    } else {
+      return _buildDialogForSameTrainer(context);
+    }
+  }
+
+  Future<void> _buildDialogForSupervisorOrOtherTrainer(BuildContext context) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -95,7 +108,36 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
                 wh.verSpace(15),
                 _buildOtherTrainerField(),
                 wh.verSpace(10),
-                _buildCloseButton(context),
+                _buildCloseAndCancelButtons(context),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _buildDialogForSameTrainer(BuildContext context) {
+    String name = AppData.instance.getTrainer().firstName();
+    String question =
+        'Hallo $name wil jij training overnemen van ${_trainerName()}?';
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: SizedBox(
+            height: AppData.instance.screenHeight * 0.2,
+            width: 500,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
+                  child: Text(question),
+                ),
+                wh.verSpace(10),
+                _buildYesNoButtons(context),
               ],
             ),
           ),
@@ -127,22 +169,21 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   void _onDropdownSelected(Object? value) {
-    setState(() {});
-
-    AppEvents.fireSpreadsheetTrainerUpdated(
-        widget.sheetRow.rowIndex, _groupIndex, value.toString());
-
-    Navigator.of(context, rootNavigator: true).pop();
+    setState(() {
+      _textTextCtrl.text = value.toString();
+    });
   }
 
   bool _isEditable() {
-    return (widget.isEditable &&
-            AppData.instance.getTrainer().isSupervisor()) ||
-        (widget.isEditable && _isSameTrainer());
+    return widget.isEditable;
+  }
+
+  String _trainerName() {
+    return widget.sheetRow.rowCells[_groupIndex].text;
   }
 
   bool _isSameTrainer() {
-    String name = widget.sheetRow.rowCells[_groupIndex].text;
+    String name = _trainerName();
     Trainer trainer = AppHelper.instance.findTrainerByFirstName(name);
     if (!trainer.isEmpty()) {
       return trainer.pk == AppData.instance.getTrainer().pk;
@@ -165,15 +206,49 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     );
   }
 
-  Widget _buildCloseButton(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {
-          AppEvents.fireSpreadsheetTrainerUpdated(
-              widget.sheetRow.rowIndex, _groupIndex, _textTextCtrl.text);
+  Widget _buildCloseAndCancelButtons(BuildContext context) {
+    return Row(
+      children: [
+        ElevatedButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text("Cancel")),
+        wh.horSpace(10),
+        ElevatedButton(
+            onPressed: () {
+              AppEvents.fireSpreadsheetTrainerUpdated(
+                  widget.sheetRow.rowIndex, _groupIndex, _textTextCtrl.text);
 
-          Navigator.of(context, rootNavigator: true)
-              .pop(); // dismisses only the dialog and returns nothing
-        },
-        child: const Text("Close"));
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text("Save")),
+      ],
+    );
+  }
+
+  Widget _buildYesNoButtons(BuildContext context) {
+    return Row(
+      children: [
+        ElevatedButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text("Nee")),
+        wh.horSpace(10),
+        ElevatedButton(
+            onPressed: () {
+              AppEvents.fireSpreadsheetTrainerUpdated(widget.sheetRow.rowIndex,
+                  _groupIndex, AppData.instance.getTrainer().firstName());
+
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text("Ja")),
+      ],
+    );
   }
 }
