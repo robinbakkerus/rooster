@@ -950,7 +950,6 @@ class TrainingGroup {
     TrainingGroupType? type,
     List<int>? trainingDays,
     List<ExcludePeriod>? excludePeriods,
-    List<ExcludeDay>? excludeDays,
     String? defaultTrainingText,
   }) {
     return TrainingGroup(
