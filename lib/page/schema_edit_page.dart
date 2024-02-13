@@ -17,7 +17,6 @@ class SchemaEditPage extends StatefulWidget {
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   final Icon _fabIcon = const Icon(Icons.save);
   List<int> _availableList = [];
-  final List<String> _schemaMsgList = [];
 
   _SchemaEditPageState();
 
@@ -152,6 +151,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   void _showSnackbarIfNeeded() {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
+    DateTime tsDate = DateTime(ts.year, ts.month, 1);
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
     Color col = Colors.lightBlue;
 
@@ -162,16 +162,15 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
           'Schema voor $maand aangemaakt, deze wordt nu als ingevuld beschouwd';
     } else {
       msg += 'Schema $maand geopend';
-      if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
+      // make use the datecheck is correct
+      DateTime useDate = AppData.instance.lastActiveDate.copyWith(day: 2);
+      if (useDate.isAfter(tsDate)) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;
       }
     }
 
-    if (!_schemaMsgList.contains(msg)) {
-      _schemaMsgList.add(msg);
-      wh.showSnackbar(msg, color: col);
-    }
+    wh.showSnackbar(msg, color: col);
   }
 }
 

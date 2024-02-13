@@ -111,11 +111,13 @@ class SpreadsheetGenerator with AppMixin {
       fsRows.add(_mapFromRow(sheetRow));
     }
 
+    bool isFinal =
+        spreadSheet.status == SpreadsheetStatus.initial ? false : true;
     FsSpreadsheet result = FsSpreadsheet(
         year: spreadSheet.year,
         month: spreadSheet.month,
         rows: fsRows,
-        isFinal: spreadSheet.isFinal);
+        isFinal: isFinal);
 
     return result;
   }

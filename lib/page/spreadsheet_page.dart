@@ -63,7 +63,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //--------------------------------
   Widget? _buildFab() {
-    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty) {
+    if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.dirty) {
       return FloatingActionButton(
         onPressed: _saveSpreadsheetMutations,
         hoverColor: Colors.greenAccent,
@@ -76,9 +76,11 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //-----------------------
   bool _isEditable() {
-    return (AppData.instance.spreadSheetStatus == SpreadsheetStatus.opened ||
-        AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty ||
-        (AppData.instance.spreadSheetStatus == SpreadsheetStatus.initial &&
+    return (AppData.instance.getSpreadsheet().status ==
+            SpreadsheetStatus.opened ||
+        AppData.instance.getSpreadsheet().status == SpreadsheetStatus.dirty ||
+        (AppData.instance.getSpreadsheet().status ==
+                SpreadsheetStatus.initial &&
             AppData.instance.getTrainer().isSupervisor()));
   }
 
@@ -271,7 +273,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //----------------------------
   Widget _buildActionButton(BuildContext context) {
-    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.initial) {
+    if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.initial) {
       return _buildActionButtonsNewSpreadsheet();
     } else {
       return _buildActionButtonPublishedSpreadsheet();
@@ -290,7 +292,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   Widget _buildActionButtonPublishedSpreadsheet() {
-    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
+    if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.active) {
       return OutlinedButton(
           onPressed: _buildDialogOpenSpreadsheet,
           child: const Text('Maak schema open voor wijziging(en)'));
@@ -310,17 +312,15 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   void _saveSpreadsheetMutations() async {
     await AppController.instance.updateSpreadsheet(_spreadSheet);
-    AppData.instance.spreadSheetStatus =
-        AppData.instance.getOriginalpreadsheet().isFinal
-            ? SpreadsheetStatus.active
-            : SpreadsheetStatus.initial;
+    AppData.instance.getSpreadsheet().status =
+        AppData.instance.getOriginalpreadsheet().status;
     wh.showSnackbar('Wijzigingen zijn doorgevoerd', color: Colors.lightGreen);
     AppEvents.fireSpreadsheetReady();
   }
 
   void _makeSpreadsheetFinal(BuildContext context) async {
     AppController.instance.finalizeSpreadsheet(_spreadSheet);
-    AppData.instance.spreadSheetStatus = SpreadsheetStatus.active;
+    AppData.instance.getSpreadsheet().status = SpreadsheetStatus.active;
     AppEvents.fireSpreadsheetReady();
     wh.showSnackbar('Training schema is nu definitief!');
   }
@@ -364,7 +364,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
     setState(() {
       if (dialogResult == true) {
-        AppData.instance.spreadSheetStatus = SpreadsheetStatus.opened;
+        AppData.instance.getSpreadsheet().status = SpreadsheetStatus.opened;
         AppEvents.fireSpreadsheetReady();
       }
     });
@@ -506,8 +506,12 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
 
-        if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
+        if (AppData.instance.getSpreadsheet().status ==
+            SpreadsheetStatus.active) {
           wh.showSnackbar('Schema is al definitief!', color: Colors.orange);
+        } else if (AppData.instance.getSpreadsheet().status ==
+            SpreadsheetStatus.old) {
+          wh.showSnackbar('Schema is verlopen!', color: Colors.orange);
         }
       });
     }

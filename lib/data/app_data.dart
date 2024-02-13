@@ -31,8 +31,6 @@ class AppData {
   late MetaPlanRankValues planRankValues;
   late List<ExcludeDay> excludeDays;
 
-  SpreadsheetStatus spreadSheetStatus = SpreadsheetStatus.initial; //asume
-  SpreadsheetStatus _prevSpreadSheetStatus = SpreadsheetStatus.initial; //asume
   // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
   SpreadSheet _originalSpreadSheet =
@@ -62,20 +60,20 @@ class AppData {
 
   void setSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
-    _originalSpreadSheet = spreadSheet.clone();
 
-    spreadSheetStatus = spreadSheet.isFinal
-        ? SpreadsheetStatus.active
-        : SpreadsheetStatus.initial;
+    DateTime spreadsheetDate = getSpreadsheetDate();
+    DateTime useDate = spreadsheetDate.copyWith(day: 2);
+    if (useDate.isBefore(DateTime.now().copyWith(day: 1))) {
+      _spreadSheet.status = SpreadsheetStatus.old;
+    }
+
+    _originalSpreadSheet = spreadSheet.clone();
   }
 
   void updateSpreadsheet(SpreadSheet spreadSheet) {
     _spreadSheet = spreadSheet;
     if (_spreadSheet != getOriginalpreadsheet()) {
-      _prevSpreadSheetStatus = spreadSheetStatus;
-      spreadSheetStatus = SpreadsheetStatus.dirty;
-    } else {
-      spreadSheetStatus = _prevSpreadSheetStatus;
+      _spreadSheet.status = SpreadsheetStatus.dirty;
     }
   }
 

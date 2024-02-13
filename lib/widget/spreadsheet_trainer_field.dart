@@ -133,7 +133,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 8, 8),
                   child: Text(question),
                 ),
                 wh.verSpace(10),
@@ -209,14 +209,14 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   Widget _buildCloseAndCancelButtons(BuildContext context) {
     return Row(
       children: [
-        ElevatedButton(
+        TextButton(
             onPressed: () {
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing
             },
-            child: const Text("Cancel")),
+            child: const Text("Cancel", style: TextStyle(color: Colors.red))),
         wh.horSpace(10),
-        ElevatedButton(
+        TextButton(
             onPressed: () {
               AppEvents.fireSpreadsheetTrainerUpdated(
                   widget.sheetRow.rowIndex, _groupIndex, _textTextCtrl.text);
@@ -224,7 +224,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing
             },
-            child: const Text("Save")),
+            child: const Text("Save", style: TextStyle(color: Colors.green))),
       ],
     );
   }
@@ -232,14 +232,17 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   Widget _buildYesNoButtons(BuildContext context) {
     return Row(
       children: [
-        ElevatedButton(
+        TextButton(
             onPressed: () {
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing
             },
-            child: const Text("Nee")),
+            child: const Text(
+              "Nee",
+              style: TextStyle(color: Colors.red),
+            )),
         wh.horSpace(10),
-        ElevatedButton(
+        TextButton(
             onPressed: () {
               AppEvents.fireSpreadsheetTrainerUpdated(widget.sheetRow.rowIndex,
                   _groupIndex, AppData.instance.getTrainer().firstName());
@@ -247,7 +250,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing
             },
-            child: const Text("Ja")),
+            child: const Text("Ja", style: TextStyle(color: Colors.green))),
       ],
     );
   }

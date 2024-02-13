@@ -575,7 +575,7 @@ class PlanRankStartValue {
 class SpreadSheet {
   int year = 2024;
   int month = 1;
-  bool isFinal = false;
+  SpreadsheetStatus status = SpreadsheetStatus.initial;
   List<SheetRow> rows = [];
 
   void addRow(SheetRow row) {
@@ -589,7 +589,7 @@ class SpreadSheet {
 
   SpreadSheet clone() {
     SpreadSheet result = SpreadSheet(year: year, month: month);
-    result.isFinal = isFinal;
+    result.status = status;
     for (SheetRow row in rows) {
       result.rows.add(row.clone());
     }
@@ -603,18 +603,18 @@ class SpreadSheet {
     return other is SpreadSheet &&
         other.year == year &&
         other.month == month &&
-        other.isFinal == isFinal &&
+        other.status == status &&
         listEquals(other.rows, rows);
   }
 
   @override
   int get hashCode {
-    return year.hashCode ^ month.hashCode ^ isFinal.hashCode ^ rows.hashCode;
+    return year.hashCode ^ month.hashCode ^ status.hashCode ^ rows.hashCode;
   }
 
   @override
   String toString() {
-    return 'SpreadSheet(year: $year, month: $month, isFinal: $isFinal, rows: $rows)';
+    return 'SpreadSheet(year: $year, month: $month, isFinal: $status, rows: $rows)';
   }
 }
 

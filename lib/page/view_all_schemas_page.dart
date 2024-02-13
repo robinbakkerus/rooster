@@ -49,7 +49,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
   }
 
   void _onTap(value) {
-    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active &&
+    if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.active &&
         value == 3) {
       wh.showSnackbar(
           'Schema is al definitief: er kunnen geen wijzigingen worden aangebracht',

@@ -62,7 +62,7 @@ class _SpreadsheetDayColumnState extends State<SpreadsheetDayColumn>
 
   bool _isEditable() {
     return AppData.instance.getTrainer().isSupervisor() &&
-        AppData.instance.spreadSheetStatus != SpreadsheetStatus.active;
+        AppData.instance.getSpreadsheet().status != SpreadsheetStatus.active;
   }
 }
 

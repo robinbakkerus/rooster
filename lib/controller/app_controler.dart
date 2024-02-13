@@ -157,7 +157,9 @@ class AppController {
   SpreadSheet _mapFromFsSpreadsheet(FsSpreadsheet fsSpreadsheet) {
     SpreadSheet spreadSheet =
         SpreadSheet(year: fsSpreadsheet.year, month: fsSpreadsheet.month);
-    spreadSheet.isFinal = fsSpreadsheet.isFinal;
+    spreadSheet.status = fsSpreadsheet.isFinal
+        ? SpreadsheetStatus.active
+        : SpreadsheetStatus.initial;
 
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();
@@ -271,7 +273,6 @@ class AppController {
     }
 
     AppData.instance.setAllTrainerData(allTrainerData);
-    AppEvents.fireSpreadsheetReady();
 
     return allTrainerData;
   }

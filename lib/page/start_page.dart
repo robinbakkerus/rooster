@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
@@ -120,7 +121,8 @@ class _StartPageState extends State<StartPage> {
     } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
       result += ' Instellingen';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
-      result = ' Schema ${AppData.instance.getActiveMonthAsString()}';
+      String s = AppHelper.instance.isWindows() ? 'Schema' : 'S';
+      result = '$s ${AppData.instance.getActiveMonthAsString()}';
       result += _getSpreadstatus();
     } else if (_getStackIndex() == PageEnum.helpPage.code) {
       return 'Help pagina';
@@ -132,20 +134,25 @@ class _StartPageState extends State<StartPage> {
   }
 
   String _getSpreadstatus() {
+    log(AppData.instance.getSpreadsheetDate().toString());
+    log(AppData.instance.getSpreadsheet().status.toString());
+
     String result = ' : ';
-    if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.active) {
+    DateTime useDate = AppData.instance.getSpreadsheetDate().copyWith(day: 2);
+    if (useDate.isBefore(DateTime.now().copyWith(day: 1))) {
+      result += '(verlopen)';
+    } else if (AppData.instance.getSpreadsheet().status ==
+        SpreadsheetStatus.active) {
       result += '(actief)';
-    } else if (AppData.instance.spreadSheetStatus ==
+    } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.initial) {
       result += '(nieuw)';
-    } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.opened) {
+    } else if (AppData.instance.getSpreadsheet().status ==
+        SpreadsheetStatus.opened) {
       result += '(geopend)';
-    } else if (AppData.instance.spreadSheetStatus == SpreadsheetStatus.dirty) {
+    } else if (AppData.instance.getSpreadsheet().status ==
+        SpreadsheetStatus.dirty) {
       result += '(aangepast)';
-    } else if (AppData.instance
-        .getSpreadsheetDate()
-        .isBefore(DateTime.now().copyWith(day: 1))) {
-      result += '(verlopen)';
     }
 
     return result;

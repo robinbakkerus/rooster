@@ -26,15 +26,13 @@ class WidgetHelper {
   ///-------------------------------
   void showSnackbar(String msg,
       {Color color = Colors.lightBlue, int seconds = 3}) {
-    if (msg != AppData.instance.lastSnackbarMsg || color == Colors.lightGreen) {
-      SnackBar snackBar = SnackBar(
-          backgroundColor: color,
-          content: Text(msg),
-          duration: Duration(seconds: seconds));
+    SnackBar snackBar = SnackBar(
+        backgroundColor: color,
+        content: Text(msg),
+        duration: Duration(seconds: seconds));
 
-      scaffoldKey.currentState?.showSnackBar(snackBar);
-      AppData.instance.lastSnackbarMsg = msg;
-    }
+    scaffoldKey.currentState?.showSnackBar(snackBar);
+    AppData.instance.lastSnackbarMsg = msg;
   }
 
   ///--------------------------------------
