@@ -166,21 +166,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         continue;
       }
 
-      MaterialStateColor col =
-          MaterialStateColor.resolveWith((states) => Colors.white);
-      if (fsRow.isExtraRow) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
-      } else if (fsRow.date.weekday == DateTime.saturday) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
-      } else if (AppHelper.instance.isDateExcluded(fsRow.date)) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
-      } else if (fsRow.date.weekday == DateTime.tuesday) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
-      } else if (fsRow.date.weekday == DateTime.thursday) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
-      } else if (fsRow.date.weekday == DateTime.saturday) {
-        col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
-      }
+      MaterialStateColor col = _getRowColor(fsRow);
 
       List<DataCell> cells = _buildDataCells(fsRow);
       if (cells.length != _headerLength) {
@@ -191,6 +177,23 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     }
 
     return result;
+  }
+
+  MaterialStateColor _getRowColor(SheetRow fsRow) {
+    MaterialStateColor col =
+        MaterialStateColor.resolveWith((states) => Colors.white);
+    if (fsRow.isExtraRow) {
+      col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
+    } else if (fsRow.date.weekday == DateTime.saturday) {
+      col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
+    } else if (AppHelper.instance.isDateExcluded(fsRow.date)) {
+      col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
+    } else if (fsRow.date.weekday == DateTime.tuesday) {
+      col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
+    } else if (fsRow.date.weekday == DateTime.thursday) {
+      col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
+    }
+    return col;
   }
 
   //------------------------------
