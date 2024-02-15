@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rooster/data/app_version.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:url_launcher/link.dart';
 
@@ -34,6 +35,8 @@ class HelpPage extends StatelessWidget with AppMixin {
           ),
           wh.verSpace(10),
           _buildFaq(),
+          wh.verSpace(10),
+          Text('Versie: $appVersion'),
         ],
       ),
     );

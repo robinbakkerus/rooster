@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
@@ -134,9 +133,6 @@ class _StartPageState extends State<StartPage> {
   }
 
   String _getSpreadstatus() {
-    log(AppData.instance.getSpreadsheetDate().toString());
-    log(AppData.instance.getSpreadsheet().status.toString());
-
     String result = ' : ';
     DateTime useDate = AppData.instance.getSpreadsheetDate().copyWith(day: 2);
     if (useDate.isBefore(DateTime.now().copyWith(day: 1))) {

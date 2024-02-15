@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +7,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/authentication.dart';
+import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
@@ -54,7 +53,6 @@ class AppController {
       html.document.cookie = "ac=${trainer.accessCode}";
       return true;
     } else {
-      log("no trainer with access code $accessCode");
       return false;
     }
   }
@@ -254,8 +252,8 @@ class AppController {
     } else if (!forAllTrainers) {
       try {
         await _createNewTrainerSchema(useTrainer, result);
-      } catch (ex) {
-        log('ex $ex');
+      } catch (ex, stackTrace) {
+        FirestoreHelper.instance.handleError(ex, stackTrace);
       }
     }
     return result;
@@ -340,30 +338,22 @@ class AppController {
     for (Trainer trainer in AppData.instance.getAllTrainers()) {
       String html = _generateSpreadsheetIsFinalHtml(spreadSheet, trainer);
 
-      bool okay = await Dbs.instance.sendEmail(
+      await Dbs.instance.sendEmail(
           toList: toList,
           ccList: [],
           subject: 'Trainingschema definitief',
           html: html);
-
-      if (!okay) {
-        log('!email NOT  okay');
-      }
     }
   }
 
   //-------------------------------------
   Future<void> _mailSpreadsheetUpdate(String html,
       {required List<Trainer> to, required List<Trainer> cc}) async {
-    bool okay = await Dbs.instance.sendEmail(
+    await Dbs.instance.sendEmail(
         toList: to,
         ccList: cc,
         subject: 'Trainingschema wijziging',
         html: html);
-
-    if (!okay) {
-      log("!email NOT  okay");
-    }
   }
 
   //-------------------------------------------
