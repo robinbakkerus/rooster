@@ -12,25 +12,41 @@ class AskAccessCodePage extends StatefulWidget {
 }
 
 class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
-  final _textCtrl1 = TextEditingController();
+  final List<TextEditingController> _textCtrls = [];
+  final List<FocusNode> _focusNodes = [];
 
   bool _findTriggered = false;
 
   @override
   void initState() {
     super.initState();
+    _setup();
+  }
 
-    _textCtrl1.addListener(_onTextFieldChanged);
+  void _setup() {
+    for (int i = 0; i < 4; i++) {
+      _textCtrls.add(TextEditingController());
+      _textCtrls[i].addListener(_onTextFieldChanged);
+      _focusNodes.add(FocusNode());
+    }
   }
 
   @override
   void dispose() {
-    _textCtrl1.dispose();
+    for (int i = 0; i < 4; i++) {
+      _textCtrls[i].dispose();
+      _focusNodes[i].dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget scaffold = _buildScaffold();
+    return scaffold;
+  }
+
+  Widget _buildScaffold() {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
@@ -46,28 +62,18 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                 Container(
                   height: 20,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 200,
-                      child: TextField(
-                        controller: _textCtrl1,
-                        textCapitalization: TextCapitalization.characters,
-                        onChanged: (value) {
-                          if (_textCtrl1.text != value.toUpperCase()) {
-                            _textCtrl1.value = _textCtrl1.value
-                                .copyWith(text: value.toUpperCase());
-                          }
-                        },
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'toegangscode',
-                        ),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  width: 500,
+                  height: 100,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTextField(0),
+                      _buildTextField(1),
+                      _buildTextField(2),
+                      _buildTextField(3),
+                    ],
+                  ),
                 ),
                 wh.verSpace(10),
                 TextButton(
@@ -84,10 +90,45 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
     );
   }
 
+  Widget _buildTextField(int index) {
+    bool autoFocus = index == 0;
+    TextEditingController ctrl = _textCtrls[index];
+    return SizedBox(
+      width: 60,
+      height: 60,
+      child: Center(
+        child: TextField(
+          autofocus: autoFocusroma,
+          textAlign: TextAlign.center,
+          textAlignVertical: TextAlignVertical.top,
+          focusNode: _focusNodes[index],
+          controller: _textCtrls[index],
+          textCapitalization: TextCapitalization.characters,
+          onChanged: (value) {
+            if (ctrl.text != value.toUpperCase()) {
+              ctrl.value = ctrl.value.copyWith(text: value.toUpperCase());
+            }
+
+            if (index < 3 && ctrl.text.isNotEmpty) {
+              _focusNodes[index + 1].requestFocus();
+            }
+          },
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onTextFieldChanged() async {
-    final text = _textCtrl1.text;
+    String text = '';
+    for (int i = 0; i < 4; i++) {
+      text += _textCtrls[i].text;
+    }
     if (text.length == 4 && !_findTriggered) {
-      String accessCode = _textCtrl1.text.toUpperCase();
+      String accessCode = text.toUpperCase();
       await _findTrainer(accessCode);
     }
   }
