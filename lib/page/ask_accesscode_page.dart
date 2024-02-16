@@ -98,7 +98,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
       height: 60,
       child: Center(
         child: TextField(
-          autofocus: autoFocusroma,
+          autofocus: autoFocus,
           textAlign: TextAlign.center,
           textAlignVertical: TextAlignVertical.top,
           focusNode: _focusNodes[index],
