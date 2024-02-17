@@ -157,7 +157,7 @@ class AppController {
         SpreadSheet(year: fsSpreadsheet.year, month: fsSpreadsheet.month);
     spreadSheet.status = fsSpreadsheet.isFinal
         ? SpreadsheetStatus.active
-        : SpreadsheetStatus.initial;
+        : SpreadsheetStatus.underConstruction;
 
     List<Available> availableList =
         SpreadsheetGenerator.instance.generateAvailableTrainersCounts();

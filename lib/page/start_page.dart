@@ -141,7 +141,7 @@ class _StartPageState extends State<StartPage> {
         SpreadsheetStatus.active) {
       result += '(actief)';
     } else if (AppData.instance.getSpreadsheet().status ==
-        SpreadsheetStatus.initial) {
+        SpreadsheetStatus.underConstruction) {
       result += '(nieuw)';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.opened) {

@@ -80,7 +80,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
             SpreadsheetStatus.opened ||
         AppData.instance.getSpreadsheet().status == SpreadsheetStatus.dirty ||
         (AppData.instance.getSpreadsheet().status ==
-                SpreadsheetStatus.initial &&
+                SpreadsheetStatus.underConstruction &&
             AppData.instance.getTrainer().isSupervisor()));
   }
 
@@ -276,7 +276,8 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   //----------------------------
   Widget _buildActionButton(BuildContext context) {
-    if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.initial) {
+    if (AppData.instance.getSpreadsheet().status ==
+        SpreadsheetStatus.underConstruction) {
       return _buildActionButtonsNewSpreadsheet();
     } else {
       return _buildActionButtonPublishedSpreadsheet();

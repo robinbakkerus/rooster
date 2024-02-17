@@ -111,8 +111,12 @@ class SpreadsheetGenerator with AppMixin {
       fsRows.add(_mapFromRow(sheetRow));
     }
 
-    bool isFinal =
-        spreadSheet.status == SpreadsheetStatus.initial ? false : true;
+    // this will be overwritten if the [make Final] button is pressed.
+    bool isFinal = AppData.instance.getOriginalpreadsheet().status ==
+            SpreadsheetStatus.active
+        ? true
+        : false;
+
     FsSpreadsheet result = FsSpreadsheet(
         year: spreadSheet.year,
         month: spreadSheet.month,

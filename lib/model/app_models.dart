@@ -41,7 +41,7 @@ enum RunMode {
 
 enum SpreadsheetStatus {
   old,
-  initial,
+  underConstruction,
   active,
   opened,
   dirty;
@@ -575,7 +575,7 @@ class PlanRankStartValue {
 class SpreadSheet {
   int year = 2024;
   int month = 1;
-  SpreadsheetStatus status = SpreadsheetStatus.initial;
+  SpreadsheetStatus status = SpreadsheetStatus.underConstruction;
   List<SheetRow> rows = [];
 
   void addRow(SheetRow row) {
