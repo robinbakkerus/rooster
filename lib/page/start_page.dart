@@ -268,10 +268,6 @@ class _StartPageState extends State<StartPage> {
             child: const Text("Trainer settings"),
           ),
           PopupMenuItem(
-            value: PageEnum.splashPage.code.toString(),
-            child: const Text("-----"),
-          ),
-          PopupMenuItem(
             value: PageEnum.spreadSheet.code.toString(),
             child: const Text("Spreadsheet & voortgang"),
           ),

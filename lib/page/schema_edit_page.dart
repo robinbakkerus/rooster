@@ -66,7 +66,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
             headingRowHeight: 30,
             horizontalMargin: 10,
             headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lightblue),
+                MaterialStateColor.resolveWith((states) => c.lonuBlauw),
             columnSpacing: colSpace,
             dataRowMinHeight: 25,
             dataRowMaxHeight: 40,

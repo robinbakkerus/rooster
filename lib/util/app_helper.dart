@@ -282,6 +282,6 @@ class AppHelper with AppMixin {
   String _getShortWeekDay(DateTime dateTime) {
     String dag =
         weekDayStringFromDate(date: dateTime, locale: c.localNL, length: 3);
-    return dag.substring(0, 3);
+    return dag.substring(0, 2);
   }
 }

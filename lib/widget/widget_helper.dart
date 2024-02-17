@@ -64,11 +64,11 @@ class WidgetHelper {
     DateTime date = AppData.instance.getActiveDates()[dateIndex];
 
     if (date.weekday == DateTime.tuesday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightGeen);
+      col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
     } else if (date.weekday == DateTime.thursday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightOrange);
+      col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
     } else if (date.weekday == DateTime.saturday) {
-      col = MaterialStateColor.resolveWith((states) => c.lightBrown);
+      col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
     }
 
     return col;
