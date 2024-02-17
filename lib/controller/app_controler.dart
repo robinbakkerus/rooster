@@ -206,6 +206,7 @@ class AppController {
     }
 
     await Dbs.instance.saveFsSpreadsheet(fsSpreadsheet);
+    await generateOrRetrieveSpreadsheet();
     AppEvents.fireSpreadsheetReady();
   }
 

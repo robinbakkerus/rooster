@@ -16,7 +16,9 @@ import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/page/trainer_prefs_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
 import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/util/spreadsheet_status_help.dart' as status_help;
 import 'package:rooster/widget/busy_indicator.dart';
+import 'package:rooster/widget/widget_helper.dart';
 import 'package:universal_html/html.dart' as html;
 
 class StartPage extends StatefulWidget {
@@ -28,7 +30,7 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> {
   // varbs
-  String _barTitle = '???';
+  Widget _barTitle = Container();
   String _accessCode = '';
 
   // This corresponds with action button next right arrow action (these are handled seperately)
@@ -100,7 +102,7 @@ class _StartPageState extends State<StartPage> {
   PreferredSizeWidget? _appBar() {
     return AppBar(
       backgroundColor: _runModeColor(),
-      title: Text(_barTitle),
+      title: _barTitle,
       actions: [
         _actionPrevMonth(),
         _actionNextMonth(),
@@ -109,46 +111,71 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  String _buildBarTitle() {
-    String result = '${AppData.instance.getTrainer().firstName()}: ';
+  Widget _buildBarTitle() {
+    String title = _getBarTitle();
+    if (_getStackIndex() == PageEnum.spreadSheet.code) {
+      return _buildSpreadsheetStatusBarTitle(title);
+    } else {
+      return Text(title);
+    }
+  }
+
+  String _getBarTitle() {
+    String title = '${AppData.instance.getTrainer().firstName()} ';
 
     if (_getStackIndex() == PageEnum.editSchema.code) {
-      result += AppData.instance.getActiveMonthAsString();
+      title += AppData.instance.getActiveMonthAsString();
       if (AppHelper.instance.isWindows() || AppHelper.instance.isTablet()) {
-        result += ' ${AppData.instance.getActiveYear()}';
+        title += ' ${AppData.instance.getActiveYear()}';
       }
     } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
-      result += ' Instellingen';
+      title += ' Instellingen';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       String s = AppHelper.instance.isWindows() ? 'Schema' : 'S';
-      result = '$s ${AppData.instance.getActiveMonthAsString()}';
-      result += _getSpreadstatus();
+      title = '$s ${AppData.instance.getActiveMonthAsString()}';
+      title += _getSpreadstatus();
     } else if (_getStackIndex() == PageEnum.helpPage.code) {
-      return 'Help pagina';
+      title = 'Help pagina';
     } else if (_getStackIndex() == PageEnum.adminPage.code) {
-      return 'Admin pagina';
+      title = 'Admin pagina';
     }
+    return title;
+  }
 
-    return result;
+  Widget _buildSpreadsheetStatusBarTitle(String title) {
+    return Row(
+      children: [
+        Text(title),
+        WidgetHelper.instance.horSpace(5),
+        InkWell(
+          onTap: () => _showStatusHelpDialog(title),
+          child: const Icon(
+            Icons.help,
+            size: 32,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    );
   }
 
   String _getSpreadstatus() {
     String result = ' : ';
     DateTime useDate = AppData.instance.getSpreadsheetDate().copyWith(day: 2);
     if (useDate.isBefore(DateTime.now().copyWith(day: 1))) {
-      result += '(verlopen)';
+      result += 'verlopen';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.active) {
-      result += '(actief)';
+      result += 'actief';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.underConstruction) {
-      result += '(nieuw)';
+      result += 'onderhanden';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.opened) {
-      result += '(geopend)';
+      result += 'geopend';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.dirty) {
-      result += '(aangepast)';
+      result += 'aangepast';
     }
 
     return result;
@@ -412,5 +439,28 @@ class _StartPageState extends State<StartPage> {
   int _getStackIndex() => AppData.instance.stackIndex;
   void _setStackIndex(int value) {
     AppData.instance.stackIndex = value;
+  }
+
+  void _showStatusHelpDialog(String title) {
+    Widget closeButton = TextButton(
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop(); // dismisses only the dialog and returns nothing
+      },
+      child: const Text("CLose"),
+    ); // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: Text(status_help.helpText()),
+      actions: [
+        closeButton,
+      ],
+    ); // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }
