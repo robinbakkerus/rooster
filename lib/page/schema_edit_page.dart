@@ -155,6 +155,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
     Color col = Colors.lightBlue;
+    int seconds = 2;
 
     String maand = AppData.instance.getActiveMonthAsString();
 
@@ -167,10 +168,11 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
       if (!_isEditable()) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;
+        seconds = 3;
       }
     }
 
-    wh.showSnackbar(msg, color: col);
+    wh.showSnackbar(msg, color: col, seconds: seconds);
   }
 }
 
