@@ -122,15 +122,17 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   DataCell _buildRadioButtonDataCell(int dateIndex, int value, Color color) {
     int avail = _availableList[dateIndex];
     return DataCell(RadioButtonWidget.forAvailability(
-        key: UniqueKey(),
-        dateIndex: dateIndex,
-        value: avail,
-        rbValue: value,
-        color: color));
+      key: UniqueKey(),
+      dateIndex: dateIndex,
+      value: avail,
+      rbValue: value,
+      color: color,
+      isEditable: _isEditable(),
+    ));
   }
 
   Widget? _buildFab() {
-    if (AppData.instance.isSchemaDirty()) {
+    if (AppData.instance.isSchemaDirty() && _isEditable()) {
       return FloatingActionButton(
         onPressed: _onSaveSchema,
         hoverColor: Colors.greenAccent,
@@ -151,7 +153,6 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   void _showSnackbarIfNeeded() {
     TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
-    DateTime tsDate = DateTime(ts.year, ts.month, 1);
     String msg = 'Hallo ${AppData.instance.getTrainer().firstName()} : ';
     Color col = Colors.lightBlue;
 
@@ -163,8 +164,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     } else {
       msg += 'Schema $maand geopend';
       // make use the datecheck is correct
-      DateTime useDate = AppData.instance.lastActiveDate.copyWith(day: 2);
-      if (useDate.isAfter(tsDate)) {
+      if (!_isEditable()) {
         msg += ', maar kan niet meer worden gewijzigd want deze is definitief';
         col = Colors.orange;
       }
@@ -174,8 +174,16 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   }
 }
 
+///------------------------------------------------
+bool _isEditable() {
+  TrainerSchema ts = AppData.instance.getTrainerData().trainerSchemas;
+  DateTime tsDate = DateTime(ts.year, ts.month, 1);
+  // make use the datecheck is correct
+  DateTime useDate = AppData.instance.lastActiveDate.copyWith(day: 2);
+  return !useDate.isAfter(tsDate);
+}
+
 ///----------------------------------------------------------------
-///
 
 final double w1 = 0.1 * AppData.instance.screenWidth;
 final double w15 = 0.15 * AppData.instance.screenWidth;

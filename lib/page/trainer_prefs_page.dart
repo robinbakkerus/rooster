@@ -321,11 +321,13 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       String paramName, int rbValue, Color color) {
     int value = _updateTrainer.getPrefValue(paramName: paramName);
     return DataCell(RadioButtonWidget.forPreference(
-        key: UniqueKey(),
-        rbValue: rbValue,
-        color: color,
-        paramName: paramName,
-        value: value));
+      key: UniqueKey(),
+      rbValue: rbValue,
+      color: color,
+      paramName: paramName,
+      value: value,
+      isEditable: true,
+    ));
   }
 
   ///------------------------------------------------

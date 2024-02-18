@@ -9,12 +9,14 @@ class RadioButtonWidget extends StatefulWidget {
   final int value;
   final int rbValue;
   final Color color;
+  final bool isEditable;
 
   // you have to provide either dateIndex && value or paramName && value
   const RadioButtonWidget({
     required Key key,
     required this.rbValue,
     required this.color,
+    required this.isEditable,
     this.dateIndex = -1,
     this.paramName = '',
     this.value = 0,
@@ -26,28 +28,32 @@ class RadioButtonWidget extends StatefulWidget {
     required Color color,
     required int dateIndex,
     required int value,
+    required bool isEditable,
   }) {
     return RadioButtonWidget(
-        key: key,
-        rbValue: rbValue,
-        color: color,
-        dateIndex: dateIndex,
-        value: value);
+      key: key,
+      rbValue: rbValue,
+      color: color,
+      dateIndex: dateIndex,
+      value: value,
+      isEditable: isEditable,
+    );
   }
 
-  factory RadioButtonWidget.forPreference({
-    required Key key,
-    required int rbValue,
-    required Color color,
-    required String paramName,
-    required int value,
-  }) {
+  factory RadioButtonWidget.forPreference(
+      {required Key key,
+      required int rbValue,
+      required Color color,
+      required String paramName,
+      required int value,
+      required bool isEditable}) {
     return RadioButtonWidget(
         key: key,
         rbValue: rbValue,
         color: color,
         paramName: paramName,
-        value: value);
+        value: value,
+        isEditable: isEditable);
   }
   @override
   State<RadioButtonWidget> createState() => _RadioButtonWidgetState();
@@ -69,7 +75,7 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> with AppMixin {
         activeColor: widget.color,
         value: widget.value,
         groupValue: widget.rbValue,
-        onChanged: (val) => onChangeValue(val),
+        onChanged: (val) => widget.isEditable ? onChangeValue(val) : null,
       ),
     );
   }
