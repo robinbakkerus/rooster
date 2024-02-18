@@ -34,11 +34,7 @@ class _AnimatedFabState extends State<AnimatedFab> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.lightGreenAccent,
-      // Use the properties stored in the State class.
-      // width: _width,
-      // height: _height,
-      // decoration: _boxDecoration(),
+      decoration: _boxDecoration(),
       // duration: const Duration(milliseconds: 500),
       // Provide an optional curve to make the animation feel smoother.
       // curve: Curves.bounceIn,
@@ -80,23 +76,23 @@ class _AnimatedFabState extends State<AnimatedFab> {
     );
   }
 
-  // BoxDecoration _boxDecoration() {
-  //   return const BoxDecoration(
-  //       borderRadius: BorderRadius.all(
-  //         Radius.circular(18.0),
-  //       ),
-  //       color: Colors.lightGreen,
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.pink,
-  //           spreadRadius: 4,
-  //           blurRadius: 10,
-  //         ),
-  //         BoxShadow(
-  //           color: Colors.pink,
-  //           spreadRadius: -4,
-  //           blurRadius: 5,
-  //         ),
-  //       ]);
-  // }
+  BoxDecoration _boxDecoration() {
+    return const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(18.0),
+        ),
+        color: Colors.lightGreen,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.greenAccent,
+            spreadRadius: 4,
+            blurRadius: 10,
+          ),
+          BoxShadow(
+            color: Colors.greenAccent,
+            spreadRadius: -4,
+            blurRadius: 5,
+          ),
+        ]);
+  }
 }
