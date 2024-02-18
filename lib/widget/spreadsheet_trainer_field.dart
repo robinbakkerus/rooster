@@ -211,13 +211,6 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
       children: [
         TextButton(
             onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pop(); // dismisses only the dialog and returns nothing
-            },
-            child: const Text("Cancel", style: TextStyle(color: Colors.red))),
-        wh.horSpace(10),
-        TextButton(
-            onPressed: () {
               AppEvents.fireSpreadsheetTrainerUpdated(
                   widget.sheetRow.rowIndex, _groupIndex, _textTextCtrl.text);
 
@@ -225,6 +218,13 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
                   .pop(); // dismisses only the dialog and returns nothing
             },
             child: const Text("Save", style: TextStyle(color: Colors.green))),
+        wh.horSpace(10),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text("Cancel", style: TextStyle(color: Colors.red))),
       ],
     );
   }
@@ -234,16 +234,6 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
       children: [
         TextButton(
             onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pop(); // dismisses only the dialog and returns nothing
-            },
-            child: const Text(
-              "Nee",
-              style: TextStyle(color: Colors.red),
-            )),
-        wh.horSpace(10),
-        TextButton(
-            onPressed: () {
               AppEvents.fireSpreadsheetTrainerUpdated(widget.sheetRow.rowIndex,
                   _groupIndex, AppData.instance.getTrainer().firstName());
 
@@ -251,6 +241,16 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
                   .pop(); // dismisses only the dialog and returns nothing
             },
             child: const Text("Ja", style: TextStyle(color: Colors.green))),
+        wh.horSpace(10),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true)
+                  .pop(); // dismisses only the dialog and returns nothing
+            },
+            child: const Text(
+              "Nee",
+              style: TextStyle(color: Colors.red),
+            )),
       ],
     );
   }

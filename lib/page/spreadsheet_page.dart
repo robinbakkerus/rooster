@@ -448,8 +448,8 @@ Weet je zeker dat je wijzigingen wilt aanbrengen?
       title: const Text("Schema definitief maken"),
       content: Text(msg),
       actions: [
-        cancelButton,
         continueButton,
+        cancelButton,
       ],
     ); // show the dialog
     showDialog(
