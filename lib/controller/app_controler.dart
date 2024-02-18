@@ -276,6 +276,22 @@ class AppController {
     return allTrainerData;
   }
 
+  /// ---------- get TrainerData for all trainers
+  Future<List<TrainerData>> getAllTrainerData() async {
+    List<Trainer> allTrainers = await Dbs.instance.getAllTrainers();
+
+    List<TrainerData> allTrainerData = [];
+    for (Trainer trainer in allTrainers) {
+      TrainerData trainerData =
+          await _getTheTrainerData(trainer: trainer, forAllTrainers: true);
+      allTrainerData.add(trainerData);
+    }
+
+    AppData.instance.setAllTrainerData(allTrainerData);
+
+    return allTrainerData;
+  }
+
   ///------------------------------------------------
   Future<void> _createNewTrainerSchema(
       Trainer useTrainer, TrainerData result) async {

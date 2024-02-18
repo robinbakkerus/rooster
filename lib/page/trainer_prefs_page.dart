@@ -1,3 +1,5 @@
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -117,7 +119,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         children: [
           SizedBox(
             width: c.w1,
-            child: const Text('toeganscode'),
+            child: const Text('toegangscode'),
           ),
           wh.horSpace(10),
           SizedBox(
@@ -130,6 +132,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
                   contentPadding: EdgeInsets.all(2)),
               textCapitalization: TextCapitalization.characters,
               onChanged: (value) {
+                _getAllTrainersIfNeeded(value);
                 if (_textAccessCodeCtrl.text != value.toUpperCase()) {
                   if (value.length > 4) {
                     value = value.substring(0, 4);
@@ -149,6 +152,14 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     );
   }
 
+  //----------------------------------
+  void _getAllTrainersIfNeeded(String value) async {
+    if (AppData.instance.getAllTrainerData().isEmpty && value.isNotEmpty) {
+      await AppController.instance.getAllTrainerData();
+    }
+  }
+
+  //----------------------------------
   Widget _emailRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
@@ -337,11 +348,39 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
 
   ///------------------------------------------------
   void _onSaveTrainer() async {
-    bool okay = await AppController.instance.updateTrainer(_updateTrainer);
-    String msg = okay
-        ? 'Met succes voorkeuren aangepast'
-        : 'Fout tijdens aanpassen voorkeuren';
-    wh.showSnackbar(msg, color: Colors.lightGreen);
+    if (_isValid()) {
+      bool okay = await AppController.instance.updateTrainer(_updateTrainer);
+      String msg = okay
+          ? 'Met succes voorkeuren aangepast'
+          : 'Fout tijdens aanpassen voorkeuren';
+      wh.showSnackbar(msg, color: Colors.lightGreen);
+    } else {}
+  }
+
+  ///------------------------------------------------
+  bool _isValid() {
+    if (!_textEmailCtrl.text.isNotEmpty && _isValidEmail(_textEmailCtrl.text)) {
+      wh.showSnackbar('Ongeldige email', color: Colors.red);
+    }
+    if (_textAccessCodeCtrl.text.length != 4) {
+      wh.showSnackbar('Toegangscode moet 4 letter zijn', color: Colors.red);
+    }
+    lp(AppData.instance.getAllTrainers().toString());
+    Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull((e) =>
+        e.originalAccessCode == _textAccessCodeCtrl.text ||
+        e.accessCode == _textAccessCodeCtrl.text);
+    if (trainer != null && trainer.pk != AppData.instance.getTrainer().pk) {
+      wh.showSnackbar('Deze accesscode bestaat al', color: Colors.red);
+    }
+
+    return false;
+  }
+
+  ///------------------------------------------------
+  bool _isValidEmail(String address) {
+    return RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(address);
   }
 
   ///------------------------------------------------
