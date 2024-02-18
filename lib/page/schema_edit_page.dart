@@ -5,6 +5,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
+import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
 class SchemaEditPage extends StatefulWidget {
@@ -15,7 +16,6 @@ class SchemaEditPage extends StatefulWidget {
 }
 
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
-  final Icon _fabIcon = const Icon(Icons.save);
   List<int> _availableList = [];
 
   _SchemaEditPageState();
@@ -136,7 +136,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
       return FloatingActionButton(
         onPressed: _onSaveSchema,
         hoverColor: Colors.greenAccent,
-        child: _fabIcon,
+        child: const AnimatedFab(),
       );
     } else {
       return null;

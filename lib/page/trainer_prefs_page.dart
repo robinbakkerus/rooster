@@ -8,6 +8,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
+import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
 class TrainerPrefsPage extends StatefulWidget {
@@ -336,7 +337,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       return FloatingActionButton(
         onPressed: _onSaveTrainer,
         hoverColor: Colors.greenAccent,
-        child: const Icon(Icons.save),
+        child: const AnimatedFab(),
       );
     } else {
       return null;

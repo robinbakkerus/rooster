@@ -5,6 +5,7 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
+import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_top_buttons.dart';
 import 'package:rooster/widget/spreadsheet_trainer_field.dart';
@@ -67,7 +68,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       return FloatingActionButton(
         onPressed: _saveSpreadsheetMutations,
         hoverColor: Colors.greenAccent,
-        child: const Text('Save'),
+        child: const AnimatedFab(),
       );
     } else {
       return null;
