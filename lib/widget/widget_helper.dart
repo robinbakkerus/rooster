@@ -73,4 +73,71 @@ class WidgetHelper {
 
     return col;
   }
+
+  //--------------------------------
+  void showConfirmDialog(BuildContext context,
+      {required String title,
+      required String content,
+      Function? yesFunction,
+      Function? noFunction}) async {
+    Widget noButton = _buildYesNoButton(context, 'Nee', Colors.red, false);
+    Widget yesButton = _buildYesNoButton(context, 'Ja', Colors.green, true);
+
+    AlertDialog alert = _buildAlertDialog(
+        title: title,
+        content: content,
+        yesButton: yesButton,
+        noButton: noButton);
+    bool dialogResult = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+
+    if (dialogResult == true && yesFunction != null) {
+      yesFunction();
+    } else if (dialogResult == false && noFunction != null) {
+      noFunction();
+    }
+  }
+
+//----------------------------------
+  AlertDialog _buildAlertDialog(
+      {required String title,
+      required String content,
+      required Widget yesButton,
+      required Widget noButton}) {
+    return AlertDialog(
+      title: Text(title),
+      content: SizedBox(
+        height: 100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(content),
+          ],
+        ),
+      ),
+      actions: [
+        noButton,
+        yesButton,
+      ],
+    );
+  }
+
+  //--------------------------------
+  Widget _buildYesNoButton(
+      BuildContext context, String text, Color color, bool result) {
+    return TextButton(
+      onPressed: () {
+        Navigator.pop(context, result);
+      },
+      child: Text(
+        text,
+        style: TextStyle(color: color),
+      ),
+    );
+  }
 }

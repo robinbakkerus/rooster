@@ -298,7 +298,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   Widget _buildActionButtonPublishedSpreadsheet() {
     if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.active) {
       return OutlinedButton(
-          onPressed: _buildDialogOpenSpreadsheet,
+          onPressed: _buildOpenSchemaAlertDialog,
           child: const Text('Maak schema open voor wijziging(en)'));
     } else {
       return Container();
@@ -352,62 +352,24 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     );
   }
 
-  //--------------------------------
-  void _buildDialogOpenSpreadsheet() async {
-    Widget noButton = _buildYesNoButton('Nee', Colors.red, false);
-    Widget yesButton = _buildYesNoButton('Ja', Colors.green, true);
-
-    AlertDialog alert =
-        _buildAlertDialog(yesButton: yesButton, noButton: noButton);
-    bool dialogResult = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-
-    setState(() {
-      if (dialogResult == true) {
-        AppData.instance.getSpreadsheet().status = SpreadsheetStatus.opened;
-        AppEvents.fireSpreadsheetReady();
-      }
-    });
-  }
-
-  //--------------------------------
-  Widget _buildYesNoButton(String text, Color color, bool result) {
-    return TextButton(
-      onPressed: () {
-        Navigator.pop(context, result);
-      },
-      child: Text(
-        text,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
-
   //----------------------------------
-  AlertDialog _buildAlertDialog(
-      {required Widget yesButton, required Widget noButton}) {
-    return AlertDialog(
-      title: const Text("Trainingschema"),
-      content: const SizedBox(
-        height: 100,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Dit schema is gepubliceerd!'),
-            Text('Weet je zeker dat je wijzigingen wilt aanbrengen?'),
-          ],
-        ),
-      ),
-      actions: [
-        noButton,
-        yesButton,
-      ],
-    );
+  void _buildOpenSchemaAlertDialog() {
+    String content = '''
+Dit schema is gepubliceerd!
+Weet je zeker dat je wijzigingen wilt aanbrengen?
+''';
+    wh.showConfirmDialog(context,
+        title: 'Trainingschema',
+        content: content,
+        yesFunction: () => _handleYes());
+  }
+
+  //-------------------------------
+  void _handleYes() {
+    setState(() {
+      AppData.instance.getSpreadsheet().status = SpreadsheetStatus.opened;
+      AppEvents.fireSpreadsheetReady();
+    });
   }
 
   //---------------------------------
