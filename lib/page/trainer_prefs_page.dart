@@ -373,7 +373,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       wh.showSnackbar('Deze accesscode bestaat al', color: Colors.red);
     }
 
-    return false;
+    return true;
   }
 
   ///------------------------------------------------
