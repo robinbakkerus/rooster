@@ -96,7 +96,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w15,
+            width: c.w40,
             child: Text(label),
           ),
           wh.horSpace(10),
@@ -119,7 +119,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w1,
+            width: c.w40,
             child: const Text('toegangscode'),
           ),
           wh.horSpace(10),

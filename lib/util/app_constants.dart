@@ -29,6 +29,8 @@ class AppConstants {
   final double w12 = 0.12 * AppData.instance.screenWidth;
   final double w15 = 0.15 * AppData.instance.screenWidth;
   final double w25 = 0.25 * AppData.instance.screenWidth;
+  final double w30 = 0.3 * AppData.instance.screenWidth;
+  final double w40 = 0.4 * AppData.instance.screenWidth;
 
   final String removeExtraSpreadsheetRow = 'REMOVE EXTRA ROW';
 
