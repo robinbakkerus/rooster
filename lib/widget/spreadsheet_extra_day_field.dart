@@ -33,8 +33,9 @@ class _SpreadsheetDayColumnState extends State<SpreadsheetDayColumn>
         ? const EdgeInsets.fromLTRB(5, 2, 5, 2)
         : const EdgeInsets.fromLTRB(2, 2, 2, 2);
 
-    Decoration? decoration =
-        _isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
+    Decoration? decoration = _isEditable()
+        ? BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey))
+        : null;
     return InkWell(
       onTap: _isEditable() ? () => _dialogBuilder(context) : null,
       child: Container(

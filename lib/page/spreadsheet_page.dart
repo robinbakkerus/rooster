@@ -241,7 +241,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         : 80;
     return DataCell(Container(
         decoration:
-            BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey)),
+            BoxDecoration(border: Border.all(width: 0.1, color: c.lightBrown)),
         width: w,
         child: SpreadsheetTrainingColumn(
           key: UniqueKey(),

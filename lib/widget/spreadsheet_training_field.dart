@@ -47,8 +47,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
 
   @override
   Widget build(BuildContext context) {
-    Decoration? decoration =
-        _isEditable() ? BoxDecoration(border: Border.all(width: 0.1)) : null;
+    Decoration? decoration = _isEditable()
+        ? BoxDecoration(border: Border.all(width: 0.1, color: Colors.grey))
+        : null;
     return InkWell(
       onTap: _isEditable()
           ? () => _buildEditTrainingDialog(context)

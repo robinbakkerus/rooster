@@ -52,7 +52,8 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
         onTap: _showDialog() ? () => _dialogBuilder(context) : null,
         child: Container(
             decoration: _showDialog()
-                ? BoxDecoration(border: Border.all(width: 0.1))
+                ? BoxDecoration(
+                    border: Border.all(width: 0.1, color: Colors.grey))
                 : null,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
