@@ -28,12 +28,10 @@ Maar er kunnen wel trainingen worden geruild.
 ''';
 
 String _helpUnderConstruction = '''
-Onderhanden betekend dat dit schema nog niet definitief is.
-Het is (nog) niet zichtbaar op de Lonu website.
-Er kunnen nog gewoon verhinderingen worden opgegeven.
-Het schema kan nog doorlopend wijzigen.
-Sterker nog, op veel punten zal het programma random een trainer selecteren, 
-dus elke keer als je dit schema opent kan het er weer anders uitzien.
+Onderhanden betekent dat dit schema nog niet definitief is, het is ook nog niet zichtbaar op de Lonu Website. 
+Het is voor deze maand nog mogelijk om voorkeuren en verhinderingen door te geven. 
+Op basis van input van trainers zal dit programma willekeurig beschikbare trainers kiezen/wijzigen totdat het schema definitief is gemaakt. 
+Neem de trainingen dus pas over in je eigen agenda als het schema definitief is. 
 ''';
 
 String _helpOpened = '''

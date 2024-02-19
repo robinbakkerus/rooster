@@ -19,6 +19,7 @@ import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_status_help.dart' as status_help;
 import 'package:rooster/widget/busy_indicator.dart';
+import 'package:rooster/widget/widget_helper.dart';
 import 'package:universal_html/html.dart' as html;
 
 class StartPage extends StatefulWidget {
@@ -52,6 +53,7 @@ class _StartPageState extends State<StartPage> {
     AppEvents.onShowPage(_onShowPage);
 
     Timer(const Duration(milliseconds: 2900), () {
+      WidgetHelper.instance.playWhooshSound();
       if (_accessCode.length == 4) {
         _findTrainer(_accessCode);
       } else {
@@ -131,12 +133,9 @@ class _StartPageState extends State<StartPage> {
     String result = '';
 
     if (_getStackIndex() == PageEnum.editSchema.code) {
-      result = firstName + AppData.instance.getActiveMonthAsString();
-      if (AppHelper.instance.isWindows() || AppHelper.instance.isTablet()) {
-        result += ' ${AppData.instance.getActiveYear()}';
-      }
+      result = _getBarTitleForSchemaEditPage();
     } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
-      result = '$firstName Instellingen';
+      result = 'Instellingen $firstName';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       result = _getBarTitleForSpreadhsheetPage();
     } else if (_getStackIndex() == PageEnum.helpPage.code) {
@@ -149,12 +148,28 @@ class _StartPageState extends State<StartPage> {
 
   String _getBarTitleForSpreadhsheetPage() {
     String result = '';
-    if (AppHelper.instance.isWindows() || AppHelper.instance.isTablet()) {
+    if (_isLargeScreen()) {
       result = 'Schema ${AppData.instance.getActiveMonthAsString()}';
     } else {
       result = AppData.instance.getActiveMonthAsString().substring(0, 3);
     }
     result += ' (${_getSpreadstatus()})';
+    return result;
+  }
+
+  String _getBarTitleForSchemaEditPage() {
+    String firstName = '${AppData.instance.getTrainer().firstName()} ';
+    String result = '';
+    if (_isLargeScreen()) {
+      result =
+          'Verhinderingen $firstName${AppData.instance.getActiveMonthAsString()}';
+      result += ' ${AppData.instance.getActiveYear()}';
+    } else {
+      result =
+          '$firstName ${AppData.instance.getActiveMonthAsString()} Verhinderingen';
+    }
+
+    if (_isLargeScreen()) {}
     return result;
   }
 
@@ -299,16 +314,16 @@ class _StartPageState extends State<StartPage> {
       itemBuilder: (BuildContext bc) {
         return [
           PopupMenuItem(
+            value: PageEnum.trainerSettings.code.toString(),
+            child: const Text("Trainer voorkeuren"),
+          ),
+          PopupMenuItem(
             value: PageEnum.editSchema.code.toString(),
             child: const Text("Trainer verhinderingen"),
           ),
           PopupMenuItem(
-            value: PageEnum.trainerSettings.code.toString(),
-            child: const Text("Trainer settings"),
-          ),
-          PopupMenuItem(
             value: PageEnum.spreadSheet.code.toString(),
-            child: const Text("Spreadsheet & voortgang"),
+            child: const Text("Schema & rooster"),
           ),
           PopupMenuItem(
             value: PageEnum.helpPage.code.toString(),
@@ -487,5 +502,10 @@ class _StartPageState extends State<StartPage> {
         return alert;
       },
     );
+  }
+
+  //--------------------
+  bool _isLargeScreen() {
+    return (AppHelper.instance.isWindows() || AppHelper.instance.isTablet());
   }
 }

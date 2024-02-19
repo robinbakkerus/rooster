@@ -169,16 +169,18 @@ MetaPlanRankValues getPlanRankValues() {
 // ApplyWeightValues
 List<String> getTrainerItems() {
   return [
-    'Herstelduurloop',
-    'Duurloop D1',
-    'Tempo Duurloop D2',
-    'Climaxduurloop D1/D2',
-    'Fartlek',
-    'Interval korte afstand',
-    'Intervalduurloop D1/D2',
-    'Bosloop',
-    'Gulbergen',
-    'Pyramideloop'
+    'Duurloop - D1',
+    'Duurloop - Tempo D2',
+    'Duurloop - Interval D1/D2',
+    'Duurloop - Climax D1/D2',
+    'Duurloop - Herstel',
+    'Interval - Korte afstand',
+    'Interval - Lange afstand',
+    'Interval - Pyramide',
+    'Interval - Fartlek',
+    'Bostraining of Gulbergen',
+    'Kilometerloop',
+    'Minutenloop'
   ];
 }
 
