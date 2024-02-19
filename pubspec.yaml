@@ -34,6 +34,7 @@ dependencies:
   stack_trace: ^1.11.1
   url_launcher: ^6.2.4
   avatar_glow: ^3.0.1
+  soundpool: ^2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -58,7 +59,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - sounds/
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

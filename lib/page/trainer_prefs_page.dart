@@ -428,6 +428,9 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         _updateTrainer.setPrefValue(event.paramName, event.newValue);
         _columnWidgets = _buildColumnWidgets();
         _fab = _getFab();
+        if (_isDirty()) {
+          wh.playWhooshSound();
+        }
       });
     }
   }

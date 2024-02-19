@@ -29,6 +29,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
 
   Widget _dataGrid = Container();
   int _headerLength = 0;
+  bool _fabVisible = false;
 
   _SpreadsheetPageState();
 
@@ -65,12 +66,17 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   //--------------------------------
   Widget? _buildFab() {
     if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.dirty) {
+      if (!_fabVisible) {
+        wh.playWhooshSound();
+      }
+      _fabVisible = true;
       return FloatingActionButton(
         onPressed: _saveSpreadsheetMutations,
         hoverColor: Colors.greenAccent,
         child: const AnimatedFab(),
       );
     } else {
+      _fabVisible = false;
       return null;
     }
   }

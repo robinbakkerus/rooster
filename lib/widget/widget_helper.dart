@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/util/app_constants.dart';
+import 'package:soundpool/soundpool.dart';
 
 class WidgetHelper {
   WidgetHelper._();
@@ -9,6 +11,10 @@ class WidgetHelper {
   final AppConstants c = AppConstants();
 
   final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
+  final Soundpool _soundPool = Soundpool.fromOptions();
+  late ByteData _soundAsset;
+  int _soundId = 0;
 
   ///--------------------------------------
   Widget horSpace(double h) {
@@ -139,5 +145,15 @@ class WidgetHelper {
         style: TextStyle(color: color),
       ),
     );
+  }
+
+  ///----------------------------------------------------------------
+  void playWhooshSound() async {
+    if (_soundId == 0) {
+      _soundAsset = await rootBundle.load("sounds/whoosh.mp3");
+      _soundId = await _soundPool.load(_soundAsset);
+    }
+
+    await _soundPool.play(_soundId);
   }
 }

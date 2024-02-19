@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
-import 'package:flutter/material.dart';
-import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
@@ -43,6 +43,9 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     if (mounted) {
       setState(() {
         _availableList = AppData.instance.newAvailaibleList;
+        if (AppData.instance.isSchemaDirty()) {
+          wh.playWhooshSound();
+        }
       });
     }
   }
