@@ -31,7 +31,8 @@ String _helpUnderConstruction = '''
 Onderhanden betekent dat dit schema nog niet definitief is, het is ook nog niet zichtbaar op de Lonu Website. 
 Het is voor deze maand nog mogelijk om voorkeuren en verhinderingen door te geven. 
 Op basis van input van trainers zal dit programma willekeurig beschikbare trainers kiezen/wijzigen totdat het schema definitief is gemaakt. 
-Neem de trainingen dus pas over in je eigen agenda als het schema definitief is. 
+
+Neem de trainingen dus pas over in je eigen agenda als het schema definitief is!. 
 ''';
 
 String _helpOpened = '''

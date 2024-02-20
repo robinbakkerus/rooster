@@ -133,11 +133,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   Widget _buildDropdown() {
-    String topVal = 'training...';
+    String topVal = '... Training';
     List<String> trainingItems = [topVal];
     trainingItems.addAll(AppData.instance.trainerItems);
 
     return DropdownButton(
+        itemHeight: null,
         value: topVal,
         items: trainingItems.map((String item) {
           return DropdownMenuItem(
@@ -168,9 +169,12 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
       _textCtrl.text = _training;
     });
 
-    AppEvents.fireTrainingUpdatedEvent(widget.sheetRow.rowIndex, _training);
+    List<String> tokens = value.toString().split(".");
+    if (tokens.length == 1) {
+      AppEvents.fireTrainingUpdatedEvent(widget.sheetRow.rowIndex, _training);
 
-    Navigator.of(context, rootNavigator: true)
-        .pop(); // dismisses only the dialog and returns nothing
+      Navigator.of(context, rootNavigator: true)
+          .pop(); // dismisses only the dialog and returns nothing
+    }
   }
 }

@@ -14,7 +14,7 @@ class AskAccessCodePage extends StatefulWidget {
 class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
   final List<TextEditingController> _textCtrls = [];
   final List<FocusNode> _focusNodes = [];
-  final _blankChar = '\u200B';
+
   bool _findTriggered = false;
 
   @override
@@ -25,8 +25,8 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
 
   void _setup() {
     for (int i = 0; i < 4; i++) {
-      _textCtrls.add(TextEditingController(text: _blankChar));
-      _textCtrls[i].addListener(() => _onTextFieldChanged(i));
+      _textCtrls.add(TextEditingController());
+      _textCtrls[i].addListener(_onTextFieldChanged);
       _focusNodes.add(FocusNode());
     }
   }
@@ -105,19 +105,12 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
           controller: _textCtrls[index],
           textCapitalization: TextCapitalization.characters,
           onChanged: (value) {
-            String useValue = value.replaceAll(_blankChar, '').toUpperCase();
-            if (ctrl.text != useValue) {
-              ctrl.text = useValue;
-              // ctrl.value = ctrl.value.replaced(replacementRange, replacementString) copyWith(text: value.toUpperCase());
+            if (ctrl.text != value.toUpperCase()) {
+              ctrl.value = ctrl.value.copyWith(text: value.toUpperCase());
             }
 
             if (index < 3 && ctrl.text.isNotEmpty) {
               _focusNodes[index + 1].requestFocus();
-            } else {
-              if (index > 0 && value.isEmpty) {
-                _focusNodes[index - 1].requestFocus();
-                ctrl.text = _blankChar;
-              }
             }
           },
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
@@ -129,10 +122,10 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
     );
   }
 
-  void _onTextFieldChanged(int index) async {
+  void _onTextFieldChanged() async {
     String text = '';
     for (int i = 0; i < 4; i++) {
-      text += _textCtrls[i].text.replaceAll(_blankChar, '');
+      text += _textCtrls[i].text;
     }
     if (text.length == 4 && !_findTriggered) {
       String accessCode = text.toUpperCase();
@@ -157,7 +150,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
         Navigator.of(context, rootNavigator: true)
             .pop(); // dismisses only the dialog and returns nothing
       },
-      child: const Text("CLose"),
+      child: const Text("Close"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: const Text('Stuur toegangscode'),

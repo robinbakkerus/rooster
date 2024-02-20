@@ -342,7 +342,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         Navigator.of(context, rootNavigator: true)
             .pop(); // dismisses only the dialog and returns nothing
       },
-      child: const Text("CLose"),
+      child: const Text("Close"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: const Text("Trainer inzet."),

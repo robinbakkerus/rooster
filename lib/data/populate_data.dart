@@ -180,7 +180,12 @@ List<String> getTrainerItems() {
     'Interval - Fartlek',
     'Bostraining of Gulbergen',
     'Kilometerloop',
-    'Minutenloop'
+    'Minutenloop',
+    'Locatie .../ Start 09:00u',
+    'Korte training 30 / ...',
+    'Bosloop / ...',
+    'Evenement / ...',
+    'Geen training / ...',
   ];
 }
 

@@ -135,7 +135,7 @@ class _StartPageState extends State<StartPage> {
     if (_getStackIndex() == PageEnum.editSchema.code) {
       result = _getBarTitleForSchemaEditPage();
     } else if (_getStackIndex() == PageEnum.trainerSettings.code) {
-      result = 'Instellingen $firstName';
+      result = 'Voorkeuren $firstName';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       result = _getBarTitleForSpreadhsheetPage();
     } else if (_getStackIndex() == PageEnum.helpPage.code) {
@@ -487,7 +487,7 @@ class _StartPageState extends State<StartPage> {
         Navigator.of(context, rootNavigator: true)
             .pop(); // dismisses only the dialog and returns nothing
       },
-      child: const Text("CLose"),
+      child: const Text("Close"),
     ); // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text(title),
