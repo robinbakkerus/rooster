@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -48,17 +49,22 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   @override
   Widget build(BuildContext context) {
     if (widget.sheetRow.rowCells.length > _groupIndex) {
+      String text = widget.sheetRow.rowCells[_groupIndex].text;
+      if (text.isEmpty) {
+        text = '           ';
+      }
+
       return InkWell(
-        onTap: _showDialog() ? () => _dialogBuilder(context) : null,
+        onTap: _isEditable() ? () => _dialogBuilder(context) : null,
         child: Container(
-            decoration: _showDialog()
+            decoration: _isEditable()
                 ? BoxDecoration(
                     border: Border.all(width: 0.1, color: Colors.grey))
                 : null,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
               child: Text(
-                widget.sheetRow.rowCells[_groupIndex].text,
+                text,
                 overflow: TextOverflow.ellipsis,
               ),
             )),
@@ -69,11 +75,6 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   bool _isSupervisor() => AppData.instance.getTrainer().isSupervisor();
-
-  bool _showDialog() {
-    String txt = widget.sheetRow.rowCells[_groupIndex].text;
-    return txt.isNotEmpty && _isEditable();
-  }
 
   Future<void> _dialogBuilder(BuildContext context) {
     if (_isSameTrainer() || _isSupervisor()) {
@@ -148,7 +149,7 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   Widget _buildDropdown() {
-    const topVal = 'Trainers ...';
+    const topVal = '... Trainers';
     List<String> trainerList = [topVal];
     trainerList.addAll(
         AppData.instance.getAllTrainers().map((e) => e.firstName()).toList());
@@ -160,12 +161,20 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
       );
     }).toList();
 
-    return DropdownButton(
-      menuMaxHeight: AppData.instance.screenHeight * 0.75,
+    return DropdownButton2(
+      isExpanded: true,
       isDense: true,
       value: topVal,
       items: items,
       onChanged: _onDropdownSelected,
+      buttonStyleData: const ButtonStyleData(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        height: 24,
+        width: 200,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 30,
+      ),
     );
   }
 

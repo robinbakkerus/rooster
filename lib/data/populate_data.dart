@@ -181,7 +181,7 @@ List<String> getTrainerItems() {
     'Bostraining of Gulbergen',
     'Kilometerloop',
     'Minutenloop',
-    'Locatie .../ Start 09:00u',
+    'Locatie ... / Start 09:00u',
     'Korte training 30 / ...',
     'Bosloop / ...',
     'Evenement / ...',

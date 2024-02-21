@@ -127,8 +127,8 @@ class WidgetHelper {
         ),
       ),
       actions: [
-        noButton,
         yesButton,
+        noButton,
       ],
     );
   }

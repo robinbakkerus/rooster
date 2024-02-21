@@ -489,15 +489,29 @@ class AppController {
   //--------------------------------------
   List<Trainer> _getSpreadsheetDiffsEmailRecipients(
       {required List<SpreedsheetDiff> diffs}) {
-    List<Trainer> result = AppHelper.instance.getAllSupervisors();
+    List<Trainer> trainerList = AppHelper.instance.getAllSupervisors();
     //plus the one who made the change
-    result.add(AppData.instance.getTrainer());
+    trainerList.add(AppData.instance.getTrainer());
 
     // plus all trainers that are affected
     for (SpreedsheetDiff diff in diffs) {
-      Trainer trainer =
+      Trainer newTrainer =
           AppHelper.instance.findTrainerByFirstName(diff.newValue);
-      if (!trainer.isEmpty()) {
+      if (!newTrainer.isEmpty()) {
+        trainerList.add(newTrainer);
+      }
+
+      Trainer oldTrainer =
+          AppHelper.instance.findTrainerByFirstName(diff.oldValue);
+      if (!newTrainer.isEmpty()) {
+        trainerList.add(oldTrainer);
+      }
+    }
+
+    //remove duplicates
+    List<Trainer> result = [];
+    for (Trainer trainer in trainerList) {
+      if (!result.contains(trainer)) {
         result.add(trainer);
       }
     }

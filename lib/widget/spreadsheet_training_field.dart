@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
@@ -137,8 +138,9 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
     List<String> trainingItems = [topVal];
     trainingItems.addAll(AppData.instance.trainerItems);
 
-    return DropdownButton(
-        itemHeight: null,
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2<String>(
+        isExpanded: true,
         value: topVal,
         items: trainingItems.map((String item) {
           return DropdownMenuItem(
@@ -146,7 +148,17 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
             child: Text(item),
           );
         }).toList(),
-        onChanged: _onDropdownSelected);
+        onChanged: _onDropdownSelected,
+        buttonStyleData: const ButtonStyleData(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          height: 24,
+          width: 300,
+        ),
+        menuItemStyleData: const MenuItemStyleData(
+          height: 30,
+        ),
+      ),
+    );
   }
 
   bool _isEditable() {
