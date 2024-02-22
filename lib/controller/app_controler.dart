@@ -351,10 +351,9 @@ class AppController {
 
   //-------------------------------------
   Future<void> _mailSpreadsheetIsFinal(SpreadSheet spreadSheet) async {
-    List<Trainer> toList = AppData.instance.getAllTrainers();
     for (Trainer trainer in AppData.instance.getAllTrainers()) {
       String html = _generateSpreadsheetIsFinalHtml(spreadSheet, trainer);
-
+      List<Trainer> toList = [trainer];
       await Dbs.instance.sendEmail(
           toList: toList,
           ccList: [],
