@@ -443,15 +443,17 @@ class AppController {
           SpreadsheetGenerator.instance.getGroupNames(newRow.date);
 
       String newVal = newRow.rowCells[c];
-      String oldVal = oldRow.rowCells[c];
-      if (newVal != oldVal) {
-        String column = groupNames[c];
-        SpreedsheetDiff diff = SpreedsheetDiff(
-            date: newRow.date,
-            column: column,
-            oldValue: oldVal,
-            newValue: newVal);
-        diffs.add(diff);
+      if (oldRow.rowCells.length > c) {
+        String oldVal = oldRow.rowCells[c];
+        if (newVal != oldVal) {
+          String column = groupNames[c];
+          SpreedsheetDiff diff = SpreedsheetDiff(
+              date: newRow.date,
+              column: column,
+              oldValue: oldVal,
+              newValue: newVal);
+          diffs.add(diff);
+        }
       }
     }
   }
