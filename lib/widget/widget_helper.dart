@@ -46,7 +46,7 @@ class WidgetHelper {
     List<DataColumn> result = [];
 
     var headerLabels = ['Dag', 'Ja', 'Nee', 'Als nodig'];
-    var colors = [Colors.black, Colors.green, Colors.red, Colors.brown];
+    var colors = [Colors.black, Colors.black, Colors.red, Colors.brown];
 
     for (int i = 0; i < headerLabels.length; i++) {
       result.add(DataColumn(

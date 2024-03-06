@@ -7,7 +7,7 @@ import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
-import 'package:universal_html/html.dart' as html;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -25,7 +25,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           OutlinedButton(
               onPressed: _addTrainers, child: const Text('Add trainers')),
           OutlinedButton(
-              onPressed: _removeCookie, child: const Text('Remove cookie')),
+              onPressed: _removeAccessCodePref,
+              child: const Text('Remove access code pref')),
           OutlinedButton(
               onPressed: _addTrainerSchemas,
               child: const Text('add trainer schemas')),
@@ -77,8 +78,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     return trainers;
   }
 
-  void _removeCookie() {
-    html.document.cookie = "ac=";
+  void _removeAccessCodePref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('ac', '');
   }
 
   void _addTrainerSchemas() async {

@@ -13,7 +13,7 @@ import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/busy_indicator.dart';
-import 'package:universal_html/html.dart' as html;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppController {
   AppController._();
@@ -39,7 +39,7 @@ class AppController {
         password: AppHelper.instance.getAuthPassword(trainer));
 
     if (signInOkay) {
-      _setCookieIfNeeded(trainer, accessCode);
+      _setAccessCodePrefIfNeeded(trainer, accessCode);
       AppEvents.fireTrainerReady();
       return true;
     } else {
@@ -47,10 +47,12 @@ class AppController {
     }
   }
 
-  bool _setCookieIfNeeded(Trainer trainer, String accessCode) {
+  Future<bool> _setAccessCodePrefIfNeeded(
+      Trainer trainer, String accessCode) async {
     if (!trainer.isEmpty()) {
       getTrainerData(trainer: trainer);
-      html.document.cookie = "ac=${trainer.accessCode}";
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('ac', trainer.accessCode);
       return true;
     } else {
       return false;

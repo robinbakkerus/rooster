@@ -20,7 +20,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_status_help.dart' as status_help;
 import 'package:rooster/widget/busy_indicator.dart';
 import 'package:rooster/widget/widget_helper.dart';
-import 'package:universal_html/html.dart' as html;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
@@ -44,7 +44,7 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     _getMetaData();
-    _accessCode = _checkCookie(); // this may be empty
+    _checkAccessCodePref(); // this may be empty
     AppEvents.onTrainerReadyEvent(_onTrainerReady);
     AppEvents.onTrainerDataReadyEvent(_onTrainerDataReady);
     AppEvents.onDatesReadyEvent(_onDatesReady);
@@ -464,15 +464,12 @@ class _StartPageState extends State<StartPage> {
     _actionEnabled[index] = false;
   }
 
-  String _checkCookie() {
-    final cookie = html.document.cookie!;
-    if (cookie.isNotEmpty) {
-      List<String> tokens = cookie.split('=');
-      if (tokens.isNotEmpty) {
-        return tokens[1];
-      }
+  void _checkAccessCodePref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? ac = prefs.getString('ac');
+    if (ac != null) {
+      _accessCode = ac;
     }
-    return '';
   }
 
   int _getStackIndex() => AppData.instance.stackIndex;
