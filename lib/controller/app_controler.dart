@@ -463,7 +463,8 @@ class AppController {
   //------------------------------------
   FsSpreadsheetRow? _getCorrSpreadsheetRow(
       FsSpreadsheetRow oldRow, FsSpreadsheet newSpreadsheet) {
-    return newSpreadsheet.rows.firstWhereOrNull((e) => e.date == oldRow.date);
+    return newSpreadsheet.rows.firstWhereOrNull(
+        (e) => e.date == oldRow.date && e.isExtraRow == oldRow.isExtraRow);
   }
 
   //--------------------------------------

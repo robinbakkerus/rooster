@@ -267,8 +267,12 @@ class AppHelper with AppMixin {
 
   ///---------------------------------------------
   bool addSchemaEditRow(DateTime date, Trainer trainer) {
-    int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
-    return dayPref == 1 || dayPref == 2;
+    if (date.weekday == DateTime.saturday) {
+      int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
+      return dayPref > 0;
+    } else {
+      return true;
+    }
   }
 
   ///---------------------------------------------

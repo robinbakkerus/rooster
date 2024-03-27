@@ -275,7 +275,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   bool _addRowForPrefDay(String dag) {
     int weekday =
         AppHelper.instance.weekdayFromString(weekday: dag, locale: c.localNL);
-    return AppData.instance.getTrainer().getDayPrefValue(weekday: weekday) > 0;
+    if (weekday == DateTime.saturday) {
+      return AppData.instance.getTrainer().getDayPrefValue(weekday: weekday) >
+          0;
+    } else {
+      return true;
+    }
   }
 
   //-------------------------
