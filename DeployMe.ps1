@@ -72,4 +72,4 @@ Function getBuildNumber{
 askModus;
 getBuildNumber;
 writeRunModeFile;
-# runFirebaseScripts
+runFirebaseScripts
