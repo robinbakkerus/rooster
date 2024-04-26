@@ -63,9 +63,11 @@ Function getBuildNumber{
     $txt = Get-Content -path $BUILDNR_FILE
     $global:buildnumber = [int]$txt
 
-    #increment build number
-    $increment_number = $global:buildnumber + 1
-    Set-Content -Path $BUILDNR_FILE -Value $increment_number
+    #increment build number 
+    if ($global:modus -eq "acc" ) {
+        $increment_number = $global:buildnumber + 1
+        Set-Content -Path $BUILDNR_FILE -Value $increment_number
+    }
 }
 
 #--------------------------------------------------------

@@ -13,6 +13,7 @@ import 'package:rooster/page/overall_availability_page.dart';
 import 'package:rooster/page/schema_edit_page.dart';
 import 'package:rooster/page/splash_page.dart';
 import 'package:rooster/page/spreadsheet_page.dart';
+import 'package:rooster/page/supervisor_page.dart';
 import 'package:rooster/page/trainer_prefs_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
 import 'package:rooster/util/app_constants.dart';
@@ -82,6 +83,7 @@ class _StartPageState extends State<StartPage> {
           HelpPage(), //7
           const AdminPage(), //8
           const AppErrorPage(), //9
+          const SupervisorPage(), //10
         ],
       ),
     );
@@ -142,6 +144,8 @@ class _StartPageState extends State<StartPage> {
       result = 'Help pagina';
     } else if (_getStackIndex() == PageEnum.adminPage.code) {
       result = 'Admin pagina';
+    } else if (_getStackIndex() == PageEnum.supervisorPage.code) {
+      result = 'Hoofdtrainer pagina';
     }
     return result;
   }
@@ -309,6 +313,8 @@ class _StartPageState extends State<StartPage> {
           _gotoHelpPage();
         } else if (value == PageEnum.adminPage.code.toString()) {
           _gotoAdminPage();
+        } else if (value == PageEnum.supervisorPage.code.toString()) {
+          _gotoSupervisorPage();
         }
       },
       itemBuilder: (BuildContext bc) {
@@ -329,6 +335,7 @@ class _StartPageState extends State<StartPage> {
             value: PageEnum.helpPage.code.toString(),
             child: const Text("Help"),
           ),
+          _supervisorPopup(),
           _adminPopup(),
         ];
       },
@@ -340,6 +347,21 @@ class _StartPageState extends State<StartPage> {
       return PopupMenuItem(
         value: PageEnum.adminPage.code.toString(),
         child: const Text("Admin pagina"),
+      );
+    } else {
+      return const PopupMenuItem(
+        height: 1,
+        value: '0',
+        child: Text(""),
+      );
+    }
+  }
+
+  PopupMenuItem _supervisorPopup() {
+    if (AppData.instance.getTrainer().isSupervisor()) {
+      return PopupMenuItem(
+        value: PageEnum.supervisorPage.code.toString(),
+        child: const Text("Hoofdtrainer pagina"),
       );
     } else {
       return const PopupMenuItem(
@@ -459,8 +481,28 @@ class _StartPageState extends State<StartPage> {
     });
   }
 
+  void _gotoSupervisorPage() {
+    setState(() {
+      _setStackIndex(PageEnum.supervisorPage.code);
+      _barTitle = _buildBarTitle();
+      _toggleActionEnabled(PageEnum.supervisorPage.code);
+    });
+  }
+
   void _toggleActionEnabled(int index) {
-    _actionEnabled = [true, true, true, true, true, true, true, true, true];
+    _actionEnabled = [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+    ];
     _actionEnabled[index] = false;
   }
 

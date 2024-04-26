@@ -649,8 +649,10 @@ class SpreadsheetGenerator with AppMixin {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (AppHelper.instance.isDateExcluded(sheetRow.date)) {
         ExcludeDay? excludeDay = AppData.instance.excludeDays
-            .firstWhereOrNull((e) => e.dateTime == sheetRow.date);
-        sheetRow.trainingText = excludeDay!.description;
+            .firstWhereOrNull((e) => e.dateTime.day == sheetRow.date.day);
+        if (excludeDay != null) {
+          sheetRow.trainingText = excludeDay.description;
+        }
       }
     }
   }
@@ -658,7 +660,8 @@ class SpreadsheetGenerator with AppMixin {
   ///-----------------------------
   void _postProcessThursdayPR() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
-      if (sheetRow.date.weekday == DateTime.thursday) {
+      if (sheetRow.date.weekday == DateTime.thursday &&
+          !AppHelper.instance.isDateExcluded(sheetRow.date)) {
         int prIndex = getGroupIndex('pr', sheetRow.date);
         if (prIndex >= 0) {
           sheetRow.rowCells[prIndex].text = '(met R1)';

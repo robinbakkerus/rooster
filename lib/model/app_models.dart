@@ -27,7 +27,8 @@ enum PageEnum {
   availability(6),
   helpPage(7),
   adminPage(8),
-  errorPage(9);
+  errorPage(9),
+  supervisorPage(10);
 
   const PageEnum(this.code);
   final int code;
@@ -1053,8 +1054,8 @@ class ExcludePeriod {
 
   factory ExcludePeriod.fromMap(Map<String, dynamic> map) {
     return ExcludePeriod(
-      fromDate: DateTime.fromMillisecondsSinceEpoch(map['fromDate']),
-      toDate: DateTime.fromMillisecondsSinceEpoch(map['toDate']),
+      fromDate: AppHelper.instance.parseDateTime(map['fromDate'])!,
+      toDate: AppHelper.instance.parseDateTime(map['toDate'])!,
     );
   }
 
@@ -1101,7 +1102,7 @@ class ExcludeDay {
 
   factory ExcludeDay.fromMap(Map<String, dynamic> map) {
     return ExcludeDay(
-      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
+      dateTime: AppHelper.instance.parseDateTime(map['dateTime'])!,
       description: map['description'],
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
@@ -185,7 +186,31 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   }
 
   bool _isEditable() {
-    return widget.isEditable;
+    if (_isSaturday() && !_isZamo()) {
+      return false;
+    } else if (!_isSaturday() && _isZamo()) {
+      return false;
+    } else if (_isThursday() && _isStartersGroup()) {
+      return false;
+    } else {
+      return widget.isEditable;
+    }
+  }
+
+  bool _isSaturday() {
+    return widget.sheetRow.date.weekday == DateTime.saturday;
+  }
+
+  bool _isThursday() {
+    return widget.sheetRow.date.weekday == DateTime.thursday;
+  }
+
+  bool _isZamo() {
+    return widget.groupName.toLowerCase() == Groep.zamo.name.toLowerCase();
+  }
+
+  bool _isStartersGroup() {
+    return widget.groupName.toLowerCase() == Groep.sg.name.toLowerCase();
   }
 
   String _trainerName() {

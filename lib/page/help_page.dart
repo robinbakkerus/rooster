@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/data/app_version.dart';
 import 'package:rooster/util/app_mixin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/link.dart';
 
 class HelpPage extends StatelessWidget with AppMixin {
@@ -37,6 +38,10 @@ class HelpPage extends StatelessWidget with AppMixin {
           _buildFaq(),
           wh.verSpace(10),
           Text('Versie: $appVersion'),
+          wh.verSpace(10),
+          OutlinedButton(
+              onPressed: _removeAccessCodePref,
+              child: const Text('Remove cookie')),
         ],
       ),
     );
@@ -67,4 +72,9 @@ Wat gebeurt er als ik geen verhindering heb opgegeven?
 
   In dit geval neemt het programma dat je altijd kan op de dagen die je hebt aangeving in Trainer settings pagina.
 ''';
+
+  void _removeAccessCodePref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('ac', '');
+  }
 }
