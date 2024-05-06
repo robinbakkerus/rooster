@@ -16,6 +16,8 @@ import 'package:rooster/widget/busy_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppController {
+  AppHelper ah = AppHelper.instance;
+
   AppController._();
 
   static AppController instance = AppController._();
@@ -84,6 +86,11 @@ class AppController {
   Future<void> getExcludeDays() async {
     List<ExcludeDay> excludeDays = await Dbs.instance.getExcludeDays();
     AppData.instance.excludeDays = excludeDays;
+  }
+
+  Future<void> getExcludePeriods() async {
+    List<ExcludePeriod> excludePeriods = await Dbs.instance.getExcludePeriods();
+    AppData.instance.excludePeriods = excludePeriods;
   }
 
   // get trainer_items (to fill combobox)
@@ -335,6 +342,76 @@ class AppController {
     AppData.instance.setAllTrainerData(allTrainerData);
 
     return allTrainerData;
+  }
+
+  //----------------------------------------
+  Future<List<ExcludeDay>> addExcludeDay(ExcludeDay excludeDay) async {
+    List<ExcludeDay> excDays = [];
+    excDays.addAll(AppData.instance.excludeDays);
+    excDays.add(excludeDay);
+    try {
+      Dbs.instance.saveExcludeDays(excDays);
+      AppData.instance.excludeDays.add(excludeDay);
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
+    }
+    return AppData.instance.excludeDays;
+  }
+
+  //----------------------------------------
+  Future<List<ExcludeDay>> deleteExcludeDay({required DateTime date}) async {
+    List<ExcludeDay> excDays = [];
+    excDays.addAll(AppData.instance.excludeDays);
+    ExcludeDay? deleteExcDay =
+        excDays.firstWhereOrNull((e) => ah.isSameDate(e.dateTime, date));
+
+    if (deleteExcDay != null) {
+      excDays.remove(deleteExcDay);
+      try {
+        Dbs.instance.saveExcludeDays(excDays);
+        AppData.instance.excludeDays = excDays;
+      } catch (ex, stackTrace) {
+        FirestoreHelper.instance.handleError(ex, stackTrace);
+      }
+    }
+
+    return AppData.instance.excludeDays;
+  }
+
+  //----------------------------------------
+  Future<List<ExcludePeriod>> addExcludePeriod(
+      ExcludePeriod excludePeriod) async {
+    List<ExcludePeriod> excPeriods = [];
+    excPeriods.addAll(AppData.instance.excludePeriods);
+    excPeriods.add(excludePeriod);
+    try {
+      Dbs.instance.saveExcludePeriods(excPeriods);
+      AppData.instance.excludePeriods.add(excludePeriod);
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
+    }
+    return AppData.instance.excludePeriods;
+  }
+
+  //----------------------------------------
+  Future<List<ExcludePeriod>> deleteExcludePeriod(
+      {required DateTime date}) async {
+    List<ExcludePeriod> excPeriods = [];
+    excPeriods.addAll(AppData.instance.excludePeriods);
+    ExcludePeriod? deleteExcPeriod =
+        excPeriods.firstWhereOrNull((e) => ah.isSameDate(e.fromDate, date));
+
+    if (deleteExcPeriod != null) {
+      excPeriods.remove(deleteExcPeriod);
+      try {
+        Dbs.instance.saveExcludePeriods(excPeriods);
+        AppData.instance.excludePeriods = excPeriods;
+      } catch (ex, stackTrace) {
+        FirestoreHelper.instance.handleError(ex, stackTrace);
+      }
+    }
+
+    return AppData.instance.excludePeriods;
   }
 
   ///------------------------------------------------

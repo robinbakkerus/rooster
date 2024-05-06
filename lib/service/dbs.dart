@@ -30,6 +30,8 @@ abstract class Dbs {
   Future<void> saveTrainingGroups(List<TrainingGroup> trainingGroups);
   Future<List<TrainingGroup>> getTrainingGroups();
   Future<void> savePlanRankValues(MetaPlanRankValues planRankValues);
-  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays);
   Future<List<ExcludeDay>> getExcludeDays();
+  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays);
+  Future<List<ExcludePeriod>> getExcludePeriods();
+  Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods);
 }

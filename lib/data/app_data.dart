@@ -30,6 +30,7 @@ class AppData {
   List<String> trainerItems = [];
   late MetaPlanRankValues planRankValues;
   late List<ExcludeDay> excludeDays;
+  late List<ExcludePeriod> excludePeriods;
 
   // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);

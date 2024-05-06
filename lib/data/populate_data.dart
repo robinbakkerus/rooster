@@ -10,6 +10,10 @@ List<ExcludeDay> excludeDays = [
   ExcludeDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
 ];
 
+List<ExcludePeriod> excludPeriods = [
+  ExcludePeriod(fromDate: DateTime(2024, 7, 16), toDate: DateTime(2024, 8, 8))
+];
+
 List<Trainer> allTrainers = [
   trainerAnne,
   trainerPaula,

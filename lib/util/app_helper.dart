@@ -183,6 +183,11 @@ class AppHelper with AppMixin {
     return -1; //not possible
   }
 
+  ///------------------------------------
+  String formatDate(DateTime dateTime) {
+    return dateTime.toIso8601String().substring(0, 10);
+  }
+
   ///-----------------------------------
   bool isDateExcluded(DateTime date) {
     ExcludeDay? excludeDay = AppData.instance.excludeDays

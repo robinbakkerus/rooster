@@ -113,4 +113,14 @@ class Simulator with AppMixin implements Dbs {
   Future<List<ExcludeDay>> getExcludeDays() async {
     return p.excludeDays;
   }
+
+  @override
+  Future<List<ExcludePeriod>> getExcludePeriods() async {
+    return p.excludPeriods;
+  }
+
+  @override
+  Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods) async {
+    return;
+  }
 }
