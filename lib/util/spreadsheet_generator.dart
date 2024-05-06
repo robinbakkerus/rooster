@@ -207,11 +207,11 @@ class SpreadsheetGenerator with AppMixin {
 
   ///----------------
   bool _isExcludedForPeriod(TrainingGroup trainingGroup, DateTime date) {
-    if (trainingGroup.excludePeriods.isEmpty) {
+    if (trainingGroup.getExcludePeriods().isEmpty) {
       return false;
     }
 
-    for (ExcludePeriod excludePeriod in trainingGroup.excludePeriods) {
+    for (ExcludePeriod excludePeriod in trainingGroup.getExcludePeriods()) {
       if (date.isAfter(excludePeriod.fromDate) &&
           date.isBefore(excludePeriod.toDate)) {
         return true;

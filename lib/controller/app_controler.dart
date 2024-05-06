@@ -72,6 +72,14 @@ class AppController {
   // get TrainingGroups
   Future<void> getTrainerGroups() async {
     AppData.instance.trainingGroups = await Dbs.instance.getTrainingGroups();
+
+    //fill excludePeriods
+    for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
+      if (trainingGroup.type == TrainingGroupType.regular) {
+        trainingGroup.setExcludePeriods(AppData.instance.excludePeriods);
+      }
+    }
+
     AppData.instance.activeTrainingGroups =
         SpreadsheetGenerator.instance.generateActiveTrainingGroups();
   }

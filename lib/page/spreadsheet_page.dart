@@ -132,14 +132,16 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   List<DataColumn> _buildHeader(DateTime date) {
     List<DataColumn> result = [];
 
+    List<String> groupNames = SpreadsheetGenerator.instance.getGroupNames(date);
+    String trainingText = groupNames.length > 2 ? 'Training' : 'Zomer training';
+
     result.add(const DataColumn(
         label: Text('Dag', style: TextStyle(fontStyle: FontStyle.italic))));
-    result.add(const DataColumn(
-        label:
-            Text('Training', style: TextStyle(fontStyle: FontStyle.italic))));
+    result.add(DataColumn(
+        label: Text(trainingText,
+            style: const TextStyle(fontStyle: FontStyle.italic))));
 
-    for (String groupName
-        in SpreadsheetGenerator.instance.getGroupNames(date)) {
+    for (String groupName in groupNames) {
       result.add(DataColumn(
           label: Text(_formatHeader(groupName),
               style: const TextStyle(fontStyle: FontStyle.italic))));

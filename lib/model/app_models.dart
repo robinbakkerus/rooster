@@ -50,7 +50,7 @@ enum SpreadsheetStatus {
 
 enum TrainingGroupType {
   regular,
-  special;
+  special; //zamo, summer, starters
 
   String toMap() {
     return name;
@@ -929,8 +929,8 @@ class TrainingGroup {
   final DateTime endDate;
   final TrainingGroupType type;
   List<int> trainingDays = []; // take into account weekdays
-  List<ExcludePeriod> excludePeriods = [];
   String defaultTrainingText;
+  List<ExcludePeriod> _excludePeriods = [];
 
   TrainingGroup({
     required this.name,
@@ -939,9 +939,16 @@ class TrainingGroup {
     required this.endDate,
     required this.type,
     required this.trainingDays,
-    required this.excludePeriods,
     required this.defaultTrainingText,
   });
+
+  List<ExcludePeriod> getExcludePeriods() {
+    return _excludePeriods;
+  }
+
+  void setExcludePeriods(List<ExcludePeriod> list) {
+    _excludePeriods = list;
+  }
 
   TrainingGroup copyWith({
     String? name,
@@ -960,7 +967,6 @@ class TrainingGroup {
       endDate: endDate ?? this.endDate,
       type: type ?? this.type,
       trainingDays: trainingDays ?? this.trainingDays,
-      excludePeriods: excludePeriods ?? this.excludePeriods,
       defaultTrainingText: defaultTrainingText ?? this.defaultTrainingText,
     );
   }
@@ -973,7 +979,6 @@ class TrainingGroup {
       'endDate': endDate.millisecondsSinceEpoch,
       'type': type.toMap(),
       'trainingDays': trainingDays,
-      'excludePeriods': excludePeriods.map((x) => x.toMap()).toList(),
       'defaultTrainingText': defaultTrainingText,
     };
   }
@@ -986,8 +991,6 @@ class TrainingGroup {
       endDate: AppHelper.instance.parseDateTime(map['endDate'])!,
       type: TrainingGroupType.fromMap(map['type']),
       trainingDays: List<int>.from(map['trainingDays']),
-      excludePeriods: List<ExcludePeriod>.from(
-          map['excludePeriods']?.map((x) => ExcludePeriod.fromMap(x))),
       defaultTrainingText: map['defaultTrainingText'],
     );
   }
@@ -996,7 +999,7 @@ class TrainingGroup {
       TrainingGroup.fromMap(json.decode(source));
   @override
   String toString() {
-    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays, excludePeriods: $excludePeriods, defaultTrainingText: $defaultTrainingText)';
+    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays,  defaultTrainingText: $defaultTrainingText)';
   }
 
   @override
@@ -1010,7 +1013,6 @@ class TrainingGroup {
         other.endDate == endDate &&
         other.type == type &&
         listEquals(other.trainingDays, trainingDays) &&
-        listEquals(other.excludePeriods, excludePeriods) &&
         other.defaultTrainingText == defaultTrainingText;
   }
 
@@ -1022,7 +1024,6 @@ class TrainingGroup {
         endDate.hashCode ^
         type.hashCode ^
         trainingDays.hashCode ^
-        excludePeriods.hashCode ^
         defaultTrainingText.hashCode;
   }
 }

@@ -235,11 +235,11 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _getMetaData() async {
-    await AppController.instance.getTrainerGroups();
     await AppController.instance.getTrainingItems();
     await AppController.instance.getPlanRankValues();
     await AppController.instance.getExcludeDays();
     await AppController.instance.getExcludePeriods();
+    await AppController.instance.getTrainerGroups();
   }
 
   void _onTrainerReady(TrainerReadyEvent event) async {

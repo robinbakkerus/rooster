@@ -436,7 +436,6 @@ TrainingGroup _buildTrainingGroup(String name, String descr) {
       type: TrainingGroupType.regular,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
-      excludePeriods: excludePeriods,
       trainingDays: [DateTime.tuesday, DateTime.thursday],
       defaultTrainingText: '*');
 }
@@ -448,7 +447,6 @@ TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
       type: TrainingGroupType.special,
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2099, 1, 1),
-      excludePeriods: [],
       trainingDays: [DateTime.saturday],
       defaultTrainingText: 'ZaMo start 9 uur Donkervoort');
 }
@@ -460,7 +458,6 @@ TrainingGroup _buildSummerTrainingGroup(String name, String descr) {
     type: TrainingGroupType.special,
     startDate: summerStart,
     endDate: summerEnd,
-    excludePeriods: [],
     trainingDays: [DateTime.tuesday, DateTime.thursday],
     defaultTrainingText: 'Zomertraining',
   );
@@ -476,7 +473,6 @@ TrainingGroup _buildStartersGroup(String name, String descr) {
       type: TrainingGroupType.special,
       startDate: startDate,
       endDate: endDate,
-      excludePeriods: [],
       trainingDays: [DateTime.tuesday],
       defaultTrainingText: '*');
 }
