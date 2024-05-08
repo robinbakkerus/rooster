@@ -72,16 +72,15 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   //---------------------------------------------
   Widget _buildCloseButtons(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        TextButton(
+        ElevatedButton(
             onPressed: () {
               Navigator.of(context, rootNavigator: true)
                   .pop(); // dismisses only the dialog and returns nothing
             },
             child: const Text("Close", style: TextStyle(color: Colors.blue))),
-        wh.horSpace(10),
       ],
     );
   }

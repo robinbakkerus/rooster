@@ -34,4 +34,6 @@ abstract class Dbs {
   Future<void> saveExcludeDays(List<ExcludeDay> excludeDays);
   Future<List<ExcludePeriod>> getExcludePeriods();
   Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods);
+  Future<void> importTrainerData(
+      List<Map<String, dynamic>> trainers, List<Map<String, dynamic>> schemas);
 }

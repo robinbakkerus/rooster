@@ -416,6 +416,41 @@ class FirestoreHelper with AppMixin implements Dbs {
     return result;
   }
 
+  @override
+  Future<void> importTrainerData(List<Map<String, dynamic>> trainers,
+      List<Map<String, dynamic>> schemas) async {
+    await _importTrainers(trainers);
+    await _importSchemas(schemas);
+  }
+
+  Future<void> _importTrainers(List<Map<String, dynamic>> trainers) async {
+    CollectionReference colRefTrainers = collectionRef(FsCol.trainer);
+    try {
+      for (Map<String, dynamic> map in trainers) {
+        String id = map["pk"];
+        await colRefTrainers.doc(id).set(map).then((val) {}).catchError((e) {
+          throw e;
+        });
+      }
+    } catch (ex, stackTrace) {
+      handleError(ex, stackTrace);
+    }
+  }
+
+  Future<void> _importSchemas(List<Map<String, dynamic>> schemas) async {
+    CollectionReference colRefTrainers = collectionRef(FsCol.schemas);
+    try {
+      for (Map<String, dynamic> map in schemas) {
+        String id = map["id"];
+        await colRefTrainers.doc(id).set(map).then((val) {}).catchError((e) {
+          throw e;
+        });
+      }
+    } catch (ex, stackTrace) {
+      handleError(ex, stackTrace);
+    }
+  }
+
   ///============ private methods --------
 
   Map<String, dynamic> _buildEmailMessageMap(String subject, String html) {

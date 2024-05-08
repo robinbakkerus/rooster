@@ -1,4 +1,7 @@
 // ignore: depend_on_referenced_packages
+import 'dart:convert';
+
+// ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -287,6 +290,41 @@ class AppController {
   ///--------------------
   Future<LastRosterFinal?> getLastRosterFinal() async {
     return await Dbs.instance.getLastRosterFinal();
+  }
+
+  Future<bool> importTrainerData(String jsonText) async {
+    try {
+      Map<String, dynamic> map = json.decode(jsonText);
+      List<Map<String, dynamic>> trainersMapList =
+          (map["trainers"] as List).cast<Map<String, dynamic>>();
+
+      List<Map<String, dynamic>> importSchemasMapList =
+          _prepareImportSchemas(map);
+
+      await Dbs.instance
+          .importTrainerData(trainersMapList, importSchemasMapList);
+
+      await generateOrRetrieveSpreadsheet();
+      return true;
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
+      return false;
+    }
+  }
+
+  List<Map<String, dynamic>> _prepareImportSchemas(Map<String, dynamic> map) {
+    List<Map<String, dynamic>> schemasMapList =
+        (map["schemas"] as List).cast<Map<String, dynamic>>();
+    List<Map<String, dynamic>> importSchemasMapList = [];
+    for (Map<String, dynamic> schemaMap in schemasMapList) {
+      if (schemaMap["trainerPk"] != null &&
+          schemaMap["trainerPk"].toString().isNotEmpty) {
+        String schemaId = ah.buildTrainerSchemaIdFromMap(schemaMap);
+        schemaMap["id"] = schemaId;
+        importSchemasMapList.add(schemaMap);
+      }
+    }
+    return importSchemasMapList;
   }
 
   /// ============ private methods -----------------

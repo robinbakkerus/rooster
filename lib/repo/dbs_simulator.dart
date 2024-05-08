@@ -123,4 +123,10 @@ class Simulator with AppMixin implements Dbs {
   Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods) async {
     return;
   }
+
+  @override
+  Future<void> importTrainerData(List<Map<String, dynamic>> trainers,
+      List<Map<String, dynamic>> schemas) async {
+    return;
+  }
 }

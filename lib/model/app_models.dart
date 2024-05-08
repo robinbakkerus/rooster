@@ -191,6 +191,10 @@ class Trainer {
     );
   }
 
+  String toJson() => json.encode(toMap());
+  factory Trainer.fromJson(String source) =>
+      Trainer.fromMap(json.decode(source));
+
   @override
   String toString() {
     return 'Trainer(pk: $pk, fullname: $fullname, accessCode: $accessCode, orgCode: $originalAccessCode email: $email, originalEmail: $originalEmail,prefs: $prefValues, roles: $roles)';
@@ -385,6 +389,10 @@ class TrainerSchema {
   String toString() {
     return 'TrainerSchema(id: $id, trainerPk: $trainerPk, year: $year, month: $month, isNew: $isNew, created: $created, modified: $modified)';
   }
+
+  String toJson() => json.encode(toMap());
+  factory TrainerSchema.fromJson(String source) =>
+      TrainerSchema.fromMap(json.decode(source));
 }
 
 ///----------
@@ -997,6 +1005,7 @@ class TrainingGroup {
   String toJson() => json.encode(toMap());
   factory TrainingGroup.fromJson(String source) =>
       TrainingGroup.fromMap(json.decode(source));
+
   @override
   String toString() {
     return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays,  defaultTrainingText: $defaultTrainingText)';

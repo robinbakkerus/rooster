@@ -41,11 +41,19 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------
-  ///
   String buildTrainerSchemaId(Trainer trainer) {
     String result = trainer.pk;
     result += '_${AppData.instance.getActiveYear()}';
     result += '_${AppData.instance.getActiveMonth()}';
+    return result;
+  }
+
+  ///----------------------------------------
+  String buildTrainerSchemaIdFromMap(Map<String, dynamic> map) {
+    String result = "";
+    result += map["trainerPk"];
+    result += '_${map["year"]}';
+    result += '_${map["month"]}';
     return result;
   }
 
