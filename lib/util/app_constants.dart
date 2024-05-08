@@ -36,4 +36,9 @@ class AppConstants {
 
   final String localNL = 'nl_NL';
   final String localUK = 'en_US';
+
+  final String informTrainerSpreadsheetMayChangeText = '''
+Dit schema is nog onderhanden.
+Het kan nog volledig worden gewijzigd!
+''';
 }

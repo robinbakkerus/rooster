@@ -40,6 +40,8 @@ class _StartPageState extends State<StartPage> {
   bool _nextMonthEnabled = true;
   bool _prevMonthEnabled = true;
 
+  bool _informSpreadsheetFirstTime = true;
+
   _StartPageState();
 
   @override
@@ -455,6 +457,31 @@ class _StartPageState extends State<StartPage> {
       _barTitle = _buildBarTitle();
       _toggleActionEnabled(PageEnum.spreadSheet.code);
     });
+
+    if (_showInformTrainerMsg()) {
+      _showInformTrainerDialog();
+    }
+  }
+
+  void _showInformTrainerDialog() {
+    _informSpreadsheetFirstTime = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text("Let op"),
+          content: Text(AppConstants().informTrainerSpreadsheetMayChangeText),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text("Ik snap het"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _gotoTrainerSettings() {
@@ -542,6 +569,15 @@ class _StartPageState extends State<StartPage> {
         return alert;
       },
     );
+  }
+
+  // ------------------------------
+  bool _showInformTrainerMsg() {
+    // return !AppData.instance.getTrainer().isSupervisor() &&
+    return !AppData.instance.getTrainer().isSupervisor() &&
+        _informSpreadsheetFirstTime &&
+        AppData.instance.getSpreadsheet().status ==
+            SpreadsheetStatus.underConstruction;
   }
 
   //--------------------
