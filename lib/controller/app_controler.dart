@@ -78,8 +78,22 @@ class AppController {
 
     //fill excludePeriods
     for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
-      if (trainingGroup.type == TrainingGroupType.regular) {
-        trainingGroup.setExcludePeriods(AppData.instance.excludePeriods);
+      if (trainingGroup.name.toLowerCase() == Groep.zomer.name.toLowerCase()) {
+        trainingGroup.setStartDate(AppData.instance.getSummerPeriod().fromDate);
+        trainingGroup.setEndDate(AppData.instance.getSummerPeriod().toDate);
+      } else {
+        trainingGroup.setStartDate(DateTime(2024, 1, 1));
+        trainingGroup.setEndDate(DateTime(2099, 1, 1));
+        trainingGroup.setSummerPeriod(AppData.instance.getSummerPeriod());
+      }
+
+      if (trainingGroup.name.toLowerCase() == Groep.zamo.name.toLowerCase()) {
+        trainingGroup.setSummerPeriod(ExcludePeriod.empty());
+      }
+
+      if (trainingGroup.name.toLowerCase() == Groep.sg.name.toLowerCase()) {
+        trainingGroup.setStartDate(DateTime(2024, 3, 1)); //TODO hardcoded
+        trainingGroup.setEndDate(DateTime(2024, 5, 31));
       }
     }
 
@@ -101,7 +115,7 @@ class AppController {
 
   Future<void> getExcludePeriods() async {
     List<ExcludePeriod> excludePeriods = await Dbs.instance.getExcludePeriods();
-    AppData.instance.excludePeriods = excludePeriods;
+    AppData.instance.setExcludePeriods(excludePeriods);
   }
 
   // get trainer_items (to fill combobox)
@@ -233,7 +247,12 @@ class AppController {
       for (int c = 0; c < fsRow.rowCells.length; c++) {
         RowCell cell = RowCell(rowIndex: r, colIndex: c);
         cell.text = fsRow.rowCells[c];
-        cell.availableCounts = _getAvailable(availableList, row.date).counts[c];
+        Available available = _getAvailable(availableList, row.date);
+        if (available.counts.length > c) {
+          cell.availableCounts = available.counts[c];
+        } else {
+          cell.availableCounts = AvailableCounts();
+        }
         row.rowCells.add(cell);
       }
 
@@ -241,6 +260,11 @@ class AppController {
     }
     return spreadSheet;
   }
+
+  ///---------------------------------------------------------
+  /// Return the 'Available' object. We look this up in the given list and date.
+  /// If no such Available can be found, an Available with an empty countList
+  /// is returned, with a length of active groupnames
 
   Available _getAvailable(List<Available> availableList, DateTime date) {
     Available? result = availableList.firstWhereOrNull((e) => e.date == date);
@@ -428,22 +452,22 @@ class AppController {
   Future<List<ExcludePeriod>> addExcludePeriod(
       ExcludePeriod excludePeriod) async {
     List<ExcludePeriod> excPeriods = [];
-    excPeriods.addAll(AppData.instance.excludePeriods);
+    excPeriods.addAll(AppData.instance.getExcludePeriods());
     excPeriods.add(excludePeriod);
     try {
       Dbs.instance.saveExcludePeriods(excPeriods);
-      AppData.instance.excludePeriods.add(excludePeriod);
+      AppData.instance.getExcludePeriods().add(excludePeriod);
     } catch (ex, stackTrace) {
       FirestoreHelper.instance.handleError(ex, stackTrace);
     }
-    return AppData.instance.excludePeriods;
+    return AppData.instance.getExcludePeriods();
   }
 
   //----------------------------------------
   Future<List<ExcludePeriod>> deleteExcludePeriod(
       {required DateTime date}) async {
     List<ExcludePeriod> excPeriods = [];
-    excPeriods.addAll(AppData.instance.excludePeriods);
+    excPeriods.addAll(AppData.instance.getExcludePeriods());
     ExcludePeriod? deleteExcPeriod =
         excPeriods.firstWhereOrNull((e) => ah.isSameDate(e.fromDate, date));
 
@@ -451,13 +475,13 @@ class AppController {
       excPeriods.remove(deleteExcPeriod);
       try {
         Dbs.instance.saveExcludePeriods(excPeriods);
-        AppData.instance.excludePeriods = excPeriods;
+        AppData.instance.setExcludePeriods(excPeriods);
       } catch (ex, stackTrace) {
         FirestoreHelper.instance.handleError(ex, stackTrace);
       }
     }
 
-    return AppData.instance.excludePeriods;
+    return AppData.instance.getExcludePeriods();
   }
 
   ///------------------------------------------------

@@ -32,7 +32,7 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   void initState() {
     super.initState();
     _excludeDaysList = AppData.instance.excludeDays;
-    _excludePeriodsList = AppData.instance.excludePeriods;
+    _excludePeriodsList = AppData.instance.getExcludePeriods();
     for (int i = 0; i < TextCtrl.values.length; i++) {
       _textCtrls.add(TextEditingController());
     }

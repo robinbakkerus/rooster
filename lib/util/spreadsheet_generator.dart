@@ -166,8 +166,8 @@ class SpreadsheetGenerator with AppMixin {
   List<String> getGroupNames(DateTime date) {
     List<String> result = [];
     for (TrainingGroup trainingGroup in AppData.instance.trainingGroups) {
-      if (trainingGroup.startDate.isBefore(date) &&
-          trainingGroup.endDate.isAfter(date) &&
+      if (trainingGroup.getStartDate().isBefore(date) &&
+          trainingGroup.getEndDate().isAfter(date) &&
           !_isExcludedForPeriod(trainingGroup, date)) {
         result.add(trainingGroup.name);
       }
@@ -207,15 +207,13 @@ class SpreadsheetGenerator with AppMixin {
 
   ///----------------
   bool _isExcludedForPeriod(TrainingGroup trainingGroup, DateTime date) {
-    if (trainingGroup.getExcludePeriods().isEmpty) {
+    if (trainingGroup.getSummerPeriod().isEmpty()) {
       return false;
     }
 
-    for (ExcludePeriod excludePeriod in trainingGroup.getExcludePeriods()) {
-      if (date.isAfter(excludePeriod.fromDate) &&
-          date.isBefore(excludePeriod.toDate)) {
-        return true;
-      }
+    if (date.isAfter(trainingGroup.getSummerPeriod().fromDate) &&
+        date.isBefore(trainingGroup.getSummerPeriod().toDate)) {
+      return true;
     }
 
     return false;
@@ -637,7 +635,7 @@ class SpreadsheetGenerator with AppMixin {
         }
         sheetRow.rowCells[zamoIndex].text = zamoTrainer;
       } else {
-        if (sheetRow.rowCells.length > zamoIndex) {
+        if (sheetRow.rowCells.length > zamoIndex && zamoIndex > 0) {
           sheetRow.rowCells[zamoIndex].setTrainer(Trainer.empty());
         }
       }

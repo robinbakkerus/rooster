@@ -30,7 +30,7 @@ class AppData {
   List<String> trainerItems = [];
   late MetaPlanRankValues planRankValues;
   late List<ExcludeDay> excludeDays;
-  late List<ExcludePeriod> excludePeriods;
+  late List<ExcludePeriod> _excludePeriods;
 
   // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
   SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
@@ -185,6 +185,23 @@ class AppData {
     return trainer.getPrefValue(paramName: groupName) > 0;
   }
 
+  //---------------------------------
+  List<ExcludePeriod> getExcludePeriods() {
+    return _excludePeriods;
+  }
+
+  void setExcludePeriods(List<ExcludePeriod> value) {
+    _excludePeriods = value;
+  }
+
+  // return the ExcludePeriod for this year
+  ExcludePeriod getSummerPeriod() {
+    ExcludePeriod? period = _excludePeriods
+        .firstWhereOrNull((e) => e.fromDate.year == getActiveYear());
+    return period ?? ExcludePeriod.empty();
+  }
+
+  //-------------------------------------------------------
   List<String> maanden = [
     'Januari',
     'Februari',

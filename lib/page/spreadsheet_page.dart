@@ -28,7 +28,6 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       month: AppData.instance.getActiveMonth());
 
   Widget _dataGrid = Container();
-  int _headerLength = 0;
   bool _fabVisible = false;
 
   _SpreadsheetPageState();
@@ -147,7 +146,6 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
               style: const TextStyle(fontStyle: FontStyle.italic))));
     }
 
-    _headerLength = result.length;
     return result;
   }
 
@@ -178,9 +176,6 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       MaterialStateColor col = _getRowColor(fsRow);
 
       List<DataCell> cells = _buildDataCells(fsRow);
-      if (cells.length != _headerLength) {
-        lp('todo error in _buildDataRows');
-      }
       DataRow dataRow = DataRow(cells: cells, color: col);
       result.add(dataRow);
     }

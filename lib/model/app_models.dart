@@ -933,46 +933,57 @@ class SpreedsheetDiff {
 class TrainingGroup {
   final String name;
   final String description;
-  final DateTime startDate;
-  final DateTime endDate;
   final TrainingGroupType type;
   List<int> trainingDays = []; // take into account weekdays
   String defaultTrainingText;
-  List<ExcludePeriod> _excludePeriods = [];
+  //-- these are set by AppController
+  ExcludePeriod? _summerPeriod;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   TrainingGroup({
     required this.name,
     required this.description,
-    required this.startDate,
-    required this.endDate,
     required this.type,
     required this.trainingDays,
     required this.defaultTrainingText,
   });
 
-  List<ExcludePeriod> getExcludePeriods() {
-    return _excludePeriods;
+  DateTime getStartDate() {
+    return _startDate ?? DateTime(2024, 1, 1);
   }
 
-  void setExcludePeriods(List<ExcludePeriod> list) {
-    _excludePeriods = list;
+  void setStartDate(DateTime date) {
+    _startDate = date;
+  }
+
+  DateTime getEndDate() {
+    return _endDate ?? DateTime(2099, 1, 1);
+  }
+
+  void setEndDate(DateTime date) {
+    _endDate = date;
+  }
+
+  ExcludePeriod getSummerPeriod() {
+    return _summerPeriod ??
+        ExcludePeriod(fromDate: DateTime.now(), toDate: DateTime.now());
+  }
+
+  void setSummerPeriod(ExcludePeriod summerPeriod) {
+    _summerPeriod = summerPeriod;
   }
 
   TrainingGroup copyWith({
     String? name,
     String? description,
-    DateTime? startDate,
-    DateTime? endDate,
     TrainingGroupType? type,
     List<int>? trainingDays,
-    List<ExcludePeriod>? excludePeriods,
     String? defaultTrainingText,
   }) {
     return TrainingGroup(
       name: name ?? this.name,
       description: description ?? this.description,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
       type: type ?? this.type,
       trainingDays: trainingDays ?? this.trainingDays,
       defaultTrainingText: defaultTrainingText ?? this.defaultTrainingText,
@@ -983,8 +994,6 @@ class TrainingGroup {
     return {
       'name': name,
       'description': description,
-      'startDate': startDate.millisecondsSinceEpoch,
-      'endDate': endDate.millisecondsSinceEpoch,
       'type': type.toMap(),
       'trainingDays': trainingDays,
       'defaultTrainingText': defaultTrainingText,
@@ -995,8 +1004,6 @@ class TrainingGroup {
     return TrainingGroup(
       name: map['name'],
       description: map['description'],
-      startDate: AppHelper.instance.parseDateTime(map['startDate'])!,
-      endDate: AppHelper.instance.parseDateTime(map['endDate'])!,
       type: TrainingGroupType.fromMap(map['type']),
       trainingDays: List<int>.from(map['trainingDays']),
       defaultTrainingText: map['defaultTrainingText'],
@@ -1008,7 +1015,7 @@ class TrainingGroup {
 
   @override
   String toString() {
-    return 'TrainingGroup(name: $name, description: $description, startDate: $startDate, endDate: $endDate, type: $type, trainingDays: $trainingDays,  defaultTrainingText: $defaultTrainingText)';
+    return 'TrainingGroup(name: $name, description: $description, startDate: $getStartDate(), endDate: $getEndDate(), type: $type, trainingDays: $trainingDays,  defaultTrainingText: $defaultTrainingText)';
   }
 
   @override
@@ -1018,8 +1025,6 @@ class TrainingGroup {
     return other is TrainingGroup &&
         other.name == name &&
         other.description == description &&
-        other.startDate == startDate &&
-        other.endDate == endDate &&
         other.type == type &&
         listEquals(other.trainingDays, trainingDays) &&
         other.defaultTrainingText == defaultTrainingText;
@@ -1029,8 +1034,6 @@ class TrainingGroup {
   int get hashCode {
     return name.hashCode ^
         description.hashCode ^
-        startDate.hashCode ^
-        endDate.hashCode ^
         type.hashCode ^
         trainingDays.hashCode ^
         defaultTrainingText.hashCode;
@@ -1067,6 +1070,15 @@ class ExcludePeriod {
       fromDate: AppHelper.instance.parseDateTime(map['fromDate'])!,
       toDate: AppHelper.instance.parseDateTime(map['toDate'])!,
     );
+  }
+
+  factory ExcludePeriod.empty() {
+    return ExcludePeriod(
+        fromDate: DateTime(2024, 1, 1), toDate: DateTime(2024, 1, 1));
+  }
+
+  bool isEmpty() {
+    return fromDate == toDate;
   }
 
   @override
