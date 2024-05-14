@@ -1,7 +1,8 @@
 import 'dart:convert';
 
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
@@ -937,7 +938,7 @@ class TrainingGroup {
   List<int> trainingDays = []; // take into account weekdays
   String defaultTrainingText;
   //-- these are set by AppController
-  ExcludePeriod? _summerPeriod;
+  SpecialPeriod? _summerPeriod;
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -965,12 +966,12 @@ class TrainingGroup {
     _endDate = date;
   }
 
-  ExcludePeriod getSummerPeriod() {
+  SpecialPeriod getSummerPeriod() {
     return _summerPeriod ??
-        ExcludePeriod(fromDate: DateTime.now(), toDate: DateTime.now());
+        SpecialPeriod(fromDate: DateTime.now(), toDate: DateTime.now());
   }
 
-  void setSummerPeriod(ExcludePeriod summerPeriod) {
+  void setSummerPeriod(SpecialPeriod summerPeriod) {
     _summerPeriod = summerPeriod;
   }
 
@@ -1041,18 +1042,30 @@ class TrainingGroup {
 }
 
 ///-----------------------------
-class ExcludePeriod {
+class SpecialPeriod {
   final DateTime fromDate;
   final DateTime toDate;
-  ExcludePeriod({
+  SpecialPeriod({
     required this.fromDate,
     required this.toDate,
   });
-  ExcludePeriod copyWith({
+
+  bool isValid() {
+    return fromDate != toDate;
+  }
+
+  SpecialPeriod clone() {
+    return SpecialPeriod(
+      fromDate: fromDate,
+      toDate: toDate,
+    );
+  }
+
+  SpecialPeriod copyWith({
     DateTime? fromDate,
     DateTime? toDate,
   }) {
-    return ExcludePeriod(
+    return SpecialPeriod(
       fromDate: fromDate ?? this.fromDate,
       toDate: toDate ?? this.toDate,
     );
@@ -1065,15 +1078,15 @@ class ExcludePeriod {
     };
   }
 
-  factory ExcludePeriod.fromMap(Map<String, dynamic> map) {
-    return ExcludePeriod(
+  factory SpecialPeriod.fromMap(Map<String, dynamic> map) {
+    return SpecialPeriod(
       fromDate: AppHelper.instance.parseDateTime(map['fromDate'])!,
       toDate: AppHelper.instance.parseDateTime(map['toDate'])!,
     );
   }
 
-  factory ExcludePeriod.empty() {
-    return ExcludePeriod(
+  factory SpecialPeriod.empty() {
+    return SpecialPeriod(
         fromDate: DateTime(2024, 1, 1), toDate: DateTime(2024, 1, 1));
   }
 
@@ -1082,12 +1095,12 @@ class ExcludePeriod {
   }
 
   @override
-  String toString() => 'ExcludePeriod(fromDate: $fromDate, toDate: $toDate)';
+  String toString() => 'SummerPeriod(fromDate: $fromDate, toDate: $toDate)';
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ExcludePeriod &&
+    return other is SpecialPeriod &&
         other.fromDate == fromDate &&
         other.toDate == toDate;
   }
@@ -1097,22 +1110,37 @@ class ExcludePeriod {
 }
 
 ///--------------------------------
-class ExcludeDay {
+class SpecialDay {
   final DateTime dateTime;
   final String description;
 
-  ExcludeDay({
+  SpecialDay({
     required this.dateTime,
     required this.description,
   });
-  ExcludeDay copyWith({
+  SpecialDay copyWith({
     DateTime? dateTime,
     String? description,
   }) {
-    return ExcludeDay(
+    return SpecialDay(
       dateTime: dateTime ?? this.dateTime,
       description: description ?? this.description,
     );
+  }
+
+  SpecialDay clone() {
+    return SpecialDay(
+      dateTime: dateTime,
+      description: description,
+    );
+  }
+
+  factory SpecialDay.empty() {
+    return SpecialDay(dateTime: DateTime(2000, 1, 1), description: '');
+  }
+
+  bool isValid() {
+    return dateTime.year > 2023 && description.isNotEmpty;
   }
 
   Map<String, dynamic> toMap() {
@@ -1122,28 +1150,103 @@ class ExcludeDay {
     };
   }
 
-  factory ExcludeDay.fromMap(Map<String, dynamic> map) {
-    return ExcludeDay(
+  factory SpecialDay.fromMap(Map<String, dynamic> map) {
+    return SpecialDay(
       dateTime: AppHelper.instance.parseDateTime(map['dateTime'])!,
       description: map['description'],
     );
   }
   String toJson() => json.encode(toMap());
-  factory ExcludeDay.fromJson(String source) =>
-      ExcludeDay.fromMap(json.decode(source));
+  factory SpecialDay.fromJson(String source) =>
+      SpecialDay.fromMap(json.decode(source));
   @override
   String toString() => 'ExcludeDay(data: $dateTime, description: $description)';
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ExcludeDay &&
+    return other is SpecialDay &&
         other.dateTime == dateTime &&
         other.description == description;
   }
 
   @override
   int get hashCode => dateTime.hashCode ^ description.hashCode;
+}
+
+//-----------------------------------------------------
+class SpecialDays {
+  final List<SpecialDay> excludeDays;
+  final SpecialPeriod summerPeriod;
+  final SpecialPeriod startersGroup;
+
+  SpecialDays({
+    required this.excludeDays,
+    required this.summerPeriod,
+    required this.startersGroup,
+  });
+
+  bool isValid() {
+    SpecialDay? invalidSpecialDay =
+        excludeDays.firstWhereOrNull((e) => !e.isValid());
+    return summerPeriod.isValid() && invalidSpecialDay == null;
+  }
+
+  SpecialDays clone() {
+    return SpecialDays(
+      excludeDays: List.from(excludeDays),
+      summerPeriod: summerPeriod.clone(),
+      startersGroup: startersGroup.clone(),
+    );
+  }
+
+  SpecialDays copyWith({
+    List<SpecialDay>? excludeDays,
+    SpecialPeriod? summerPeriod,
+    SpecialPeriod? startersGroup,
+  }) {
+    return SpecialDays(
+      excludeDays: excludeDays ?? this.excludeDays,
+      summerPeriod: summerPeriod ?? this.summerPeriod,
+      startersGroup: startersGroup ?? this.startersGroup,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'excludeDays': excludeDays.map((x) => x.toMap()).toList(),
+      'summerPeriod': summerPeriod.toMap(),
+      'startersGroup': startersGroup.toMap(),
+    };
+  }
+
+  factory SpecialDays.fromMap(Map<String, dynamic> map) {
+    return SpecialDays(
+      excludeDays: List<SpecialDay>.from(
+          map['excludeDays']?.map((x) => SpecialDay.fromMap(x))),
+      summerPeriod: SpecialPeriod.fromMap(map['summerPeriod']),
+      startersGroup: SpecialPeriod.fromMap(map['startersGroup']),
+    );
+  }
+  String toJson() => json.encode(toMap());
+  factory SpecialDays.fromJson(String source) =>
+      SpecialDays.fromMap(json.decode(source));
+  @override
+  String toString() =>
+      'SpecialDays(excludeDays: $excludeDays, summerPeriod: $summerPeriod, startersGroup: $startersGroup)';
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SpecialDays &&
+        listEquals(other.excludeDays, excludeDays) &&
+        other.summerPeriod == summerPeriod &&
+        other.startersGroup == startersGroup;
+  }
+
+  @override
+  int get hashCode =>
+      excludeDays.hashCode ^ summerPeriod.hashCode ^ startersGroup.hashCode;
 }
 
 ///--------------------------------

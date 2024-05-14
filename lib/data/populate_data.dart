@@ -4,14 +4,22 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
 
-DateTime summerStart = DateTime(2024, 7, 6);
-DateTime summerEnd = DateTime(2024, 8, 18);
-List<ExcludeDay> excludeDays = [
-  ExcludeDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
+DateTime _summerStart = DateTime(2024, 7, 6);
+DateTime _summerEnd = DateTime(2024, 8, 18);
+DateTime _startgroupStart = DateTime(2024, 3, 17);
+DateTime _startgroupEnd = DateTime(2024, 5, 31);
+List<SpecialDay> _excludeDays = [
+  SpecialDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
 ];
+SpecialDays specialDays = SpecialDays(
+  excludeDays: _excludeDays,
+  summerPeriod: SpecialPeriod(fromDate: _summerStart, toDate: _summerEnd),
+  startersGroup:
+      SpecialPeriod(fromDate: _startgroupStart, toDate: _startgroupEnd),
+);
 
-List<ExcludePeriod> excludPeriods = [
-  ExcludePeriod(fromDate: DateTime(2024, 7, 16), toDate: DateTime(2024, 8, 8))
+List<SpecialPeriod> excludPeriods = [
+  SpecialPeriod(fromDate: DateTime(2024, 7, 16), toDate: DateTime(2024, 8, 8))
 ];
 
 List<Trainer> allTrainers = [
@@ -427,8 +435,8 @@ List<TrainingGroup> allTrainingGroups() {
 }
 
 TrainingGroup _buildTrainingGroup(String name, String descr) {
-  List<ExcludePeriod> excludePeriods = [];
-  excludePeriods.add(ExcludePeriod(fromDate: summerStart, toDate: summerEnd));
+  List<SpecialPeriod> excludePeriods = [];
+  excludePeriods.add(SpecialPeriod(fromDate: _summerStart, toDate: _summerEnd));
 
   return TrainingGroup(
       name: name,

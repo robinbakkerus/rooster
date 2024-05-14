@@ -646,7 +646,7 @@ class SpreadsheetGenerator with AppMixin {
   void _postProcessExcludedDays() {
     for (SheetRow sheetRow in _spreadSheet.rows) {
       if (AppHelper.instance.isDateExcluded(sheetRow.date)) {
-        ExcludeDay? excludeDay = AppData.instance.excludeDays
+        SpecialDay? excludeDay = AppData.instance.specialDays.excludeDays
             .firstWhereOrNull((e) => e.dateTime.day == sheetRow.date.day);
         if (excludeDay != null) {
           sheetRow.trainingText = excludeDay.description;

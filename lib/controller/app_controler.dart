@@ -88,12 +88,13 @@ class AppController {
       }
 
       if (trainingGroup.name.toLowerCase() == Groep.zamo.name.toLowerCase()) {
-        trainingGroup.setSummerPeriod(ExcludePeriod.empty());
+        trainingGroup.setSummerPeriod(SpecialPeriod.empty());
       }
 
       if (trainingGroup.name.toLowerCase() == Groep.sg.name.toLowerCase()) {
-        trainingGroup.setStartDate(DateTime(2024, 3, 1)); //TODO hardcoded
-        trainingGroup.setEndDate(DateTime(2024, 5, 31));
+        SpecialPeriod startgroup = AppData.instance.specialDays.startersGroup;
+        trainingGroup.setStartDate(startgroup.fromDate);
+        trainingGroup.setEndDate(startgroup.toDate);
       }
     }
 
@@ -108,14 +109,14 @@ class AppController {
     AppData.instance.planRankValues = applyWeightValues;
   }
 
-  Future<void> getExcludeDays() async {
-    List<ExcludeDay> excludeDays = await Dbs.instance.getExcludeDays();
-    AppData.instance.excludeDays = excludeDays;
+  Future<void> getSpecialDays() async {
+    SpecialDays specialDays = await Dbs.instance.getSpecialsDays();
+    AppData.instance.specialDays = specialDays;
   }
 
-  Future<void> getExcludePeriods() async {
-    List<ExcludePeriod> excludePeriods = await Dbs.instance.getExcludePeriods();
-    AppData.instance.setExcludePeriods(excludePeriods);
+  Future<void> saveSpecialDays(SpecialDays specialDays) async {
+    await Dbs.instance.saveSpecialDays(specialDays);
+    AppData.instance.specialDays = specialDays;
   }
 
   // get trainer_items (to fill combobox)
@@ -412,76 +413,6 @@ class AppController {
     AppData.instance.setAllTrainerData(allTrainerData);
 
     return allTrainerData;
-  }
-
-  //----------------------------------------
-  Future<List<ExcludeDay>> addExcludeDay(ExcludeDay excludeDay) async {
-    List<ExcludeDay> excDays = [];
-    excDays.addAll(AppData.instance.excludeDays);
-    excDays.add(excludeDay);
-    try {
-      Dbs.instance.saveExcludeDays(excDays);
-      AppData.instance.excludeDays.add(excludeDay);
-    } catch (ex, stackTrace) {
-      FirestoreHelper.instance.handleError(ex, stackTrace);
-    }
-    return AppData.instance.excludeDays;
-  }
-
-  //----------------------------------------
-  Future<List<ExcludeDay>> deleteExcludeDay({required DateTime date}) async {
-    List<ExcludeDay> excDays = [];
-    excDays.addAll(AppData.instance.excludeDays);
-    ExcludeDay? deleteExcDay =
-        excDays.firstWhereOrNull((e) => ah.isSameDate(e.dateTime, date));
-
-    if (deleteExcDay != null) {
-      excDays.remove(deleteExcDay);
-      try {
-        Dbs.instance.saveExcludeDays(excDays);
-        AppData.instance.excludeDays = excDays;
-      } catch (ex, stackTrace) {
-        FirestoreHelper.instance.handleError(ex, stackTrace);
-      }
-    }
-
-    return AppData.instance.excludeDays;
-  }
-
-  //----------------------------------------
-  Future<List<ExcludePeriod>> addExcludePeriod(
-      ExcludePeriod excludePeriod) async {
-    List<ExcludePeriod> excPeriods = [];
-    excPeriods.addAll(AppData.instance.getExcludePeriods());
-    excPeriods.add(excludePeriod);
-    try {
-      Dbs.instance.saveExcludePeriods(excPeriods);
-      AppData.instance.getExcludePeriods().add(excludePeriod);
-    } catch (ex, stackTrace) {
-      FirestoreHelper.instance.handleError(ex, stackTrace);
-    }
-    return AppData.instance.getExcludePeriods();
-  }
-
-  //----------------------------------------
-  Future<List<ExcludePeriod>> deleteExcludePeriod(
-      {required DateTime date}) async {
-    List<ExcludePeriod> excPeriods = [];
-    excPeriods.addAll(AppData.instance.getExcludePeriods());
-    ExcludePeriod? deleteExcPeriod =
-        excPeriods.firstWhereOrNull((e) => ah.isSameDate(e.fromDate, date));
-
-    if (deleteExcPeriod != null) {
-      excPeriods.remove(deleteExcPeriod);
-      try {
-        Dbs.instance.saveExcludePeriods(excPeriods);
-        AppData.instance.setExcludePeriods(excPeriods);
-      } catch (ex, stackTrace) {
-        FirestoreHelper.instance.handleError(ex, stackTrace);
-      }
-    }
-
-    return AppData.instance.getExcludePeriods();
   }
 
   ///------------------------------------------------

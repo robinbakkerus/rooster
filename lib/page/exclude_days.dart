@@ -13,29 +13,37 @@ class ExcludeDaysPage extends StatefulWidget {
 }
 
 enum TextCtrl {
-  excDayDate,
-  excDayDescr,
-  excPerFrom,
-  excPerTo,
+  summerFromDate,
+  summerToDate,
+  startgroupFromDate,
+  startgroupToDate,
+  specialDayDate,
+  specialDayDescr,
 }
 
 //----------------------------------------------------
 class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   final AppHelper ah = AppHelper.instance;
   final List<TextEditingController> _textCtrls = [];
-  ExcludeDay? _excludeDay;
-  ExcludePeriod? _excludePeriod;
-  List<ExcludeDay> _excludeDaysList = [];
-  List<ExcludePeriod> _excludePeriodsList = [];
+  bool _addSpecialDay = false;
+  SpecialDays? _specialDays;
+  String _saveMsg = '';
 
   @override
   void initState() {
     super.initState();
-    _excludeDaysList = AppData.instance.excludeDays;
-    _excludePeriodsList = AppData.instance.getExcludePeriods();
+    _specialDays = AppData.instance.specialDays.clone();
     for (int i = 0; i < TextCtrl.values.length; i++) {
       _textCtrls.add(TextEditingController());
     }
+    _textCtrls[TextCtrl.startgroupFromDate.index].text =
+        ah.formatDate(_specialDays!.startersGroup.fromDate);
+    _textCtrls[TextCtrl.startgroupToDate.index].text =
+        ah.formatDate(_specialDays!.startersGroup.toDate);
+    _textCtrls[TextCtrl.summerFromDate.index].text =
+        ah.formatDate(_specialDays!.summerPeriod.fromDate);
+    _textCtrls[TextCtrl.summerToDate.index].text =
+        ah.formatDate(_specialDays!.summerPeriod.toDate);
   }
 
   @override
@@ -46,35 +54,55 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _header('Vakantiedagen'),
-          _buildDataTable(context, _buildHeaderExcDays, _buildDataRowsExcDays),
-          _buildAddRowExcDays(),
+          _header(),
+          wh.verSpace(10),
+          _subHeader('Vakantiedagen'),
+          _buildDataTable(context, _buildHeaderForSpecialDays,
+              _buildDataRowsForSpecialDays),
+          _buildAddRowForSpecialDays(),
+          wh.verSpace(20),
+          _subHeader('Zomer vakantie'),
+          _buildSummerPeriod(),
+          wh.verSpace(20),
+          _subHeader('Starters groep'),
+          _buildStartgroupPeriod(),
           wh.verSpace(30),
-          _header('Zomer vakantie'),
-          _buildDataTable(
-              context, _buildHeaderExcPeriods, _buildDataRowsExcPeriods),
-          _buildAddRowExcPeriod(),
-          wh.verSpace(30),
-          _buildCloseButtons(context),
+          _buildCloseAndSaveButtons(context),
+          wh.verSpace(10),
+          _buildSaveMsg(),
         ],
       ),
     );
   }
 
   //-----------------------------------------------
-  Widget _header(String text) {
+  Widget _header() {
+    String title = 'Beheer van speciale dagen ';
     return Text(
-      text,
+      title,
       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
     );
   }
 
+  //-----------------------------------------------
+  Widget _subHeader(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+    );
+  }
+
   //---------------------------------------------
-  Widget _buildCloseButtons(BuildContext context) {
+  Widget _buildCloseAndSaveButtons(BuildContext context) {
+    bool flag = _isDirty() && _isValid();
+    Color saveColor = flag ? Colors.green : Colors.blue[200]!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        ElevatedButton(
+            onPressed: flag ? _onSaveClicked : null,
+            child: Text("Save", style: TextStyle(color: saveColor))),
         ElevatedButton(
             onPressed: () {
               Navigator.of(context, rootNavigator: true)
@@ -102,77 +130,81 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   }
 
   //-------------------------------------------
-  Widget _buildAddRowExcDays() {
-    bool showAddButton = _excludeDay != null;
-    TextEditingController ctrl1 = _textCtrls[TextCtrl.excDayDate.index];
-    TextEditingController ctrl2 = _textCtrls[TextCtrl.excDayDescr.index];
-    bool enableSaveButton =
-        showAddButton && ctrl1.text.isNotEmpty && ctrl2.text.isNotEmpty;
+  Widget _buildAddRowForSpecialDays() {
+    if (!_addSpecialDay) {
+      return ElevatedButton(
+          onPressed: _onAddSpecialDayClicked, child: const Text('+'));
+    } else {
+      return Row(
+        children: [
+          _datePicker(TextCtrl.specialDayDate, 'datum'),
+          wh.horSpace(5),
+          _descrFieldNeeded(TextCtrl.specialDayDescr),
+        ],
+      );
+    }
+  }
+
+  //-------------------------------------------------
+  void _onAddSpecialDayClicked() {
+    setState(() {
+      _addSpecialDay = true;
+      _saveMsg = '';
+      _textCtrls[TextCtrl.specialDayDate.index].text = '';
+      _textCtrls[TextCtrl.specialDayDescr.index].text = '';
+    });
+  }
+
+  //---------------------------------------
+  List<DataRow> _buildDataRowsForSpecialDays() {
+    List<DataRow> result = [];
+
+    for (SpecialDay specialDay in _specialDays!.excludeDays) {
+      List<DataCell> datacells = [];
+      datacells.add(DataCell(Text(ah.formatDate(specialDay.dateTime))));
+      datacells.add(DataCell(Text(specialDay.description)));
+      datacells.add(DataCell(_deleteSpecialDayButton(specialDay.dateTime)));
+
+      result.add(DataRow(cells: datacells));
+    }
+    return result;
+  }
+
+//-------------------------------------------
+  Widget _buildSummerPeriod() {
     return Row(
       children: [
-        _datePickerIfNeeded(showAddButton, TextCtrl.excDayDate, 'datum'),
+        _datePicker(TextCtrl.summerFromDate, 'Van'),
         wh.horSpace(5),
-        _descrFieldNeeded(showAddButton, TextCtrl.excDayDescr),
-        wh.horSpace(5),
-        _addOrSaveButton(enableSaveButton, _handleAddExcDay),
+        _datePicker(TextCtrl.summerToDate, 'Tot'),
       ],
     );
   }
 
 //-------------------------------------------
-  Widget _buildAddRowExcPeriod() {
-    bool showAddButton = _excludePeriod != null;
-    TextEditingController ctrl1 = _textCtrls[TextCtrl.excPerFrom.index];
-    TextEditingController ctrl2 = _textCtrls[TextCtrl.excPerTo.index];
-    bool enableSaveButton =
-        showAddButton && ctrl1.text.isNotEmpty && ctrl2.text.isNotEmpty;
+  Widget _buildStartgroupPeriod() {
     return Row(
       children: [
-        _datePickerIfNeeded(showAddButton, TextCtrl.excPerFrom, 'Van'),
+        _datePicker(TextCtrl.startgroupFromDate, 'Van'),
         wh.horSpace(5),
-        _datePickerIfNeeded(showAddButton, TextCtrl.excPerTo, 'Tot'),
-        _addOrSaveButton(enableSaveButton, _handleAddExcPeriods),
+        _datePicker(TextCtrl.startgroupToDate, 'Tot'),
       ],
     );
   }
 
   //----------------------------------------
-  Widget _datePickerIfNeeded(bool flag, TextCtrl textCtrlEnum, String label) {
-    return flag
-        ? SizedBox(
-            width: 200,
-            child: _datePicker(_textCtrls[textCtrlEnum.index], label),
-          )
-        : Container();
-  }
-
-  //----------------------------------------
-  Widget _descrFieldNeeded(bool flag, TextCtrl textCtrlEnum) {
-    return flag
-        ? SizedBox(
-            width: 300,
-            child: TextField(
-              onChanged: (value) => setState(() {}),
-              controller: _textCtrls[textCtrlEnum.index],
-            ),
-          )
-        : Container();
-  }
-
-  //---------------------------------------------
-  Widget _addOrSaveButton(bool flag, Function() handleSave) {
-    Color color = flag ? Colors.green : Colors.blue;
-    String txt = flag ? 'Save' : '+';
-    return ElevatedButton(
-      style: ButtonStyle(
-          backgroundColor: MaterialStateColor.resolveWith((states) => color)),
-      onPressed: handleSave,
-      child: Text(txt, style: const TextStyle(color: Colors.white)),
+  Widget _descrFieldNeeded(TextCtrl textCtrlEnum) {
+    return SizedBox(
+      width: 300,
+      child: TextField(
+        onChanged: (value) => setState(() {}),
+        controller: _textCtrls[textCtrlEnum.index],
+      ),
     );
   }
 
   //------------------------------------------
-  List<DataColumn> _buildHeaderExcDays() {
+  List<DataColumn> _buildHeaderForSpecialDays() {
     List<DataColumn> result = [];
 
     result.add(const DataColumn(
@@ -186,139 +218,30 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
     return result;
   }
 
-  //------------------------------------------
-  List<DataColumn> _buildHeaderExcPeriods() {
-    List<DataColumn> result = [];
-
-    result.add(const DataColumn(
-        label: Text('Van', style: TextStyle(fontStyle: FontStyle.italic))));
-    result.add(const DataColumn(
-        label: Text('Tot', style: TextStyle(fontStyle: FontStyle.italic))));
-    result.add(const DataColumn(
-        label: Text('Aktie', style: TextStyle(fontStyle: FontStyle.italic))));
-
-    return result;
-  }
-
-  //---------------------------------------
-  List<DataRow> _buildDataRowsExcDays() {
-    List<DataRow> result = [];
-
-    for (ExcludeDay excDay in _excludeDaysList) {
-      List<DataCell> datacells = [];
-      datacells.add(DataCell(Text(ah.formatDate(excDay.dateTime))));
-      datacells.add(DataCell(Text(excDay.description)));
-      datacells
-          .add(DataCell(_deleteButton(_handleDeleteExcDay, excDay.dateTime)));
-      result.add(DataRow(cells: datacells));
-    }
-    return result;
-  }
-
-  //---------------------------------------
-  List<DataRow> _buildDataRowsExcPeriods() {
-    List<DataRow> result = [];
-
-    for (ExcludePeriod excPeriod in _excludePeriodsList) {
-      List<DataCell> datacells = [];
-      datacells.add(DataCell(Text(ah.formatDate(excPeriod.fromDate))));
-      datacells.add(DataCell(Text(ah.formatDate(excPeriod.toDate))));
-      datacells.add(
-          DataCell(_deleteButton(_handleDeleteExcPeriod, excPeriod.fromDate)));
-
-      result.add(DataRow(cells: datacells));
-    }
-    return result;
-  }
-
-  //-----------------------------------------
-  void _handleAddExcDay() async {
-    if (_excludeDay == null) {
-      setState(() {
-        _excludeDay = ExcludeDay(dateTime: DateTime.now(), description: "");
-      });
-    } else {
-      _handleSaveExcDay();
-    }
-  }
-
   //-------------------------------------------
-  void _handleSaveExcDay() async {
-    TextEditingController ctrl1 = _textCtrls[TextCtrl.excDayDate.index];
-    TextEditingController ctrl2 = _textCtrls[TextCtrl.excDayDescr.index];
-    _excludeDay = ExcludeDay(
-        dateTime: DateTime.parse(ctrl1.text), description: ctrl2.text);
-
-    _excludeDaysList = await AppController.instance.addExcludeDay(_excludeDay!);
-    setState(() {
-      _excludeDay = null;
-    });
-  }
-
-  //-----------------------------------------
-  void _handleDeleteExcDay(DateTime dateTime) async {
-    _excludeDaysList =
-        await AppController.instance.deleteExcludeDay(date: dateTime);
-    setState(() {
-      _excludeDay = null;
-    });
-  }
-
-  //-------------------------------------------
-  void _handleAddExcPeriods() {
-    if (_excludePeriod == null) {
-      setState(() {
-        _excludePeriod =
-            ExcludePeriod(fromDate: DateTime.now(), toDate: DateTime.now());
-      });
-    } else {
-      _handleSaveExcPeriod();
-    }
-  }
-
-  //-------------------------------------------
-  void _handleSaveExcPeriod() async {
-    TextEditingController ctrl1 = _textCtrls[TextCtrl.excPerFrom.index];
-    TextEditingController ctrl2 = _textCtrls[TextCtrl.excPerTo.index];
-    _excludePeriod = ExcludePeriod(
-        fromDate: DateTime.parse(ctrl1.text),
-        toDate: DateTime.parse(ctrl2.text));
-
-    _excludePeriodsList =
-        await AppController.instance.addExcludePeriod(_excludePeriod!);
-    setState(() {
-      _excludePeriod = null;
-    });
-  }
-
-  //-----------------------------------------
-  void _handleDeleteExcPeriod(DateTime dateTime) async {
-    _excludePeriodsList =
-        await AppController.instance.deleteExcludePeriod(date: dateTime);
-    setState(() {
-      _excludePeriod = null;
-    });
-  }
-
-  //-------------------------------------------
-  Widget _datePicker(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          prefixIcon: const Icon(Icons.calendar_today),
-          enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          )),
-      readOnly: true,
-      onTap: () => _selectDate(context, controller),
+  Widget _datePicker(TextCtrl textCtrl, String label) {
+    TextEditingController controller = _textCtrls[textCtrl.index];
+    return SizedBox(
+      width: 200,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+            labelText: label,
+            filled: true,
+            prefixIcon: const Icon(Icons.calendar_today),
+            enabledBorder:
+                const OutlineInputBorder(borderSide: BorderSide.none),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue),
+            )),
+        readOnly: true,
+        onTap: () => _selectDate(context, controller),
+      ),
     );
   }
 
 //--------------------------------------------
-  Widget _deleteButton(Function(DateTime) function, DateTime dateTime) {
+  Widget _deleteSpecialDayButton(DateTime dateTime) {
     return ElevatedButton.icon(
       icon: const Icon(
         Icons.delete,
@@ -327,7 +250,7 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
       ),
       label: const Text(''),
       onPressed: () {
-        function(dateTime);
+        _handleDeleteSpecialDay(dateTime);
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -337,18 +260,92 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
     );
   }
 
+  //-----------------------------------------
+  void _handleDeleteSpecialDay(DateTime dateTime) async {
+    setState(() {
+      _specialDays!.excludeDays
+          .removeWhere((e) => ah.isSameDate(e.dateTime, dateTime));
+    });
+  }
+
   //------------------------------------------
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {
+    final DateTime firstDate = DateTime.now();
+    final DateTime lastDate = DateTime.now().copyWith(year: firstDate.year + 1);
+    String text = controller.text;
+    final DateTime initDate =
+        text.isEmpty ? DateTime.now() : DateTime.parse(text);
+
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2024, 1),
-        lastDate: DateTime(2025, 12));
+        initialDate: initDate,
+        firstDate: firstDate,
+        lastDate: lastDate);
+
     if (picked != null) {
       setState(() {
+        _saveMsg = '';
         controller.text = ah.formatDate(picked);
+        _specialDays = _updateSpecialDaysObject();
       });
     }
+  }
+
+  //--------------------------------------
+  SpecialDays _updateSpecialDaysObject() {
+    _saveMsg = '';
+    List<DateTime> dates =
+        List.generate(4, (index) => DateTime.parse(_textCtrls[index].text));
+
+    SpecialPeriod summerPeriod =
+        SpecialPeriod(fromDate: dates[0], toDate: dates[1]);
+    SpecialPeriod startersGroup =
+        SpecialPeriod(fromDate: dates[2], toDate: dates[3]);
+    SpecialDays result = SpecialDays(
+        excludeDays: [],
+        summerPeriod: summerPeriod,
+        startersGroup: startersGroup);
+
+    result.excludeDays.addAll(_specialDays!.excludeDays);
+    return result;
+  }
+
+  //-------------------------------------
+  bool _isDirty() {
+    bool b =
+        AppData.instance.specialDays == _specialDays && _addSpecialDay == false;
+    return !b;
+  }
+
+  //----------------------------------------
+  bool _isValid() {
+    bool b = _addSpecialDay == false ||
+        (_textCtrls[TextCtrl.specialDayDate.index].text.isNotEmpty &&
+            _textCtrls[TextCtrl.specialDayDescr.index].text.isNotEmpty);
+    return _specialDays != null && _specialDays!.isValid() && b;
+  }
+
+  //--------------------------------------
+  Widget _buildSaveMsg() {
+    return _saveMsg.isEmpty ? Container() : Text(_saveMsg);
+  }
+
+  //----------------------------------
+  void _onSaveClicked() async {
+    if (_addSpecialDay) {
+      _specialDays!.excludeDays.add(SpecialDay(
+          dateTime:
+              DateTime.parse(_textCtrls[TextCtrl.specialDayDate.index].text),
+          description: _textCtrls[TextCtrl.specialDayDescr.index].text));
+    }
+
+    _specialDays = _updateSpecialDaysObject();
+    await AppController.instance.saveSpecialDays(_specialDays!);
+    setState(() {
+      _specialDays = AppData.instance.specialDays.clone();
+      _addSpecialDay = false;
+      _saveMsg = 'Met succes speciale dagen opgeslagen in database';
+    });
   }
 }

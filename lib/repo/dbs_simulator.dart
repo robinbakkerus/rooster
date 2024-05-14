@@ -107,26 +107,19 @@ class Simulator with AppMixin implements Dbs {
   Future<void> savePlanRankValues(MetaPlanRankValues planRankValues) async {}
 
   @override
-  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays) async {}
-
-  @override
-  Future<List<ExcludeDay>> getExcludeDays() async {
-    return p.excludeDays;
-  }
-
-  @override
-  Future<List<ExcludePeriod>> getExcludePeriods() async {
-    return p.excludPeriods;
-  }
-
-  @override
-  Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods) async {
-    return;
-  }
+  Future<void> saveSpecialDays(SpecialDays specialDays) async {}
 
   @override
   Future<void> importTrainerData(List<Map<String, dynamic>> trainers,
       List<Map<String, dynamic>> schemas) async {
     return;
+  }
+
+  @override
+  Future<SpecialDays> getSpecialsDays() async {
+    return SpecialDays(
+        excludeDays: [],
+        summerPeriod: SpecialPeriod.empty(),
+        startersGroup: SpecialPeriod.empty());
   }
 }

@@ -198,7 +198,7 @@ class AppHelper with AppMixin {
 
   ///-----------------------------------
   bool isDateExcluded(DateTime date) {
-    ExcludeDay? excludeDay = AppData.instance.excludeDays
+    SpecialDay? excludeDay = AppData.instance.specialDays.excludeDays
         .firstWhereOrNull((e) => e.dateTime.day == date.day);
     return excludeDay != null ? true : false;
   }

@@ -169,7 +169,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   void _addMetaData() async {
     await _addPlanRankValues();
     await _addTrainingItems();
-    await _addExcludeDays();
+    await _addSpecialDays();
     await _addTrainingGroups();
   }
 
@@ -178,9 +178,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     await FirestoreHelper.instance.savePlanRankValues(planRankValues);
   }
 
-  Future<void> _addExcludeDays() async {
-    List<ExcludeDay> excludeDays = p.excludeDays;
-    await FirestoreHelper.instance.saveExcludeDays(excludeDays);
+  Future<void> _addSpecialDays() async {
+    await FirestoreHelper.instance.saveSpecialDays(p.specialDays);
   }
 
   Future<void> _addTrainingItems() async {

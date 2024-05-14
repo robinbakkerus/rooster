@@ -325,75 +325,36 @@ class FirestoreHelper with AppMixin implements Dbs {
   }
 
   @override
-  Future<void> saveExcludeDays(List<ExcludeDay> excludeDays) async {
+  Future<void> saveSpecialDays(SpecialDays specialDays) async {
     CollectionReference colRef = collectionRef(FsCol.metadata);
 
-    List<Map<String, dynamic>> excludeDaysMap = [];
-    for (ExcludeDay excDay in excludeDays) {
-      excludeDaysMap.add(excDay.toMap());
-    }
-    Map<String, dynamic> map = {'days': excludeDaysMap};
-
-    await colRef.doc('exclude_days').set(map).then((val) {}).catchError((e) {
+    Map<String, dynamic> map = specialDays.toMap();
+    await colRef.doc('special_days').set(map).then((val) {}).catchError((e) {
       lp('Error in saveExcludeDays $e');
       throw e;
     });
   }
 
   @override
-  Future<List<ExcludeDay>> getExcludeDays() async {
-    List<ExcludeDay> result = [];
+  Future<SpecialDays> getSpecialsDays() async {
+    SpecialDays result = SpecialDays(
+        excludeDays: [],
+        summerPeriod: SpecialPeriod.empty(),
+        startersGroup: SpecialPeriod.empty());
     CollectionReference colRef = collectionRef(FsCol.metadata);
 
     late DocumentSnapshot snapshot;
     try {
-      snapshot = await colRef.doc('exclude_days').get();
+      snapshot = await colRef.doc('special_days').get();
       if (snapshot.exists) {
         Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> data = List<dynamic>.from(map['days'] as List);
-        result = data.map((e) => ExcludeDay.fromMap(e)).toList();
+        result = SpecialDays.fromMap(map);
       }
     } catch (ex, stackTrace) {
       handleError(ex, stackTrace);
     }
 
     return result;
-  }
-
-  @override
-  Future<List<ExcludePeriod>> getExcludePeriods() async {
-    List<ExcludePeriod> result = [];
-    CollectionReference colRef = collectionRef(FsCol.metadata);
-
-    late DocumentSnapshot snapshot;
-    try {
-      snapshot = await colRef.doc('exclude_periods').get();
-      if (snapshot.exists) {
-        Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> data = List<dynamic>.from(map['periods'] as List);
-        result = data.map((e) => ExcludePeriod.fromMap(e)).toList();
-      }
-    } catch (ex, stackTrace) {
-      handleError(ex, stackTrace);
-    }
-
-    return result;
-  }
-
-  @override
-  Future<void> saveExcludePeriods(List<ExcludePeriod> excludePeriods) async {
-    CollectionReference colRef = collectionRef(FsCol.metadata);
-
-    List<Map<String, dynamic>> excludePeriodsMap = [];
-    for (ExcludePeriod excDay in excludePeriods) {
-      excludePeriodsMap.add(excDay.toMap());
-    }
-    Map<String, dynamic> map = {'periods': excludePeriodsMap};
-
-    await colRef.doc('exclude_periods').set(map).then((val) {}).catchError((e) {
-      lp('Error in saveExcludePeriods $e');
-      throw e;
-    });
   }
 
   @override
