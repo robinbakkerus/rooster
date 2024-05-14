@@ -155,6 +155,8 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       return header.toUpperCase();
     } else if (header.toLowerCase() == 'zamo') {
       return 'ZaMo';
+    } else if (header.toLowerCase() == 'zomer') {
+      return 'Gecombineerd';
     } else {
       return header;
     }

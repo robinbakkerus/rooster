@@ -271,7 +271,7 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   //------------------------------------------
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {
-    final DateTime firstDate = DateTime.now();
+    final DateTime firstDate = DateTime(DateTime.now().year, 1, 1);
     final DateTime lastDate = DateTime.now().copyWith(year: firstDate.year + 1);
     String text = controller.text;
     final DateTime initDate =
@@ -342,6 +342,7 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
 
     _specialDays = _updateSpecialDaysObject();
     await AppController.instance.saveSpecialDays(_specialDays!);
+    await AppController.instance.generateOrRetrieveSpreadsheet();
     setState(() {
       _specialDays = AppData.instance.specialDays.clone();
       _addSpecialDay = false;
