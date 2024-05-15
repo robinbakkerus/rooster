@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/page/manage_special_days.dart';
-import 'package:rooster/page/sync_trainer_data.dart';
+import 'package:rooster/admin_pages/manage_special_days.dart';
+import 'package:rooster/admin_pages/sync_trainer_data.dart';
 import 'package:rooster/util/app_mixin.dart';
 
 class SupervisorPage extends StatefulWidget {
