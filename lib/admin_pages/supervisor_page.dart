@@ -17,10 +17,10 @@ class _SupervisorPageState extends State<SupervisorPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: wh.adminPageAppBar(context, 'Admin page'),
       body: Center(
         child: Column(
           children: [
-            _header(),
             wh.verSpace(10),
             OutlinedButton(
                 onPressed: _updateSpreadsheet,
@@ -44,15 +44,6 @@ class _SupervisorPageState extends State<SupervisorPage> with AppMixin {
   }
 
   //------------------ private -------------------------
-
-  Widget _header() {
-    return const Text(
-      'Admin page',
-      style: TextStyle(fontSize: 20, color: Colors.blue),
-    );
-  }
-
-  //-------------------------------------------------
   void _updateSpreadsheet() async {
     await AppController.instance.regenerateSpreadsheet();
     AppEvents.fireShowPage(PageEnum.spreadSheet);

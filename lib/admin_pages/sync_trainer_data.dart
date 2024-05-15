@@ -26,14 +26,13 @@ class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
   //----------- triggered in prod
   Widget _buildDownloadDataDialog() {
     return Scaffold(
-      appBar: wh.adminPageAppBar(context, 'Synchroniseer Trainer data'),
+      appBar: wh.adminPageAppBar(context, 'Download data uit Prod omgeving'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Download data uit Prod omgeving'),
             _downloadButton(),
             wh.verSpace(10),
             _textField(),
@@ -55,6 +54,7 @@ class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
 //----------- triggered in acc
   Widget _buildUploadDataDialog() {
     return Scaffold(
+      appBar: wh.adminPageAppBar(context, 'Upload data in ACC omgeving'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

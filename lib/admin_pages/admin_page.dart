@@ -20,6 +20,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: wh.adminPageAppBar(context, 'Admin page'),
       body: Center(
         child: Column(
           children: [
@@ -49,8 +50,6 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
                 child: const Text('Email accesscodes')),
             OutlinedButton(
                 onPressed: _signUpOrSignIn, child: const Text('SignUp')),
-            wh.verSpace(10),
-            wh.popPageButton(context),
           ],
         ),
       ),

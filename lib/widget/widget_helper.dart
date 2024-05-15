@@ -134,7 +134,7 @@ class WidgetHelper {
 
 //------------------------------------------
   AppBar adminPageAppBar(BuildContext context, String title) {
-    Color color = AppData.instance.runMode != RunMode.prod
+    Color color = AppData.instance.runMode == RunMode.prod
         ? Colors.lightBlue[200]!
         : Colors.yellow;
     return AppBar(
