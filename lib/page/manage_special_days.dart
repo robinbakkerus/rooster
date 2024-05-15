@@ -5,11 +5,11 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
-class ExcludeDaysPage extends StatefulWidget {
-  const ExcludeDaysPage({super.key});
+class SpecialDaysPage extends StatefulWidget {
+  const SpecialDaysPage({super.key});
 
   @override
-  State<ExcludeDaysPage> createState() => _ExcludeDaysPageState();
+  State<SpecialDaysPage> createState() => _SpecialDaysPageState();
 }
 
 enum TextCtrl {
@@ -22,12 +22,11 @@ enum TextCtrl {
 }
 
 //----------------------------------------------------
-class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
+class _SpecialDaysPageState extends State<SpecialDaysPage> with AppMixin {
   final AppHelper ah = AppHelper.instance;
   final List<TextEditingController> _textCtrls = [];
   bool _addSpecialDay = false;
   SpecialDays? _specialDays;
-  String _saveMsg = '';
 
   @override
   void initState() {
@@ -48,29 +47,31 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _header(),
-          wh.verSpace(10),
-          _subHeader('Vakantiedagen'),
-          _buildDataTable(context, _buildHeaderForSpecialDays,
-              _buildDataRowsForSpecialDays),
-          _buildAddRowForSpecialDays(),
-          wh.verSpace(20),
-          _subHeader('Zomer vakantie'),
-          _buildSummerPeriod(),
-          wh.verSpace(20),
-          _subHeader('Starters groep'),
-          _buildStartgroupPeriod(),
-          wh.verSpace(30),
-          _buildCloseAndSaveButtons(context),
-          wh.verSpace(10),
-          _buildSaveMsg(),
-        ],
+    return Scaffold(
+      appBar: wh.adminPageAppBar(context, 'Beheer van speciale dagen'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _header(),
+            wh.verSpace(10),
+            _subHeader('Vakantiedagen'),
+            _buildDataTable(context, _buildHeaderForSpecialDays,
+                _buildDataRowsForSpecialDays),
+            _buildAddRowForSpecialDays(),
+            wh.verSpace(20),
+            _subHeader('Zomer vakantie'),
+            _buildSummerPeriod(),
+            wh.verSpace(20),
+            _subHeader('Starters groep'),
+            _buildStartgroupPeriod(),
+            wh.verSpace(30),
+            _buildCloseAndSaveButtons(context),
+            wh.verSpace(10),
+          ],
+        ),
       ),
     );
   }
@@ -103,12 +104,7 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
         ElevatedButton(
             onPressed: flag ? _onSaveClicked : null,
             child: Text("Save", style: TextStyle(color: saveColor))),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pop(); // dismisses only the dialog and returns nothing
-            },
-            child: const Text("Close", style: TextStyle(color: Colors.blue))),
+        wh.popPageButton(context),
       ],
     );
   }
@@ -149,7 +145,6 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
   void _onAddSpecialDayClicked() {
     setState(() {
       _addSpecialDay = true;
-      _saveMsg = '';
       _textCtrls[TextCtrl.specialDayDate.index].text = '';
       _textCtrls[TextCtrl.specialDayDescr.index].text = '';
     });
@@ -285,7 +280,6 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
 
     if (picked != null) {
       setState(() {
-        _saveMsg = '';
         controller.text = ah.formatDate(picked);
         _specialDays = _updateSpecialDaysObject();
       });
@@ -294,7 +288,6 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
 
   //--------------------------------------
   SpecialDays _updateSpecialDaysObject() {
-    _saveMsg = '';
     List<DateTime> dates =
         List.generate(4, (index) => DateTime.parse(_textCtrls[index].text));
 
@@ -326,11 +319,6 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
     return _specialDays != null && _specialDays!.isValid() && b;
   }
 
-  //--------------------------------------
-  Widget _buildSaveMsg() {
-    return _saveMsg.isEmpty ? Container() : Text(_saveMsg);
-  }
-
   //----------------------------------
   void _onSaveClicked() async {
     if (_addSpecialDay) {
@@ -343,10 +331,10 @@ class _ExcludeDaysPageState extends State<ExcludeDaysPage> with AppMixin {
     _specialDays = _updateSpecialDaysObject();
     await AppController.instance.saveSpecialDays(_specialDays!);
     await AppController.instance.generateOrRetrieveSpreadsheet();
+    wh.showSnackbar(color: Colors.green, "Met succes opgeslagen");
     setState(() {
       _specialDays = AppData.instance.specialDays.clone();
       _addSpecialDay = false;
-      _saveMsg = 'Met succes speciale dagen opgeslagen in database';
     });
   }
 }

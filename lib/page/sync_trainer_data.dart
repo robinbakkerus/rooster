@@ -14,7 +14,6 @@ class SyncTrainerData extends StatefulWidget {
 //----------------------------------------------------------------
 class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
   String _clipboardText = '';
-  String _importStatusMsg = '';
   bool _validJson = false;
 
   @override
@@ -26,52 +25,52 @@ class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
 
   //----------- triggered in prod
   Widget _buildDownloadDataDialog() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Download data uit Prod omgeving'),
-          _downloadButton(),
-          wh.verSpace(10),
-          _textField(),
-          wh.verSpace(10),
-          _clipboardText.isEmpty
-              ? Container()
-              : const Text(
-                  'Data is naar clipboard gekopieerd!',
-                  style: TextStyle(color: Colors.green, fontSize: 20),
-                ),
-          _buildCloseButton(context),
-        ],
+    return Scaffold(
+      appBar: wh.adminPageAppBar(context, 'Synchroniseer Trainer data'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Download data uit Prod omgeving'),
+            _downloadButton(),
+            wh.verSpace(10),
+            _textField(),
+            wh.verSpace(10),
+            _clipboardText.isEmpty
+                ? Container()
+                : const Text(
+                    'Data is naar clipboard gekopieerd!',
+                    style: TextStyle(color: Colors.green, fontSize: 20),
+                  ),
+            wh.verSpace(10),
+            wh.popPageButton(context),
+          ],
+        ),
       ),
     );
   }
 
 //----------- triggered in acc
   Widget _buildUploadDataDialog() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Upload data in Acc omgeving'),
-          _pasteFromClipboardButton(),
-          wh.verSpace(10),
-          _textField(),
-          wh.verSpace(10),
-          _clipboardText.isEmpty
-              ? Container()
-              : _importStatusMsg.isEmpty
-                  ? _importToAccButton()
-                  : Text(
-                      _importStatusMsg,
-                      style: const TextStyle(color: Colors.green, fontSize: 20),
-                    ),
-          _buildCloseButton(context),
-        ],
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Upload data in Acc omgeving'),
+            _pasteFromClipboardButton(),
+            wh.verSpace(10),
+            _textField(),
+            wh.verSpace(10),
+            _clipboardText.isEmpty ? Container() : _importToAccButton(),
+            wh.verSpace(10),
+            wh.popPageButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -174,13 +173,11 @@ class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
     bool importOkay =
         await AppController.instance.importTrainerData(_clipboardText);
     if (importOkay) {
-      setState(() {
-        _importStatusMsg = 'Met succes trainer data geimporteerd';
-      });
+      wh.showSnackbar(
+          color: Colors.green, "Met succues trainer data geimporteerd");
     } else {
-      setState(() {
-        _importStatusMsg = 'Fout tijdens importeren van trainer data';
-      });
+      wh.showSnackbar(
+          color: Colors.orange, "Fout tijdens importeren trainer data");
     }
   }
 
@@ -200,21 +197,5 @@ class _SyncTrainerDataState extends State<SyncTrainerData> with AppMixin {
   //--------------------------------
   void _copyToClipboard() async {
     await Clipboard.setData(ClipboardData(text: _clipboardText));
-  }
-
-  //---------------------------------------------
-  Widget _buildCloseButton(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        ElevatedButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pop(); // dismisses only the dialog and returns nothing
-            },
-            child: const Text("Close", style: TextStyle(color: Colors.blue))),
-      ],
-    );
   }
 }

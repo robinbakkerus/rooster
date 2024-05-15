@@ -82,10 +82,7 @@ class _StartPageState extends State<StartPage> {
           const SpreadsheetPage(), //4
           const TrainerProgressPage(), //5
           const OverallAvailabilityPage(), //6
-          HelpPage(), //7
-          const AdminPage(), //8
-          const AppErrorPage(), //9
-          const SupervisorPage(), //10
+          const AppErrorPage(), //8
         ],
       ),
     );
@@ -142,12 +139,6 @@ class _StartPageState extends State<StartPage> {
       result = 'Voorkeuren $firstName';
     } else if (_getStackIndex() == PageEnum.spreadSheet.code) {
       result = _getBarTitleForSpreadhsheetPage();
-    } else if (_getStackIndex() == PageEnum.helpPage.code) {
-      result = 'Help pagina';
-    } else if (_getStackIndex() == PageEnum.adminPage.code) {
-      result = 'Admin pagina';
-    } else if (_getStackIndex() == PageEnum.supervisorPage.code) {
-      result = 'Hoofdtrainer pagina';
     }
     return result;
   }
@@ -297,9 +288,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _onErrorEvent(ErrorEvent event) {
-    setState(() {
-      AppData.instance.stackIndex = PageEnum.errorPage.code;
-    });
+    WidgetHelper.instance.pushPage(context, const AppErrorPage());
   }
 
   Widget _buildPopMenu() {
@@ -493,27 +482,15 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _gotoHelpPage() {
-    setState(() {
-      _setStackIndex(PageEnum.helpPage.code);
-      _barTitle = _buildBarTitle();
-      _toggleActionEnabled(PageEnum.helpPage.code);
-    });
+    WidgetHelper.instance.pushPage(context, HelpPage());
   }
 
   void _gotoAdminPage() {
-    setState(() {
-      _setStackIndex(PageEnum.adminPage.code);
-      _barTitle = _buildBarTitle();
-      _toggleActionEnabled(PageEnum.adminPage.code);
-    });
+    WidgetHelper.instance.pushPage(context, const AdminPage());
   }
 
   void _gotoSupervisorPage() {
-    setState(() {
-      _setStackIndex(PageEnum.supervisorPage.code);
-      _barTitle = _buildBarTitle();
-      _toggleActionEnabled(PageEnum.supervisorPage.code);
-    });
+    WidgetHelper.instance.pushPage(context, const SupervisorPage());
   }
 
   void _toggleActionEnabled(int index) {

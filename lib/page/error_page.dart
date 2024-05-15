@@ -20,20 +20,24 @@ class _AppErrorPageState extends State<AppErrorPage> with AppMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Er is een fout opgetreden!',
-            style: TextStyle(color: Colors.red),
-          ),
-          wh.verSpace(10),
-          const Text('error message = '),
-          Text(_errorMessage),
-          wh.verSpace(10),
-          const Text('Er is al een email naar de beheerder verstuurd'),
-        ],
+    return Scaffold(
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Er is een fout opgetreden!',
+              style: TextStyle(color: Colors.red),
+            ),
+            wh.verSpace(10),
+            const Text('error message = '),
+            Text(_errorMessage),
+            wh.verSpace(10),
+            const Text('Er is al een email naar de beheerder verstuurd'),
+            wh.verSpace(10),
+            wh.popPageButton(context),
+          ],
+        ),
       ),
     );
   }

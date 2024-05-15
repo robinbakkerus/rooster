@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rooster/data/app_data.dart';
+import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:soundpool/soundpool.dart';
 
@@ -106,6 +107,44 @@ class WidgetHelper {
     } else if (dialogResult == false && noFunction != null) {
       noFunction();
     }
+  }
+
+//------------------------------------------
+  void pushPage(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
+//------------------------------------------
+  void popPage(BuildContext context) {
+    Navigator.pop(
+      context,
+    );
+  }
+
+//-----------------------------------------------
+  Widget popPageButton(BuildContext context) {
+    return ElevatedButton.icon(
+        onPressed: () => popPage(context),
+        icon: const Icon(Icons.home),
+        label: const Text('Terug'));
+  }
+
+//------------------------------------------
+  AppBar adminPageAppBar(BuildContext context, String title) {
+    Color color = AppData.instance.runMode != RunMode.prod
+        ? Colors.lightBlue[200]!
+        : Colors.yellow;
+    return AppBar(
+      title: Text(title),
+      centerTitle: true,
+      backgroundColor: color,
+      leading: IconButton.filled(
+          onPressed: () => popPage(context),
+          icon: const Icon(Icons.arrow_back)),
+    );
   }
 
 //----------------------------------

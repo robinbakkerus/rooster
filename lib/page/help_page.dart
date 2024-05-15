@@ -9,40 +9,46 @@ class HelpPage extends StatelessWidget with AppMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(18.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text(
-                  'Een korte video over het gebruik van deze app vind je'),
-              Link(
-                  uri: Uri.parse(
-                      'https://drive.google.com/file/d/1P1VRW5GXnh7jFimqcddL_0VJlvLq3Qrs/view'),
-                  target: LinkTarget.blank,
-                  builder: (context, followLink) {
-                    return TextButton(
-                      onPressed: followLink,
-                      child: const Text(
-                        'hier',
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    );
-                  }),
-            ],
-          ),
-          wh.verSpace(10),
-          _buildFaq(),
-          wh.verSpace(10),
-          Text('Versie: $appVersion'),
-          wh.verSpace(10),
-          OutlinedButton(
-              onPressed: _removeAccessCodePref,
-              child: const Text('Remove cookie')),
-        ],
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Help pagina'),
+            wh.verSpace(10),
+            Row(
+              children: [
+                const Text(
+                    'Een korte video over het gebruik van deze app vind je'),
+                Link(
+                    uri: Uri.parse(
+                        'https://drive.google.com/file/d/1P1VRW5GXnh7jFimqcddL_0VJlvLq3Qrs/view'),
+                    target: LinkTarget.blank,
+                    builder: (context, followLink) {
+                      return TextButton(
+                        onPressed: followLink,
+                        child: const Text(
+                          'hier',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      );
+                    }),
+              ],
+            ),
+            wh.verSpace(10),
+            _buildFaq(),
+            wh.verSpace(10),
+            Text('Versie: $appVersion'),
+            wh.verSpace(10),
+            OutlinedButton(
+                onPressed: _removeAccessCodePref,
+                child: const Text('Remove cookie')),
+            wh.verSpace(10),
+            wh.popPageButton(context),
+          ],
+        ),
       ),
     );
   }

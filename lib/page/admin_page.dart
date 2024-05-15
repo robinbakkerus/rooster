@@ -19,35 +19,40 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          OutlinedButton(
-              onPressed: _addTrainers, child: const Text('Add trainers')),
-          OutlinedButton(
-              onPressed: _removeAccessCodePref,
-              child: const Text('Remove access code pref')),
-          OutlinedButton(
-              onPressed: _addTrainerSchemas,
-              child: const Text('add trainer schemas')),
-          OutlinedButton(
-              onPressed: _saveFsSpreadsheet,
-              child: const Text('Save spreadsheet')),
-          OutlinedButton(
-              onPressed: _deleteOldLogs, child: const Text('Delete old logs')),
-          OutlinedButton(
-              onPressed: _deleteOldErrors,
-              child: const Text('Delete old errors')),
-          OutlinedButton(
-              onPressed: _addMetaData, child: const Text('Add MetaData')),
-          OutlinedButton(
-              onPressed: _sendEmail, child: const Text('Send email')),
-          OutlinedButton(
-              onPressed: _sendAccessCodes,
-              child: const Text('Email accesscodes')),
-          OutlinedButton(
-              onPressed: _signUpOrSignIn, child: const Text('SignUp')),
-        ],
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            OutlinedButton(
+                onPressed: _addTrainers, child: const Text('Add trainers')),
+            OutlinedButton(
+                onPressed: _removeAccessCodePref,
+                child: const Text('Remove access code pref')),
+            OutlinedButton(
+                onPressed: _addTrainerSchemas,
+                child: const Text('add trainer schemas')),
+            OutlinedButton(
+                onPressed: _saveFsSpreadsheet,
+                child: const Text('Save spreadsheet')),
+            OutlinedButton(
+                onPressed: _deleteOldLogs,
+                child: const Text('Delete old logs')),
+            OutlinedButton(
+                onPressed: _deleteOldErrors,
+                child: const Text('Delete old errors')),
+            OutlinedButton(
+                onPressed: _addMetaData, child: const Text('Add MetaData')),
+            OutlinedButton(
+                onPressed: _sendEmail, child: const Text('Send email')),
+            OutlinedButton(
+                onPressed: _sendAccessCodes,
+                child: const Text('Email accesscodes')),
+            OutlinedButton(
+                onPressed: _signUpOrSignIn, child: const Text('SignUp')),
+            wh.verSpace(10),
+            wh.popPageButton(context),
+          ],
+        ),
       ),
     );
   }
