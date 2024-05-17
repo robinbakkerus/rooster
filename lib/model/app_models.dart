@@ -79,6 +79,13 @@ class TrainerPref {
     required this.value,
   });
 
+  TrainerPref clone() {
+    return TrainerPref(
+      paramName: paramName,
+      value: value,
+    );
+  }
+
   TrainerPref copyWith({
     String? paramName,
     int? value,
@@ -141,6 +148,19 @@ class Trainer {
     required this.prefValues,
     required this.roles,
   });
+
+  Trainer clone() {
+    return Trainer(
+      accessCode: accessCode,
+      originalAccessCode: originalAccessCode,
+      pk: pk,
+      fullname: fullname,
+      email: email,
+      originalEmail: originalEmail,
+      prefValues: prefValues.map((e) => e.clone()).toList(),
+      roles: roles,
+    );
+  }
 
   Trainer copyWith({
     String? accessCode,

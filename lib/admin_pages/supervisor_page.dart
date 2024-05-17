@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rooster/admin_pages/manage_trainers.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
@@ -29,6 +30,9 @@ class _SupervisorPageState extends State<SupervisorPage> with AppMixin {
                 onPressed: _manageSpecialDays,
                 child: const Text('Beheer vakantiedagen/periodes')),
             OutlinedButton(
+                onPressed: _manageTrainers,
+                child: const Text('Beheer trainers')),
+            OutlinedButton(
                 onPressed: _syncTrainerDataProd,
                 child: const Text('PROD: Synchronize Trainer data, download')),
             OutlinedButton(
@@ -51,7 +55,12 @@ class _SupervisorPageState extends State<SupervisorPage> with AppMixin {
 
   //-----------------------------
   void _manageSpecialDays() async {
-    wh.pushPage(context, const SpecialDaysPage());
+    wh.pushPage(context, const ManageSpecialDaysPage());
+  }
+
+  //-----------------------------
+  void _manageTrainers() async {
+    wh.pushPage(context, const ManageTrainers());
   }
 
   //-----------------------------

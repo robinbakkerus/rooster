@@ -373,7 +373,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     if (_textAccessCodeCtrl.text.length != 4) {
       wh.showSnackbar('Toegangscode moet 4 letter zijn', color: Colors.red);
     }
-    lp(AppData.instance.getAllTrainers().toString());
     Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull((e) =>
         e.originalAccessCode == _textAccessCodeCtrl.text ||
         e.accessCode == _textAccessCodeCtrl.text);

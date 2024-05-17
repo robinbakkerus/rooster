@@ -5,7 +5,6 @@ import 'package:rooster/widget/widget_helper.dart';
 
 mixin AppMixin {
   final WidgetHelper wh = WidgetHelper.instance;
-
   final AppConstants c = AppConstants();
 
   lp(String message) {

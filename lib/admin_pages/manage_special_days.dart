@@ -5,11 +5,11 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
-class SpecialDaysPage extends StatefulWidget {
-  const SpecialDaysPage({super.key});
+class ManageSpecialDaysPage extends StatefulWidget {
+  const ManageSpecialDaysPage({super.key});
 
   @override
-  State<SpecialDaysPage> createState() => _SpecialDaysPageState();
+  State<ManageSpecialDaysPage> createState() => _ManageSpecialDaysPageState();
 }
 
 enum TextCtrl {
@@ -22,7 +22,8 @@ enum TextCtrl {
 }
 
 //----------------------------------------------------
-class _SpecialDaysPageState extends State<SpecialDaysPage> with AppMixin {
+class _ManageSpecialDaysPageState extends State<ManageSpecialDaysPage>
+    with AppMixin {
   final AppHelper ah = AppHelper.instance;
   final List<TextEditingController> _textCtrls = [];
   bool _addSpecialDay = false;
@@ -55,7 +56,6 @@ class _SpecialDaysPageState extends State<SpecialDaysPage> with AppMixin {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _header(),
             wh.verSpace(10),
             _subHeader('Vakantiedagen'),
             _buildDataTable(context, _buildHeaderForSpecialDays,
@@ -73,15 +73,6 @@ class _SpecialDaysPageState extends State<SpecialDaysPage> with AppMixin {
           ],
         ),
       ),
-    );
-  }
-
-  //-----------------------------------------------
-  Widget _header() {
-    String title = 'Beheer van speciale dagen ';
-    return Text(
-      title,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
     );
   }
 
