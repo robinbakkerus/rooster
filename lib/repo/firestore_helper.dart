@@ -138,7 +138,7 @@ class FirestoreHelper with AppMixin implements Dbs {
 
   ///--------------------------
   @override
-  Future<Trainer> createOrUpdateTrainer(trainer) async {
+  Future<Trainer> createOrUpdateTrainer(Trainer trainer) async {
     Trainer result = Trainer.empty();
 
     CollectionReference colRef = collectionRef(FsCol.trainer);
@@ -147,7 +147,6 @@ class FirestoreHelper with AppMixin implements Dbs {
       Map<String, dynamic> map = trainer.toMap();
       await colRef.doc(trainer.pk).set(map);
       result = trainer;
-      _handleSucces(LogAction.modifySettings);
     } catch (e, stackTrace) {
       handleError(e, stackTrace);
     }
@@ -155,8 +154,19 @@ class FirestoreHelper with AppMixin implements Dbs {
     return result;
   }
 
-  ///--------------------------------------------
-  // get list of items used to populate combobox of training items
+  //-------------------------------------------------------------------
+  @override
+  Future<void> deleteTrainer(Trainer trainer) async {
+    CollectionReference colRef = collectionRef(FsCol.trainer);
+
+    try {
+      await colRef.doc(trainer.pk).delete();
+    } catch (e, stackTrace) {
+      handleError(e, stackTrace);
+    }
+  }
+
+  //----------------- get list of items used to populate combobox of training items
   @override
   Future<List<String>> getTrainingItems() async {
     List<String> result = [];

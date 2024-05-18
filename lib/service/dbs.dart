@@ -14,7 +14,8 @@ abstract class Dbs {
   Future<bool> createOrUpdateTrainerSchemas(TrainerSchema trainerSchemas,
       {required bool updateSchema});
   Future<List<Trainer>> getAllTrainers();
-  Future<Trainer> createOrUpdateTrainer(trainer);
+  Future<Trainer> createOrUpdateTrainer(Trainer trainer);
+  Future<void> deleteTrainer(Trainer trainer);
   Future<List<String>> getTrainingItems();
   Future<MetaPlanRankValues> getApplyPlanRankValues();
   Future<LastRosterFinal> saveLastRosterFinal();

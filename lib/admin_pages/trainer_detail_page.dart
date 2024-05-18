@@ -6,6 +6,7 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/animated_fab.dart';
+import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
 class TrainerDetailPage extends StatefulWidget {
   final Trainer trainer;
@@ -17,11 +18,12 @@ class TrainerDetailPage extends StatefulWidget {
   State<TrainerDetailPage> createState() => _TrainerDetailPageState();
 }
 
-enum TextCtrl { fullname, email, accesscode, pk }
+enum TextCtrl { fullname, email, accesscode, pk, roles }
 
 class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   late Trainer _trainer;
-  Trainer _updateTrainer = Trainer.empty();
+  late Trainer _updateTrainer;
+  bool _newTrainer = false;
 
   final List<TextEditingController> _textCtrls = [];
   List<Widget> _columnWidgets = [];
@@ -33,7 +35,27 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
     }
     _columnWidgets = _buildColumnWidgets();
     _trainer = widget.trainer.clone();
+    _updateTrainer = _trainer.clone();
+    _newTrainer = _trainer.isEmpty();
+    if (_newTrainer) {
+      _setupNewTrainer();
+    }
+    _fillTextControls();
     super.initState();
+  }
+
+  //------------------------------------------------------------
+  void _fillTextControls() {
+    _textCtrls[TextCtrl.fullname.index].text = _updateTrainer.fullname;
+    _textCtrls[TextCtrl.email.index].text = _updateTrainer.email;
+    _textCtrls[TextCtrl.pk.index].text = _updateTrainer.pk;
+    _textCtrls[TextCtrl.accesscode.index].text = _updateTrainer.accessCode;
+    _textCtrls[TextCtrl.roles.index].text = _updateTrainer.roles;
+  }
+
+  //------------------------------------------------------------
+  void _setupNewTrainer() {
+    _updateTrainer = _updateTrainer.copyWith(roles: 'T');
   }
 
   @override
@@ -65,6 +87,8 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
     list.add(wh.verSpace(10));
     list.add(_pkRow());
     list.add(wh.verSpace(20));
+    list.add(_rolesRow());
+    list.add(wh.verSpace(20));
     list.add(_buildCloseButton());
     return list;
   }
@@ -93,16 +117,27 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
 
   void _onNameChanged(String value) {
     TextEditingController ctrl = _textCtrls[TextCtrl.fullname.index];
-    List<String> tokens = ctrl.text.split(' ');
-    if (tokens.length > 1) {
-      String pk = tokens[0].substring(0, 1).toUpperCase();
-      pk += tokens[tokens.length - 1].substring(0, 1).toUpperCase();
-      _updateTrainer = _updateTrainer.copyWith(pk: pk);
-      _textCtrls[TextCtrl.pk.index].text = pk;
+    String fullname = toBeginningOfSentenceCase(ctrl.text);
+    ctrl.value = ctrl.value.copyWith(text: fullname);
+    if (_newTrainer) {
+      _updateTrainerPk(fullname);
     }
     setState(() {
-      _updateTrainer = _updateTrainer.copyWith(fullname: ctrl.text);
+      _updateTrainer = _updateTrainer.copyWith(fullname: fullname);
     });
+  }
+
+  //------------------------------------------------------------
+  void _updateTrainerPk(String fullname) {
+    String pk = '';
+    List<String> tokens = fullname.split(' ');
+    if (tokens.length > 1 && !fullname.endsWith(' ')) {
+      for (int i = 0; i < tokens.length; i++) {
+        pk += tokens[i].substring(0, 1);
+      }
+    }
+    _updateTrainer = _updateTrainer.copyWith(pk: pk);
+    _textCtrls[TextCtrl.pk.index].text = pk;
   }
 
   //---------------------------------------------------------
@@ -148,6 +183,19 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
     TextEditingController ctrl = _textCtrls[TextCtrl.email.index];
     setState(() {
       _updateTrainer = _updateTrainer.copyWith(email: ctrl.text);
+    });
+  }
+
+//---------------------------------------------------------
+  Widget _rolesRow() {
+    return _textFieldRow(TextCtrl.roles, 'Rollen', '', c.w1, _onRolesChanged,
+        TextCapitalization.characters);
+  }
+
+  void _onRolesChanged(String value) {
+    TextEditingController ctrl = _textCtrls[TextCtrl.roles.index];
+    setState(() {
+      _updateTrainer = _updateTrainer.copyWith(pk: ctrl.text);
     });
   }
 
@@ -208,21 +256,21 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
 
   ///--------------------------------------------------
   bool _isValid() {
-    TextEditingController ctrl1 = _textCtrls[TextCtrl.email.index];
-    if (ctrl1.text.isEmpty || !_isValidEmail(ctrl1.text)) {
+    if (_updateTrainer.fullname.length < 3) {
       return false;
-    }
-
-    TextEditingController ctrl2 = _textCtrls[TextCtrl.accesscode.index];
-    if (ctrl2.text.length != 4) {
+    } else if (_updateTrainer.email.isEmpty ||
+        !_isValidEmail(_updateTrainer.email)) {
       return false;
-    }
-
-    Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull((e) =>
-        e.originalAccessCode == ctrl2.text || e.accessCode == ctrl2.text);
-    if (trainer != null && trainer.pk != AppData.instance.getTrainer().pk) {
-      wh.showSnackbar('Deze accesscode bestaat al', color: Colors.red);
+    } else if (_updateTrainer.accessCode.length != 4) {
       return false;
+    } else {
+      Trainer? trainer = AppData.instance.getAllTrainers().firstWhereOrNull(
+          (e) =>
+              e.originalAccessCode == _updateTrainer.accessCode ||
+              e.accessCode == _updateTrainer.accessCode);
+      if (trainer != null && trainer.pk != _updateTrainer.pk) {
+        return false;
+      }
     }
 
     return true;
@@ -231,11 +279,16 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   ///------------------------------------------------
   void _onSaveTrainer() async {
     if (_isValid()) {
-      bool okay = await AppController.instance.updateTrainer(_updateTrainer);
+      bool okay = await AppController.instance
+          .updateTrainerBySupervisor(_updateTrainer);
       String msg =
           okay ? 'Met succes trainer opgeslagen' : 'Fout opslaan van trainer';
       wh.showSnackbar(msg, color: Colors.lightGreen);
-    } else {}
+
+      setState(() {
+        _trainer = _updateTrainer.clone();
+      });
+    }
   }
 
   ///------------------------------------------------

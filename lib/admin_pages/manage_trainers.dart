@@ -16,6 +16,7 @@ class ManageTrainers extends StatefulWidget {
 
 class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
   List<Trainer> _trainerList = [];
+  Widget? _dataTable;
 
   @override
   void initState() {
@@ -39,23 +40,27 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
   }
 
   //-------------------------------------------------
-  void _onTrainerDataReady(TrainerDataReadyEvent event) {
+  void _onTrainerDataReady(TrainerDataReadyEvent event) async {
+    _trainerList = AppData.instance.getAllTrainers();
     setState(() {
-      _trainerList = AppData.instance.getAllTrainers();
+      _dataTable = _buildDataTable(context, _buildHeaderRow, _buildDataRows);
     });
   }
 
   //--------------------------------------------------
   Widget _buildBody() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        wh.verSpace(10),
-        _buildDataTable(context, _buildHeaderRow, _buildDataRows),
-        wh.verSpace(10),
-        _buildAddTrainerButton(),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          wh.verSpace(10),
+          _dataTable ?? Container(),
+          wh.verSpace(10),
+          _buildAddTrainerButton(),
+        ],
+      ),
     );
   }
 
@@ -81,6 +86,8 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
     List<DataColumn> result = [];
 
     result.add(const DataColumn(
+        label: Text('PK', style: TextStyle(fontStyle: FontStyle.italic))));
+    result.add(const DataColumn(
         label: Text('Naam', style: TextStyle(fontStyle: FontStyle.italic))));
     result.add(const DataColumn(
         label: Text('Email', style: TextStyle(fontStyle: FontStyle.italic))));
@@ -104,6 +111,7 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
   //-----------------------------------------------------
   List<DataCell> _buildDataCells(Trainer trainer) {
     List<DataCell> list = [];
+    list.add(DataCell(Text(trainer.pk)));
     list.add(DataCell(Text(trainer.fullname)));
     list.add(DataCell(Text(trainer.email)));
     list.add(DataCell(Text(trainer.accessCode)));
@@ -150,7 +158,7 @@ Weet je zeker dat je ${trainer.fullname} wilt verwijderen?
   }
 
   void _doDeleteTrainer(Trainer trainer) {
-    lp('delete ${trainer.fullname}');
+    AppController.instance.deleteTrainer(trainer);
   }
 
   //--------------------------------------------------
@@ -180,11 +188,8 @@ Weet je zeker dat je ${trainer.fullname} wilt verwijderen?
       },
     );
 
-    // if (dialogResult == true && yesFunction != null) {
-    //   yesFunction();
-    // } else if (dialogResult == false && noFunction != null) {
-    //   noFunction();
-    // }
+    await AppController.instance.getAllTrainerData();
+    setState(() {});
   }
 
   //----------------------------------------

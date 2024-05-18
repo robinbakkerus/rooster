@@ -17,9 +17,11 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/busy_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rooster/data/populate_data.dart' as p;
 
 class AppController {
   AppHelper ah = AppHelper.instance;
+  final Trainer administrator = p.trainerRobin;
 
   AppController._();
 
@@ -136,11 +138,45 @@ class AppController {
     return result;
   }
 
-  ///----- updateTrainer
+  ///----- updateTrainer via trainer_prefs_page
   Future<bool> updateTrainer(Trainer trainer) async {
     Trainer updatedTrainer = await Dbs.instance.createOrUpdateTrainer(trainer);
     AppData.instance.setTrainer(updatedTrainer);
     AppEvents.fireTrainerUpdated(updatedTrainer);
+    return true;
+  }
+
+  Future<bool> updateTrainerBySupervisor(Trainer trainer) async {
+    await Dbs.instance.createOrUpdateTrainer(trainer);
+    await getAllTrainerData();
+    AppEvents.fireTrainerDataReady();
+
+    final html = '''
+  <div>Trainer ${trainer.fullname} aangepast of toegevoegd.</div>
+''';
+    Dbs.instance.sendEmail(
+        toList: [administrator],
+        ccList: [],
+        subject: 'Trainer updated',
+        html: html);
+    return true;
+  }
+
+  ///----- updateTrainer
+  Future<bool> deleteTrainer(Trainer trainer) async {
+    await Dbs.instance.deleteTrainer(trainer);
+    await getAllTrainerData();
+
+    final html = '''
+  <div>Trainer ${trainer.fullname} verwijderd.</div>
+''';
+    Dbs.instance.sendEmail(
+        toList: [administrator],
+        ccList: [],
+        subject: 'Trainer updated',
+        html: html);
+
+    AppEvents.fireTrainerDataReady();
     return true;
   }
 

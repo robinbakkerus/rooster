@@ -11,7 +11,7 @@ class Simulator with AppMixin implements Dbs {
   static final Simulator instance = Simulator._();
 
   @override
-  Future<Trainer> createOrUpdateTrainer(trainer) async {
+  Future<Trainer> createOrUpdateTrainer(Trainer trainer) async {
     return trainer;
   }
 
@@ -121,5 +121,10 @@ class Simulator with AppMixin implements Dbs {
         excludeDays: [],
         summerPeriod: SpecialPeriod.empty(),
         startersGroup: SpecialPeriod.empty());
+  }
+
+  @override
+  Future<void> deleteTrainer(Trainer trainer) async {
+    return;
   }
 }
