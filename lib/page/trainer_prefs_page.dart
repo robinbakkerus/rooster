@@ -1,15 +1,12 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
-import 'package:flutter/material.dart';
-import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/animated_fab.dart';
-import 'package:rooster/widget/radiobutton_widget.dart';
 
 class TrainerPrefsPage extends StatefulWidget {
   const TrainerPrefsPage({super.key});
@@ -47,10 +44,13 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: _columnWidgets,
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _columnWidgets,
+        ),
       ),
       floatingActionButton: _fab,
     );
@@ -64,12 +64,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       padding: EdgeInsets.only(left: 20, top: 10),
       child: Text('Voorkeur dagen'),
     ));
-    list.add(_buildGridForPrefDays());
+    list.add(wh.buildGridForPrefDays(trainer: _updateTrainer));
     list.add(const Padding(
       padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
       child: Text('Voorkeur groepen'),
     ));
-    list.add(_buildGridForPrefGroups());
+    list.add(wh.buildGridForPrefGroups(trainer: _updateTrainer));
     return list;
   }
 
@@ -201,139 +201,6 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   String _getStringValue(String mapElem) {
     Map<String, dynamic> map = _updateTrainer.toMap();
     return map[mapElem];
-  }
-
-  ///------------------------------------------------
-  Widget _buildGridForPrefDays() {
-    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
-    return Scrollbar(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 30,
-            horizontalMargin: 10,
-            headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lightblue),
-            columnSpacing: colSpace,
-            dataRowMinHeight: 25,
-            dataRowMaxHeight: 40,
-            columns: _buildHeader(),
-            rows: _buildDataRowsForPrefDays(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  ///------------------------------------------------
-  Widget _buildGridForPrefGroups() {
-    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
-    return Scrollbar(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 30,
-            horizontalMargin: 10,
-            headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lightblue),
-            columnSpacing: colSpace,
-            dataRowMinHeight: 25,
-            dataRowMaxHeight: 40,
-            columns: _buildHeader(),
-            rows: _buildDataRowsForPrefGroups(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  //-------------------------
-  List<DataColumn> _buildHeader() {
-    return wh.buildYesNoIfNeededHeader();
-  }
-
-  //-------------------------
-  List<DataRow> _buildDataRowsForPrefDays() {
-    List<DataRow> result = [];
-
-    var days = SpreadsheetGenerator.instance.getTrainingDays(locale: c.localNL);
-
-    for (String dag in days) {
-      if (_addRowForPrefDay(dag)) {
-        result.add(DataRow(cells: _buildDataCells(dag)));
-      }
-    }
-
-    return result;
-  }
-
-  ///-------------------------
-  bool _addRowForPrefDay(String dag) {
-    int weekday =
-        AppHelper.instance.weekdayFromString(weekday: dag, locale: c.localNL);
-    if (weekday == DateTime.saturday) {
-      return AppData.instance.getTrainer().getDayPrefValue(weekday: weekday) >
-          0;
-    } else {
-      return true;
-    }
-  }
-
-  //-------------------------
-  List<DataRow> _buildDataRowsForPrefGroups() {
-    List<DataRow> result = [];
-
-    for (String groupName
-        in AppData.instance.activeTrainingGroups[0].groupNames) {
-      if (_addRowForPrefGroup(groupName)) {
-        result.add(DataRow(cells: _buildDataCells(groupName)));
-      }
-    }
-
-    return result;
-  }
-
-  ///-------------------------
-  bool _addRowForPrefGroup(String groupName) {
-    TrainingGroup? trainingGroup =
-        AppHelper.instance.getTrainingGroupByName(groupName);
-    if (trainingGroup != null &&
-        trainingGroup.type == TrainingGroupType.regular) {
-      return true;
-    } else {
-      return AppData.instance
-          .isTrainerForGroup(AppData.instance.getTrainer(), groupName);
-    }
-  }
-
-  //-------------------------
-  List<DataCell> _buildDataCells(String paramName) {
-    List<DataCell> result = [];
-
-    result.add(DataCell(Text(paramName)));
-    result.add(_buildRadioButtonDataCell(paramName, 1, Colors.green));
-    result.add(_buildRadioButtonDataCell(paramName, 0, Colors.red));
-    result.add(_buildRadioButtonDataCell(paramName, 2, Colors.brown));
-
-    return result;
-  }
-
-  //-------------------------
-  DataCell _buildRadioButtonDataCell(
-      String paramName, int rbValue, Color color) {
-    int value = _updateTrainer.getPrefValue(paramName: paramName);
-    return DataCell(RadioButtonWidget.forPreference(
-      key: UniqueKey(),
-      rbValue: rbValue,
-      color: color,
-      paramName: paramName,
-      value: value,
-      isEditable: true,
-    ));
   }
 
   ///------------------------------------------------

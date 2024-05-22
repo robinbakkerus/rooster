@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
+import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/animated_fab.dart';
-import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
 class TrainerDetailPage extends StatefulWidget {
   final Trainer trainer;
@@ -22,7 +23,7 @@ enum TextCtrl { fullname, email, accesscode, pk, roles }
 
 class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   late Trainer _trainer;
-  late Trainer _updateTrainer;
+  Trainer _updateTrainer = Trainer.empty();
   bool _newTrainer = false;
 
   final List<TextEditingController> _textCtrls = [];
@@ -33,7 +34,6 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
     for (int i = 0; i < TextCtrl.values.length; i++) {
       _textCtrls.add(TextEditingController());
     }
-    _columnWidgets = _buildColumnWidgets();
     _trainer = widget.trainer.clone();
     _updateTrainer = _trainer.clone();
     _newTrainer = _trainer.isEmpty();
@@ -41,6 +41,10 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
       _setupNewTrainer();
     }
     _fillTextControls();
+
+    _columnWidgets = _buildColumnWidgets();
+
+    AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdated);
     super.initState();
   }
 
@@ -61,12 +65,15 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _columnWidgets,
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _columnWidgets,
+          ),
         ),
       ),
       floatingActionButton: _buildFab(),
@@ -76,19 +83,25 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   //---------------------------------------------------
   List<Widget> _buildColumnWidgets() {
     List<Widget> list = [];
-    list.add(wh.verSpace(20));
+    list.add(wh.verSpace(10));
     list.add(_title());
-    list.add(wh.verSpace(15));
+    list.add(wh.verSpace(10));
     list.add(_fullnameRow());
-    list.add(wh.verSpace(10));
+    list.add(wh.verSpace(5));
     list.add(_emailRow());
-    list.add(wh.verSpace(10));
+    list.add(wh.verSpace(5));
     list.add(_accesscodeRow());
-    list.add(wh.verSpace(10));
+    list.add(wh.verSpace(5));
     list.add(_pkRow());
-    list.add(wh.verSpace(20));
+    list.add(wh.verSpace(5));
     list.add(_rolesRow());
-    list.add(wh.verSpace(20));
+    list.add(wh.verSpace(15));
+    list.add(wh.buildGridForPrefDays(
+        trainer: _updateTrainer, viewOnly: widget.viewOnly));
+    list.add(wh.verSpace(10));
+    list.add(wh.buildGridForPrefGroups(
+        trainer: _updateTrainer, viewOnly: widget.viewOnly));
+    list.add(wh.verSpace(10));
     list.add(_buildCloseButton());
     return list;
   }
@@ -130,10 +143,14 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   //------------------------------------------------------------
   void _updateTrainerPk(String fullname) {
     String pk = '';
-    List<String> tokens = fullname.split(' ');
-    if (tokens.length > 1 && !fullname.endsWith(' ')) {
+    List<String> tokens = fullname.trim().split(' ');
+    if (tokens.length > 1) {
       for (int i = 0; i < tokens.length; i++) {
-        pk += tokens[i].substring(0, 1);
+        if (i == 0 || i == tokens.length - 1) {
+          pk += tokens[i].substring(0, 1).toUpperCase();
+        } else {
+          pk += tokens[i].substring(0, 1).toLowerCase();
+        }
       }
     }
     _updateTrainer = _updateTrainer.copyWith(pk: pk);
@@ -163,7 +180,8 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   //---------------------------------------------------------
   Widget _pkRow() {
     return _textFieldRow(TextCtrl.pk, 'PK', '', c.w1, _onPkChanged,
-        TextCapitalization.characters);
+        TextCapitalization.characters,
+        viewOnly: true);
   }
 
   void _onPkChanged(String value) {
@@ -189,7 +207,8 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
 //---------------------------------------------------------
   Widget _rolesRow() {
     return _textFieldRow(TextCtrl.roles, 'Rollen', '', c.w1, _onRolesChanged,
-        TextCapitalization.characters);
+        TextCapitalization.characters,
+        viewOnly: true);
   }
 
   void _onRolesChanged(String value) {
@@ -200,14 +219,11 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
   }
 
   //----------------------------------------------------------
-  Widget _textFieldRow(
-      TextCtrl textCtrl,
-      String label,
-      String hint,
-      double textWidth,
-      Function(String) onChanged,
-      TextCapitalization textCap) {
+  Widget _textFieldRow(TextCtrl textCtrl, String label, String hint,
+      double textWidth, Function(String) onChanged, TextCapitalization textCap,
+      {bool viewOnly = false}) {
     TextEditingController ctrl = _textCtrls[textCtrl.index];
+    bool enabled = !viewOnly && !widget.viewOnly;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
       child: Row(
@@ -221,7 +237,7 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
           SizedBox(
             width: textWidth,
             child: TextField(
-              enabled: !widget.viewOnly,
+              enabled: enabled,
               controller: ctrl,
               decoration: InputDecoration(
                   isDense: true,
@@ -251,7 +267,8 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
 
   ///------------------------------------------------
   bool _isDirty() {
-    return _trainer != _updateTrainer;
+    bool b = _trainer != _updateTrainer;
+    return b;
   }
 
   ///--------------------------------------------------
@@ -307,5 +324,19 @@ class _TrainerDetailPageState extends State<TrainerDetailPage> with AppMixin {
     Navigator.pop(
       context,
     );
+  }
+
+  ///------------------------------------------------
+  void _onTrainerPrefUpdated(TrainerPrefUpdatedEvent event) {
+    if (mounted) {
+      setState(() {
+        _updateTrainer.setPrefValue(event.paramName, event.newValue);
+        _columnWidgets = _buildColumnWidgets();
+        _buildFab();
+        if (_isDirty()) {
+          wh.playWhooshSound();
+        }
+      });
+    }
   }
 }

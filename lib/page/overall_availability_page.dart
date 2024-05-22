@@ -68,7 +68,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     return DataTable(
       headingRowHeight: 30,
       horizontalMargin: 10,
-      headingRowColor: MaterialStateColor.resolveWith((states) => c.lightblue),
+      headingRowColor: WidgetStateColor.resolveWith((states) => c.lightblue),
       columnSpacing: colSpace,
       dataRowMinHeight: 15,
       dataRowMaxHeight: 30,

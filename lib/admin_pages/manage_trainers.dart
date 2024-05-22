@@ -42,9 +42,11 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
   //-------------------------------------------------
   void _onTrainerDataReady(TrainerDataReadyEvent event) async {
     _trainerList = AppData.instance.getAllTrainers();
-    setState(() {
-      _dataTable = _buildDataTable(context, _buildHeaderRow, _buildDataRows);
-    });
+    if (mounted) {
+      setState(() {
+        _dataTable = _buildDataTable(context, _buildHeaderRow, _buildDataRows);
+      });
+    }
   }
 
   //--------------------------------------------------
@@ -59,6 +61,8 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
           _dataTable ?? Container(),
           wh.verSpace(10),
           _buildAddTrainerButton(),
+          wh.verSpace(5),
+          wh.popPageButton(context),
         ],
       ),
     );
@@ -71,7 +75,7 @@ class _ManageTrainersState extends State<ManageTrainers> with AppMixin {
     return DataTable(
       headingRowHeight: 30,
       horizontalMargin: 10,
-      headingRowColor: MaterialStateColor.resolveWith((states) => c.lonuBlauw),
+      headingRowColor: WidgetStateColor.resolveWith((states) => c.lonuBlauw),
       columnSpacing: colSpace,
       dataRowMinHeight: 15,
       dataRowMaxHeight: 30,

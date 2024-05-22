@@ -69,11 +69,11 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
             headingRowHeight: 30,
             horizontalMargin: 10,
             headingRowColor:
-                MaterialStateColor.resolveWith((states) => c.lonuBlauw),
+                WidgetStateColor.resolveWith((states) => c.lonuBlauw),
             columnSpacing: colSpace,
             dataRowMinHeight: 25,
             dataRowMaxHeight: 40,
-            columns: _buildHeader(),
+            columns: _buildHeader('Dag'),
             rows: _buildDataRows(),
           ),
         ),
@@ -82,8 +82,8 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   }
 
   //-------------------------
-  List<DataColumn> _buildHeader() {
-    return wh.buildYesNoIfNeededHeader();
+  List<DataColumn> _buildHeader(String label) {
+    return wh.buildYesNoIfNeededHeader(label);
   }
 
   List<DataRow> _buildDataRows() {

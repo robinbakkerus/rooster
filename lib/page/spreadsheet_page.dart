@@ -118,7 +118,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return DataTable(
       headingRowHeight: 30,
       horizontalMargin: 10,
-      headingRowColor: MaterialStateColor.resolveWith((states) => c.lonuBlauw),
+      headingRowColor: WidgetStateColor.resolveWith((states) => c.lonuBlauw),
       columnSpacing: colSpace,
       dataRowMinHeight: 15,
       dataRowMaxHeight: 30,
@@ -175,7 +175,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
         continue;
       }
 
-      MaterialStateColor col = _getRowColor(fsRow);
+      WidgetStateColor col = _getRowColor(fsRow);
 
       List<DataCell> cells = _buildDataCells(fsRow);
       DataRow dataRow = DataRow(cells: cells, color: col);
@@ -185,19 +185,19 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     return result;
   }
 
-  MaterialStateColor _getRowColor(SheetRow fsRow) {
-    MaterialStateColor col =
-        MaterialStateColor.resolveWith((states) => Colors.white);
+  WidgetStateColor _getRowColor(SheetRow fsRow) {
+    WidgetStateColor col =
+        WidgetStateColor.resolveWith((states) => Colors.white);
     if (fsRow.isExtraRow) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuExtraDag);
     } else if (fsRow.date.weekday == DateTime.saturday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuZaterDag);
     } else if (AppHelper.instance.isDateExcluded(fsRow.date)) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuExtraDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuExtraDag);
     } else if (fsRow.date.weekday == DateTime.tuesday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuDinsDag);
     } else if (fsRow.date.weekday == DateTime.thursday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuDonderDag);
     }
     return col;
   }

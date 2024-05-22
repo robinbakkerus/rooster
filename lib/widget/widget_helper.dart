@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
+import 'package:rooster/util/app_helper.dart';
+import 'package:rooster/util/spreadsheet_generator.dart';
+import 'package:rooster/widget/radiobutton_widget.dart';
 import 'package:soundpool/soundpool.dart';
 
 class WidgetHelper {
@@ -43,10 +46,10 @@ class WidgetHelper {
   }
 
   ///--------------------------------------
-  List<DataColumn> buildYesNoIfNeededHeader() {
+  List<DataColumn> buildYesNoIfNeededHeader(String label) {
     List<DataColumn> result = [];
 
-    var headerLabels = ['Dag', 'Ja', 'Nee', 'Als nodig'];
+    var headerLabels = [label, 'Ja', 'Nee', 'Als nodig'];
     var colors = [Colors.black, Colors.black, Colors.red, Colors.brown];
 
     for (int i = 0; i < headerLabels.length; i++) {
@@ -64,18 +67,18 @@ class WidgetHelper {
   }
 
   ///-----------------------------
-  MaterialStateColor getDaySchemaRowColor(int dateIndex) {
-    MaterialStateColor col =
-        MaterialStateColor.resolveWith((states) => Colors.white);
+  WidgetStateColor getDaySchemaRowColor(int dateIndex) {
+    WidgetStateColor col =
+        WidgetStateColor.resolveWith((states) => Colors.white);
 
     DateTime date = AppData.instance.getActiveDates()[dateIndex];
 
     if (date.weekday == DateTime.tuesday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuDinsDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuDinsDag);
     } else if (date.weekday == DateTime.thursday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuDonderDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuDonderDag);
     } else if (date.weekday == DateTime.saturday) {
-      col = MaterialStateColor.resolveWith((states) => c.lonuZaterDag);
+      col = WidgetStateColor.resolveWith((states) => c.lonuZaterDag);
     }
 
     return col;
@@ -194,5 +197,122 @@ class WidgetHelper {
     }
 
     await _soundPool.play(_soundId);
+  }
+
+  //-------------- prefdays & prefgroups ------------------------------
+  Widget buildGridForPrefDays(
+      {required Trainer trainer, bool viewOnly = false}) {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 24,
+            horizontalMargin: 10,
+            headingRowColor:
+                WidgetStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 20,
+            dataRowMaxHeight: 30,
+            columns: buildYesNoIfNeededHeader('Dag'),
+            rows:
+                _buildDataRowsForPrefDays(trainer: trainer, viewOnly: viewOnly),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ///------------------------------------------------
+  Widget buildGridForPrefGroups(
+      {required Trainer trainer, bool viewOnly = false}) {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return Scrollbar(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowHeight: 24,
+            horizontalMargin: 10,
+            headingRowColor:
+                WidgetStateColor.resolveWith((states) => c.lightblue),
+            columnSpacing: colSpace,
+            dataRowMinHeight: 20,
+            dataRowMaxHeight: 30,
+            columns: buildYesNoIfNeededHeader('Groep'),
+            rows: _buildDataRowsForPrefGroups(
+                trainer: trainer, viewOnly: viewOnly),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //-------------------------
+  List<DataRow> _buildDataRowsForPrefDays(
+      {required Trainer trainer, bool viewOnly = false}) {
+    List<DataRow> result = [];
+
+    var days = SpreadsheetGenerator.instance.getTrainingDays(locale: c.localNL);
+
+    for (String dag in days) {
+      result.add(DataRow(
+          cells: _buildDataCellsForPrefs(
+              trainer: trainer, paramName: dag, viewOnly: viewOnly)));
+    }
+
+    return result;
+  }
+
+  //-------------------------
+  List<DataRow> _buildDataRowsForPrefGroups(
+      {required Trainer trainer, bool viewOnly = false}) {
+    List<DataRow> result = [];
+
+    var groupNames =
+        AppData.instance.trainingGroups.map((e) => e.name).toList();
+
+    for (String groupName in groupNames) {
+      result.add(DataRow(
+          cells: _buildDataCellsForPrefs(
+              trainer: trainer, paramName: groupName, viewOnly: viewOnly)));
+    }
+
+    return result;
+  }
+
+  //-------------------------
+  List<DataCell> _buildDataCellsForPrefs(
+      {required Trainer trainer,
+      required String paramName,
+      bool viewOnly = false}) {
+    List<DataCell> result = [];
+
+    result.add(DataCell(Text(paramName)));
+    result.add(_buildRadioButtonDataCell(
+        trainer, paramName, 1, Colors.green, viewOnly));
+    result.add(
+        _buildRadioButtonDataCell(trainer, paramName, 0, Colors.red, viewOnly));
+    result.add(_buildRadioButtonDataCell(
+        trainer, paramName, 2, Colors.brown, viewOnly));
+
+    return result;
+  }
+
+  //-------------------------
+  DataCell _buildRadioButtonDataCell(Trainer trainer, String paramName,
+      int rbValue, Color color, bool viewOnly) {
+    int value = trainer.getPrefValue(paramName: paramName);
+    return DataCell(RadioButtonWidget.forPreference(
+      key: UniqueKey(),
+      rbValue: rbValue,
+      color: color,
+      paramName: paramName,
+      value: value,
+      isEditable: !viewOnly,
+    ));
   }
 }

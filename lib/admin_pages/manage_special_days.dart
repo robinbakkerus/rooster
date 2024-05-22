@@ -107,7 +107,7 @@ class _ManageSpecialDaysPageState extends State<ManageSpecialDaysPage>
     return DataTable(
       headingRowHeight: 30,
       horizontalMargin: 10,
-      headingRowColor: MaterialStateColor.resolveWith((states) => c.lonuBlauw),
+      headingRowColor: WidgetStateColor.resolveWith((states) => c.lonuBlauw),
       columnSpacing: colSpace,
       dataRowMinHeight: 15,
       dataRowMaxHeight: 30,
