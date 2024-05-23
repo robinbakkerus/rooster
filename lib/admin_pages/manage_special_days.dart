@@ -321,6 +321,8 @@ class _ManageSpecialDaysPageState extends State<ManageSpecialDaysPage>
 
     _specialDays = _updateSpecialDaysObject();
     await AppController.instance.saveSpecialDays(_specialDays!);
+    await AppController.instance.getSpecialDays();
+    await AppController.instance.getTrainerGroups();
     await AppController.instance.generateOrRetrieveSpreadsheet();
     wh.showSnackbar(color: Colors.green, "Met succes opgeslagen");
     setState(() {
