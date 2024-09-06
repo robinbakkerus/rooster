@@ -66,7 +66,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
 
   List<Trainer> _allTrainers() {
     List<Trainer> trainers = [
-      p.trainerAnne,
+      p.trainerMerijn,
       p.trainerPaula,
       p.trainerRobin,
       p.trainerFried,

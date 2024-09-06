@@ -23,7 +23,7 @@ List<SpecialPeriod> excludPeriods = [
 ];
 
 List<Trainer> allTrainers = [
-  trainerAnne,
+  trainerMerijn,
   trainerPaula,
   trainerRobin,
   trainerFried,
@@ -58,10 +58,12 @@ Trainer trainerHuib = _buildTrainer('HC', 'Huib van Chapelle', 'HACO',
     'huiblachapelle@icloud.com', 0, 0, 2, 1, 1, 1, 1);
 Trainer trainerRonald = _buildTrainer('RV', 'Ronald Vissers', 'ROME',
     'rc.vissers@gmail.com', 0, 1, 2, 0, 1, 1, 1);
-Trainer trainerAnne = _buildTrainer('AJ', 'Anne Joustra', 'AKEN',
-    'a.joustra595242@kpnmail.nl', 0, 0, 0, 1, 1, 0, 0);
+// Trainer trainerAnne = _buildTrainer('AJ', 'Anne Joustra', 'AKEN',
+//     'a.joustra595242@kpnmail.nl', 0, 0, 0, 1, 1, 0, 0);
 Trainer trainerCyriel = _buildTrainer('CD', 'Cyriel Douven', 'CALI',
     'cyrieldouven@gmail.com', 0, 0, 1, 2, 0, 0, 0);
+Trainer trainerMerijn = _buildTrainer('MW', 'Merijn Wijnen', 'MALI',
+    'merijnwijnen@fastmail.fm', 1, 2, 0, 0, 0, 0, 0);
 
 // _buildTRainer
 Trainer _buildTrainer(
@@ -120,7 +122,7 @@ TrainerSchema trainerSchemasFried = _buildTrainerSchema(trainerFried);
 TrainerSchema trainerSchemasRonald = _buildTrainerSchema(trainerRonald);
 TrainerSchema trainerSchemasMaria = _buildTrainerSchema(trainerMaria);
 TrainerSchema trainerSchemasJanneke = _buildTrainerSchema(trainerJanneke);
-TrainerSchema trainerSchemasAnne = _buildTrainerSchema(trainerAnne);
+TrainerSchema trainerSchemasAnne = _buildTrainerSchema(trainerMerijn);
 TrainerSchema trainerSchemasPauline = _buildTrainerSchema(trainerPauline);
 TrainerSchema trainerSchemasHuib = _buildTrainerSchema(trainerHuib);
 TrainerSchema trainerSchemasCyriel = _buildTrainerSchema(trainerCyriel);
