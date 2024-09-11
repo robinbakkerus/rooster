@@ -4,6 +4,7 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/model/app_models.dart';
+import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 
@@ -175,7 +176,9 @@ Weet je zeker dat je ${trainer.fullname} wilt verwijderen?
 
   //--------------------------------------------------
   void _onAddTrainerClicked() {
-    _showTrainerDetailPageDialog(trainer: Trainer.empty(), viewOnly: false);
+    Trainer newTrainer = Trainer.empty();
+    newTrainer.prefValues.addAll(_buildNewPrefValues());
+    _showTrainerDetailPageDialog(trainer: newTrainer, viewOnly: false);
   }
 
   //--------------------------------
@@ -203,5 +206,21 @@ Weet je zeker dat je ${trainer.fullname} wilt verwijderen?
       onPressed: () => onPressed(),
       icon: Icon(iconData),
     );
+  }
+
+  //-----------------------------------------------
+  List<TrainerPref> _buildNewPrefValues() {
+    return [
+      TrainerPref(paramName: 'dinsdag', value: 0),
+      TrainerPref(paramName: 'donderdag', value: 0),
+      TrainerPref(paramName: 'zaterdag', value: 0),
+      TrainerPref(paramName: Groep.pr.name, value: 0),
+      TrainerPref(paramName: Groep.r1.name, value: 0),
+      TrainerPref(paramName: Groep.r2.name, value: 0),
+      TrainerPref(paramName: Groep.r3.name, value: 0),
+      TrainerPref(paramName: Groep.zamo.name, value: 0),
+      TrainerPref(paramName: Groep.sg.name, value: 0),
+      TrainerPref(paramName: Groep.zomer.name, value: 0),
+    ];
   }
 }
