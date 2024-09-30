@@ -289,17 +289,17 @@ class SpreadsheetGenerator with AppMixin {
 
   void _genCountsForEnteredSchema(TrainerSchema trainerSchema, int dateIndex,
       AvailableCounts availableCounts, Trainer trainer, int groupPref) {
-    if (trainerSchema.availableList.length >= dateIndex &&
+    if (trainerSchema.availableList.length > dateIndex &&
         trainerSchema.availableList[dateIndex] == 0) {
       availableCounts.notAvailable.add(trainer);
-    } else if (trainerSchema.availableList.length >= dateIndex &&
+    } else if (trainerSchema.availableList.length > dateIndex &&
         trainerSchema.availableList[dateIndex] == 1) {
       if (groupPref == 2) {
         availableCounts.ifNeeded.add(trainer);
       } else {
         availableCounts.available.add(trainer);
       }
-    } else if (trainerSchema.availableList.length >= dateIndex &&
+    } else if (trainerSchema.availableList.length > dateIndex &&
         trainerSchema.availableList[dateIndex] == 2) {
       availableCounts.ifNeeded.add(trainer);
     }
