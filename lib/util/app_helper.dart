@@ -87,7 +87,7 @@ class AppHelper with AppMixin {
 
       if (groupIndex >= 0) {
         SpreadSheet spreadsheet = AppData.instance.getSpreadsheet();
-        if (rowIndex < spreadsheet.rows.length - 1) {
+        if (rowIndex < spreadsheet.rows.length) {
           SheetRow sheetRow = spreadsheet.rows[rowIndex];
           if (!sheetRow.isExtraRow &&
               spreadsheet.rows[rowIndex].rowCells.length > groupIndex) {
