@@ -21,10 +21,10 @@ class AppData {
   double shortestSide = 600; //assume
   String trainerId = "";
 
-  DateTime _activeDate = DateTime(2024, 1, 1);
-  DateTime lastActiveDate = DateTime(2024, 1, 1);
-  DateTime lastMonth = DateTime(2024, 1, 1);
-  DateTime firstSpreadDate = DateTime(2024, 1, 1);
+  DateTime _activeDate = DateTime(2025, 1, 1);
+  DateTime lastActiveDate = DateTime(2025, 1, 1);
+  DateTime lastMonth = DateTime(2025, 1, 1);
+  DateTime firstSpreadDate = DateTime(2025, 1, 1);
 
   int stackIndex = 0;
   List<String> trainerItems = [];
@@ -32,9 +32,9 @@ class AppData {
   late SpecialDays specialDays;
 
   // this is set in the start_page when you click on the showSpreadsheet, or next/prev month
-  SpreadSheet _spreadSheet = SpreadSheet(year: 2024, month: 1);
+  SpreadSheet _spreadSheet = SpreadSheet(year: 2025, month: 1);
   SpreadSheet _originalSpreadSheet =
-      SpreadSheet(year: 2024, month: 1); // to obtain the diffs
+      SpreadSheet(year: 2025, month: 1); // to obtain the diffs
 
   List<TrainingGroup> trainingGroups = [];
   List<ActiveTrainingGroup> activeTrainingGroups = [];

@@ -84,7 +84,7 @@ class AppController {
         trainingGroup.setStartDate(AppData.instance.getSummerPeriod().fromDate);
         trainingGroup.setEndDate(AppData.instance.getSummerPeriod().toDate);
       } else {
-        trainingGroup.setStartDate(DateTime(2024, 1, 1));
+        trainingGroup.setStartDate(DateTime(2025, 1, 1));
         trainingGroup.setEndDate(DateTime(2099, 1, 1));
         trainingGroup.setSummerPeriod(AppData.instance.getSummerPeriod());
       }

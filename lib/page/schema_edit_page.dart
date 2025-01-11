@@ -90,6 +90,11 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     List<DataRow> result = [];
 
     for (int dateIndex = 0; dateIndex < _availableList.length; dateIndex++) {
+      List<DateTime> dates = AppData.instance.getActiveDates();
+      if (dateIndex > dates.length - 1) {
+        break;
+      }
+
       DateTime date = AppData.instance.getActiveDates()[dateIndex];
 
       bool addRow = AppHelper.instance

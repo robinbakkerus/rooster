@@ -40,7 +40,7 @@ class Simulator with AppMixin implements Dbs {
 
   @override
   Future<LastRosterFinal?> getLastRosterFinal() async {
-    return LastRosterFinal(at: DateTime.now(), year: 2024, month: 1, by: 'RB');
+    return LastRosterFinal(at: DateTime.now(), year: 2025, month: 1, by: 'RB');
   }
 
   @override

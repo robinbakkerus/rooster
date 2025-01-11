@@ -4,12 +4,12 @@ import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
 
-DateTime _summerStart = DateTime(2024, 7, 6);
-DateTime _summerEnd = DateTime(2024, 8, 18);
-DateTime _startgroupStart = DateTime(2024, 3, 17);
-DateTime _startgroupEnd = DateTime(2024, 5, 31);
+DateTime _summerStart = DateTime(2025, 7, 6);
+DateTime _summerEnd = DateTime(2025, 8, 18);
+DateTime _startgroupStart = DateTime(2025, 3, 17);
+DateTime _startgroupEnd = DateTime(2025, 5, 31);
 List<SpecialDay> _excludeDays = [
-  SpecialDay(dateTime: DateTime(2024, 5, 30), description: 'Mei vakantie')
+  SpecialDay(dateTime: DateTime(2025, 5, 30), description: 'Mei vakantie')
 ];
 SpecialDays specialDays = SpecialDays(
   excludeDays: _excludeDays,
@@ -19,7 +19,7 @@ SpecialDays specialDays = SpecialDays(
 );
 
 List<SpecialPeriod> excludPeriods = [
-  SpecialPeriod(fromDate: DateTime(2024, 7, 16), toDate: DateTime(2024, 8, 8))
+  SpecialPeriod(fromDate: DateTime(2025, 7, 16), toDate: DateTime(2025, 8, 8))
 ];
 
 List<Trainer> allTrainers = [
@@ -131,10 +131,10 @@ TrainerSchema trainerSchemasJeroen = _buildTrainerSchema(trainerJeroen);
 // build schema's for februari
 TrainerSchema _buildTrainerSchema(Trainer trainer) {
   TrainerSchema result = TrainerSchema.empty();
-  AppData.instance.setActiveDate(DateTime(2024, 1, 1));
+  AppData.instance.setActiveDate(DateTime(2025, 1, 1));
 
   Map<String, dynamic> map = result.toMap();
-  map['id'] = '${trainer.pk}_2024_1'; //todo
+  map['id'] = '${trainer.pk}_2025_1'; //todo
   map['year'] = DateTime.now().year;
   map['month'] = DateTime.now().month;
   map['trainerPk'] = trainer.pk;
@@ -212,100 +212,100 @@ List<FsSpreadsheet> allFsSpreadsheets = [
 
 FsSpreadsheet _spreadSheetJanuari() {
   return FsSpreadsheet(
-      year: 2024, month: 1, rows: _januariRows(), isFinal: true);
+      year: 2025, month: 1, rows: _januariRows(), isFinal: true);
 }
 
 FsSpreadsheet _spreadSheetFebruari() {
   return FsSpreadsheet(
-      year: 2024, month: 2, rows: _februariRows(), isFinal: true);
+      year: 2025, month: 2, rows: _februariRows(), isFinal: true);
 }
 
 FsSpreadsheet _spreadSheetMarch() {
-  return FsSpreadsheet(year: 2024, month: 3, rows: _maartRows(), isFinal: true);
+  return FsSpreadsheet(year: 2025, month: 3, rows: _maartRows(), isFinal: true);
 }
 
 List<FsSpreadsheetRow> _januariRows() {
   List<FsSpreadsheetRow> rows = [];
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 2),
+      date: DateTime(2025, 1, 2),
       trainingText: 'Kerstvakantie training',
       isExtraRow: false,
       rowCells: ['Olav', 'Robin', 'Fried', 'Paula', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 4),
+      date: DateTime(2025, 1, 4),
       trainingText: 'Kerstvakantie training',
       isExtraRow: false,
       rowCells: ['(met R1)', 'Ronald', '(met R3)', 'Anne', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 6),
+      date: DateTime(2025, 1, 6),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 9),
+      date: DateTime(2025, 1, 9),
       trainingText: 'korte training + NY borrel',
       isExtraRow: false,
       rowCells: ['Olav', 'Jeroen', 'Maria', 'Anne', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 11),
+      date: DateTime(2025, 1, 11),
       trainingText: 'Tempo duurloop D2',
       isExtraRow: false,
       rowCells: ['(met R1)', 'Ronald', 'Fried', 'Pauline', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 13),
+      date: DateTime(2025, 1, 13),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 16),
+      date: DateTime(2025, 1, 16),
       trainingText: 'Fartlek',
       isExtraRow: false,
       rowCells: ['Janneke', 'Robin', 'Ronald', 'Huib', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 18),
+      date: DateTime(2025, 1, 18),
       trainingText: 'Duurloop D1',
       isExtraRow: false,
       rowCells: ['(met R1)', 'Jeroen', 'Cyriel', 'Fried', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 20),
+      date: DateTime(2025, 1, 20),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 23),
+      date: DateTime(2025, 1, 23),
       trainingText: 'Herstelduurloop',
       isExtraRow: false,
       rowCells: ['Olav', 'Janneke', 'Maria', 'Huib', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 25),
+      date: DateTime(2025, 1, 25),
       trainingText: 'Climaxduurloop D1/D2',
       isExtraRow: false,
       rowCells: ['(met R1)', 'Jeroen', 'Cyriel', 'Pauline', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 27),
+      date: DateTime(2025, 1, 27),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 30),
+      date: DateTime(2025, 1, 30),
       trainingText: 'Interval korte afstand',
       isExtraRow: false,
       rowCells: ['Janneke', 'Robin', 'Maria', 'Paula', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 1, 21),
+      date: DateTime(2025, 1, 21),
       trainingText: 'Houffalize ultra trail	',
       isExtraRow: true,
       rowCells: []));
@@ -316,79 +316,79 @@ List<FsSpreadsheetRow> _januariRows() {
 List<FsSpreadsheetRow> _februariRows() {
   List<FsSpreadsheetRow> rows = [];
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 1),
+      date: DateTime(2025, 2, 1),
       trainingText: 'Intervalduurloop D1/D2',
       isExtraRow: false,
       rowCells: ['(Met R1)', 'Ronald', 'Fried', 'Anne', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 3),
+      date: DateTime(2025, 2, 3),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 6),
+      date: DateTime(2025, 2, 6),
       trainingText: '30′ Training + ALV',
       isExtraRow: false,
       rowCells: ['Olav', 'Jeroen', 'Maria', 'Paula', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 8),
+      date: DateTime(2025, 2, 8),
       trainingText: 'Fartlek',
       isExtraRow: false,
       rowCells: ['(Met R1)', 'Robin', 'Fried', 'Huib', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 10),
+      date: DateTime(2025, 2, 10),
       trainingText: 'ZAMO',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 13),
+      date: DateTime(2025, 2, 13),
       trainingText: 'Geen training: Carnaval',
       isExtraRow: false,
       rowCells: ['', '', '', '', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 15),
+      date: DateTime(2025, 2, 15),
       trainingText: 'Voorjaarsvakantie training',
       isExtraRow: false,
       rowCells: ['(Met R1)', 'Robin', '(Met R3)', 'Pauline', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 17),
+      date: DateTime(2025, 2, 17),
       trainingText: 'ZaMo',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 20),
+      date: DateTime(2025, 2, 20),
       trainingText: 'Duurloop D1',
       isExtraRow: false,
       rowCells: ['Janneke', 'Robin', 'Maria', 'Paula', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 22),
+      date: DateTime(2025, 2, 22),
       trainingText: 'Interval lange afstand',
       isExtraRow: false,
       rowCells: ['(Met R1)', 'Jeroen', 'Cyriel', 'Pauline', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 24),
+      date: DateTime(2025, 2, 24),
       trainingText: 'ZaMo',
       isExtraRow: false,
       rowCells: ['', '', '', '', 'Hu/Pa/Ro']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 27),
+      date: DateTime(2025, 2, 27),
       trainingText: 'Tempoduurloop D2',
       isExtraRow: false,
       rowCells: ['Olav', 'Janneke', 'Ronald', 'Huib', '']));
 
   rows.add(FsSpreadsheetRow(
-      date: DateTime(2024, 2, 29),
+      date: DateTime(2025, 2, 29),
       trainingText: 'Interval korte afstand',
       isExtraRow: false,
       rowCells: ['(Met R1)', 'Jeroen', 'Fried', 'Anne', '']));
@@ -399,8 +399,8 @@ List<FsSpreadsheetRow> _februariRows() {
 List<FsSpreadsheetRow> _maartRows() {
   List<FsSpreadsheetRow> result = [];
 
-  DateTime start = DateTime(2024, 3, 1);
-  DateTime end = DateTime(2024, 3, 31);
+  DateTime start = DateTime(2025, 3, 1);
+  DateTime end = DateTime(2025, 3, 31);
   int days = end.difference(start).inDays;
   for (int i = 0; i < days; i++) {
     DateTime date = start.add(Duration(days: i));

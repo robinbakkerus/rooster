@@ -386,7 +386,7 @@ class TrainerSchema {
     return TrainerSchema(
         id: '',
         trainerPk: '',
-        year: 2024,
+        year: 2025,
         month: 1,
         availableList: [],
         isNew: true,
@@ -603,7 +603,7 @@ class PlanRankStartValue {
 ///------- Spreadsheet
 
 class SpreadSheet {
-  int year = 2024;
+  int year = 2025;
   int month = 1;
   SpreadsheetStatus status = SpreadsheetStatus.underConstruction;
   List<SheetRow> rows = [];
@@ -830,7 +830,7 @@ class TrainerPlanningRank {
 ///-------------------------------
 
 class FsSpreadsheet {
-  int year = 2024;
+  int year = 2025;
   int month = 1;
   List<FsSpreadsheetRow> rows = [];
   bool isFinal = false;
@@ -971,7 +971,7 @@ class TrainingGroup {
   });
 
   DateTime getStartDate() {
-    return _startDate ?? DateTime(2024, 1, 1);
+    return _startDate ?? DateTime(2025, 1, 1);
   }
 
   void setStartDate(DateTime date) {
@@ -1107,7 +1107,7 @@ class SpecialPeriod {
 
   factory SpecialPeriod.empty() {
     return SpecialPeriod(
-        fromDate: DateTime(2024, 1, 1), toDate: DateTime(2024, 1, 1));
+        fromDate: DateTime(2025, 1, 1), toDate: DateTime(2025, 1, 1));
   }
 
   bool isEmpty() {

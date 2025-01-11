@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
-import 'package:soundpool/soundpool.dart';
+// import 'package:soundpool/soundpool.dart';
 
 class WidgetHelper {
   WidgetHelper._();
@@ -16,9 +16,9 @@ class WidgetHelper {
 
   final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
-  final Soundpool _soundPool = Soundpool.fromOptions();
-  late ByteData _soundAsset;
-  int _soundId = 0;
+  // final Soundpool _soundPool = Soundpool.fromOptions();
+  // late ByteData _soundAsset;
+  // final int _soundId = 0;
 
   ///--------------------------------------
   Widget horSpace(double h) {
@@ -191,12 +191,12 @@ class WidgetHelper {
 
   ///----------------------------------------------------------------
   void playWhooshSound() async {
-    if (_soundId == 0) {
-      _soundAsset = await rootBundle.load("sounds/whoosh.mp3");
-      _soundId = await _soundPool.load(_soundAsset);
-    }
+    // if (_soundId == 0) {
+    //   _soundAsset = await rootBundle.load("sounds/whoosh.mp3");
+    //   _soundId = await _soundPool.load(_soundAsset);
+    // }
 
-    await _soundPool.play(_soundId);
+    // await _soundPool.play(_soundId);
   }
 
   //-------------- prefdays & prefgroups ------------------------------
