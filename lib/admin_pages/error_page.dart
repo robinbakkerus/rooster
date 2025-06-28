@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:rooster/event/app_events.dart';
 import 'package:rooster/util/app_mixin.dart';
@@ -20,6 +22,7 @@ class _AppErrorPageState extends State<AppErrorPage> with AppMixin {
 
   @override
   Widget build(BuildContext context) {
+    log(_errorMessage);
     return Scaffold(
       body: Center(
         child: Column(

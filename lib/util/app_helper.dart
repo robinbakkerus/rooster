@@ -79,6 +79,12 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------//------------------
+  DateTime getLastDayOfMonth(DateTime startDate) {
+    List<DateTime> days = getDaysInBetween(startDate);
+    return days[days.length - 1];
+  }
+
+  ///----------------------------------------//------------------
   AvailableCounts getAvailableCounts(
       int rowIndex, String groupName, DateTime dateTime) {
     try {
@@ -265,7 +271,9 @@ class AppHelper with AppMixin {
 
   ///---------------------------------------------
   String getAuthPassword(Trainer trainer) {
-    return 'pwd${trainer.originalAccessCode}!678123';
+    String prefix = c.passwordPrefix;
+    String suffix = c.passwordSuffix;
+    return '$prefix${trainer.originalAccessCode}$suffix';
   }
 
   ///---------------------------------------------

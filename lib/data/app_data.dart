@@ -37,6 +37,8 @@ class AppData {
       SpreadSheet(year: 2025, month: 1); // to obtain the diffs
 
   List<TrainingGroup> trainingGroups = [];
+  // this is the list of all training groups, that are active in a given period
+  // for example, a month may start with normal training and halfway the summer period starts
   List<ActiveTrainingGroup> activeTrainingGroups = [];
 
   String lastSnackbarMsg = '';

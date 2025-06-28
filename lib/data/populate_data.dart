@@ -454,7 +454,7 @@ TrainingGroup _buildZamoTrainingGroup(String name, String descr) {
       description: descr,
       type: TrainingGroupType.special,
       trainingDays: [DateTime.saturday],
-      defaultTrainingText: 'ZaMo start 9 uur Donkervoort');
+      defaultTrainingText: '09.00u Donkervoort');
 }
 
 TrainingGroup _buildSummerTrainingGroup(String name, String descr) {

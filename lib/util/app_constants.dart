@@ -41,4 +41,7 @@ class AppConstants {
 Dit schema is nog onderhanden.
 Het kan nog volledig worden gewijzigd!
 ''';
+
+  final String passwordPrefix = 'pwd';
+  final String passwordSuffix = '!678123';
 }

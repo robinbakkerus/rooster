@@ -100,7 +100,8 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
     rows.add(const SpreadsheetTopButtons(index: 0));
 
     for (int i = 0; i < AppData.instance.activeTrainingGroups.length; i++) {
-      rows.add(_buildDataTable(context, i));
+      rows.add(_buildDataTable(
+          context, i, AppData.instance.activeTrainingGroups.length - 1));
     }
     rows.add(_buildButtons());
 
@@ -112,9 +113,10 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
 //--------------------------------
-  Widget _buildDataTable(BuildContext context, int index) {
+  Widget _buildDataTable(BuildContext context, int index, int lastIndex) {
     double colSpace = AppHelper.instance.isWindows() ? 25 : 10;
     DateTime date = AppData.instance.activeTrainingGroups[index].startDate;
+    List<DataColumn> header = _buildHeader(date);
     return DataTable(
       headingRowHeight: 30,
       horizontalMargin: 10,
@@ -122,8 +124,8 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
       columnSpacing: colSpace,
       dataRowMinHeight: 15,
       dataRowMaxHeight: 30,
-      columns: _buildHeader(date),
-      rows: _buildDataRows(index),
+      columns: header,
+      rows: _buildDataRows(index, header.length),
     );
   }
 
@@ -163,28 +165,25 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   //------------------------------
-  List<DataRow> _buildDataRows(int index) {
+  List<DataRow> _buildDataRows(int index, int headerLength) {
     List<DataRow> result = [];
 
     _spreadSheet.rows.sort((a, b) => a.date.compareTo(b.date));
-    DateTime startDate = AppData.instance.activeTrainingGroups[index].startDate;
-    DateTime endDate = AppData.instance.activeTrainingGroups[index].endDate!;
 
     for (SheetRow fsRow in _spreadSheet.rows) {
-      if (fsRow.date.isAfter(endDate) || fsRow.date.isBefore(startDate)) {
-        continue;
-      }
-
       WidgetStateColor col = _getRowColor(fsRow);
 
       List<DataCell> cells = _buildDataCells(fsRow);
       DataRow dataRow = DataRow(cells: cells, color: col);
-      result.add(dataRow);
+      if (cells.length == headerLength) {
+        result.add(dataRow);
+      }
     }
 
     return result;
   }
 
+  //------------------------------
   WidgetStateColor _getRowColor(SheetRow fsRow) {
     WidgetStateColor col =
         WidgetStateColor.resolveWith((states) => Colors.white);

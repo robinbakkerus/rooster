@@ -8,6 +8,10 @@ import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
 
+/*
+This page is used to edit the schema for a trainer.
+It shows a grid with the days of the month and the availability for each day.
+*/
 class SchemaEditPage extends StatefulWidget {
   const SchemaEditPage({super.key});
 

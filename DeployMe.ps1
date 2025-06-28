@@ -52,8 +52,8 @@ String appVersion = '{1} buildnr: {2}';
 Function runFirebaseScripts{
     Write-host "Run scripts ..." 
     flutter clean
-    flutter build web --web-renderer html
-    Remove-Item '.firebase' -Force -Recurse
+    flutter build web
+    # Remove-Item '.firebase' -Force -Recurse
     firebase deploy --only hosting:$global:modus
 }
 

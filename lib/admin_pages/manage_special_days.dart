@@ -260,12 +260,11 @@ class _ManageSpecialDaysPageState extends State<ManageSpecialDaysPage>
     final DateTime firstDate = DateTime(DateTime.now().year, 1, 1);
     final DateTime lastDate = DateTime.now().copyWith(year: firstDate.year + 1);
     String text = controller.text;
-    final DateTime initDate =
-        text.isEmpty ? DateTime.now() : DateTime.parse(text);
+    DateTime initialDate = _getInitialDate(text, firstDate, lastDate);
 
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: initDate,
+        initialDate: initialDate,
         firstDate: firstDate,
         lastDate: lastDate);
 
@@ -275,6 +274,16 @@ class _ManageSpecialDaysPageState extends State<ManageSpecialDaysPage>
         _specialDays = _updateSpecialDaysObject();
       });
     }
+  }
+
+  DateTime _getInitialDate(String text, DateTime firstDate, DateTime lastDate) {
+    DateTime initialDate = text.isEmpty ? DateTime.now() : DateTime.parse(text);
+    if (initialDate.isBefore(firstDate)) {
+      initialDate = firstDate;
+    } else if (initialDate.isAfter(lastDate)) {
+      initialDate = lastDate;
+    }
+    return initialDate;
   }
 
   //--------------------------------------

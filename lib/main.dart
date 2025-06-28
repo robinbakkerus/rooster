@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primarySwatch: Colors.blue,
-          tabBarTheme: const TabBarTheme(labelColor: Colors.black)),
+          tabBarTheme: const TabBarThemeData(labelColor: Colors.black)),
       home: const StartPage(),
     );
   }

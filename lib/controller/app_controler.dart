@@ -34,19 +34,27 @@ class AppController {
     await initializeDateFormatting('nl_NL', null);
   }
 
-  /// find the trainer gived the access code
+  /// find the trainer given the access code
   Future<bool> findTrainer(String accessCode) async {
     Trainer trainer = await Dbs.instance.findTrainerByAccessCode(accessCode);
     if (trainer.isEmpty()) {
       return false;
     }
 
-    bool signInOkay = await AuthHelper.instance.signIn(
+    bool signInOkay;
+    try {
+      signInOkay = await AuthHelper.instance.signIn(
         email: trainer.originalEmail,
-        password: AppHelper.instance.getAuthPassword(trainer));
+        password: AppHelper.instance.getAuthPassword(trainer),
+      );
+    } catch (ex, stackTrace) {
+      FirestoreHelper.instance.handleError(ex, stackTrace);
+      signInOkay = false;
+    }
 
     if (signInOkay) {
       _setAccessCodePrefIfNeeded(trainer, accessCode);
+      _setDates();
       AppEvents.fireTrainerReady();
       return true;
     } else {
@@ -474,11 +482,19 @@ class AppController {
     setActiveDate(nextMonth);
     AppData.instance.lastActiveDate = lastActiveDate;
 
-    // trainer may create 2 months ahead if where near the end the curr month (day=20), else 1 month ahead
-    DateTime lastMonth = DateTime.now().day > 15
-        ? AppHelper.instance.addMonths(lastActiveDate, 2)
-        : AppHelper.instance.addMonths(lastActiveDate, 1);
-    AppData.instance.lastMonth = lastMonth;
+    // trainer may create 2 months ahead if we are near the end the curr month (day=20), else 1 month ahead
+    // admin and hoofdtrainer may create 5 months ahead.
+    if (AppData.instance.getTrainer().isSupervisor()) {
+      DateTime lastMonth = DateTime.now().day > 15
+          ? AppHelper.instance.addMonths(lastActiveDate, 6)
+          : AppHelper.instance.addMonths(lastActiveDate, 5);
+      AppData.instance.lastMonth = lastMonth;
+    } else {
+      DateTime lastMonth = DateTime.now().day > 15
+          ? AppHelper.instance.addMonths(lastActiveDate, 2)
+          : AppHelper.instance.addMonths(lastActiveDate, 1);
+      AppData.instance.lastMonth = lastMonth;
+    }
   }
 
   //-------------------------------------------
