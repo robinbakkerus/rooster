@@ -44,4 +44,7 @@ Het kan nog volledig worden gewijzigd!
 
   final String passwordPrefix = 'pwd';
   final String passwordSuffix = '!678123';
+
+  final String maxTrainingCountPref = 'max';
+  final int maxTrainingCountDefault = 10;
 }

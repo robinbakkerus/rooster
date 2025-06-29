@@ -22,6 +22,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   final _textAccessCodeCtrl = TextEditingController();
   Widget? _fab;
   List<Widget> _columnWidgets = [];
+  double _maxTrainingCount = 10;
 
   _TrainerPrefsPageState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
@@ -70,6 +71,10 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
       child: Text('Voorkeur groepen'),
     ));
     list.add(wh.buildGridForPrefGroups(trainer: _updateTrainer));
+    list.add(const Divider(
+      height: 10,
+    ));
+    list.add(_maxTrainingCountRow());
     return list;
   }
 
@@ -160,7 +165,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     }
   }
 
-  //----------------------------------
+  ///----------------------------------
   Widget _emailRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
@@ -198,6 +203,27 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     );
   }
 
+  ///----------------------------------
+  Widget _maxTrainingCountRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: c.w15,
+            child: const Text('max aantal trainingen/maand'),
+          ),
+          wh.horSpace(10),
+          _buildMaxCountSlider(),
+          wh.horSpace(10),
+          Text(_maxTrainingCount.toString()),
+        ],
+      ),
+    );
+  }
+
+  ///------------------------------------------------
   String _getStringValue(String mapElem) {
     Map<String, dynamic> map = _updateTrainer.toMap();
     return map[mapElem];
@@ -262,6 +288,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     if (mounted) {
       setState(() {
         _trainer = AppData.instance.getTrainer();
+        _maxTrainingCount = _getMaxTrainingCount().toDouble();
         _updateTrainer = _trainer.copyWith();
         _textEmailCtrl.text = _trainer.email;
         _textAccessCodeCtrl.text = _trainer.accessCode;
@@ -304,5 +331,37 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         }
       });
     }
+  }
+
+  ///------------------------------------------------
+  int _getMaxTrainingCount() {
+    int max = _trainer.getMaxTrainingCountValue();
+    if (max < 0 || max > 10) {
+      max = 10; // Default value
+    }
+    return max;
+  }
+
+  ///------------------------------------------------
+  Widget _buildMaxCountSlider() {
+    return SizedBox(
+      width: c.w15 * 2,
+      child: Slider.adaptive(
+        value: _maxTrainingCount,
+        label: _maxTrainingCount.toString(),
+        max: 10,
+        min: 1,
+        divisions: 9,
+        onChanged: (value) => setState(() {
+          _maxTrainingCount = value;
+          _updateTrainer.setPrefValue(c.maxTrainingCountPref, value.toInt());
+          _columnWidgets = _buildColumnWidgets();
+          _fab = _getFab();
+          if (_isDirty()) {
+            wh.playWhooshSound();
+          }
+        }),
+      ),
+    );
   }
 }

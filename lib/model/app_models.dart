@@ -283,6 +283,7 @@ class Trainer {
     return roles.contains(RegExp('A'));
   }
 
+  /// Returns the preference value for a given parameter name.
   int getPrefValue({required String paramName}) {
     for (TrainerPref pref in prefValues) {
       if (pref.paramName.toLowerCase() == paramName.toLowerCase()) {
@@ -292,6 +293,7 @@ class Trainer {
     return -1;
   }
 
+  /// Returns the preference value for a given weekday.
   int getDayPrefValue({required int weekday}) {
     int result = -1;
 
@@ -307,6 +309,7 @@ class Trainer {
     return result;
   }
 
+  /// Sets the preference value for a given parameter name.
   void setPrefValue(String paramName, int value) {
     for (TrainerPref pref in prefValues) {
       if (pref.paramName == paramName) {
@@ -314,6 +317,20 @@ class Trainer {
         return;
       }
     }
+
+    prefValues.add(TrainerPref(
+        paramName: AppConstants().maxTrainingCountPref, value: value));
+  }
+
+  /// Returns the maximum training count value from preferences.
+  int getMaxTrainingCountValue() {
+    for (TrainerPref pref in prefValues) {
+      if (pref.paramName.toLowerCase() ==
+          AppConstants().maxTrainingCountPref.toLowerCase()) {
+        return pref.value;
+      }
+    }
+    return AppConstants().maxTrainingCountDefault;
   }
 }
 
