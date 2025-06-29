@@ -511,7 +511,7 @@ class MetaPlanRankValues {
   List<PlanRankStartValue> startValues = [];
   List<PlanRankStartValue> zamoStartValues = [];
   double onlyIfNeeded = -15;
-  // the first [0] value is the default value, the [1] value means 1 training day before etc
+  // the first [0] value is the default value, the [1] value means 1 training day before etc (see Firestore dbs )
   List<double> alreadyScheduled = [];
 
   MetaPlanRankValues({
