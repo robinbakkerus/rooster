@@ -112,6 +112,21 @@ class WidgetHelper {
     }
   }
 
+  //--------------------------------
+  void showInfoDialog(BuildContext context,
+      {required String title, required String content}) async {
+    AlertDialog infoDialog = _buildInfoDialog(
+      title: title,
+      content: content,
+    );
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return infoDialog;
+      },
+    );
+  }
+
 //------------------------------------------
   void pushPage(BuildContext context, Widget page) {
     Navigator.push(
@@ -172,6 +187,24 @@ class WidgetHelper {
         yesButton,
         noButton,
       ],
+    );
+  }
+
+//----------------------------------
+  AlertDialog _buildInfoDialog(
+      {required String title, required String content}) {
+    return AlertDialog(
+      title: Text(title),
+      content: SizedBox(
+        height: 100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(content),
+          ],
+        ),
+      ),
     );
   }
 

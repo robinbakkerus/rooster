@@ -27,11 +27,20 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   @override
   void initState() {
     AppEvents.onTrainerDataReadyEvent(_onReady);
+    AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdatedReady);
     AppEvents.onSchemaUpdatedEvent(_onSchemaUpdated);
     super.initState();
   }
 
   void _onReady(TrainerDataReadyEvent event) {
+    _handleReadyEvent();
+  }
+
+  void _onTrainerPrefUpdatedReady(TrainerPrefUpdatedEvent event) {
+    _handleReadyEvent();
+  }
+
+  void _handleReadyEvent() {
     if (mounted) {
       setState(() {
         _availableList = AppData.instance.newAvailaibleList;
@@ -69,16 +78,21 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
         padding: const EdgeInsets.only(left: 20),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowHeight: 30,
-            horizontalMargin: 10,
-            headingRowColor:
-                WidgetStateColor.resolveWith((states) => c.lonuBlauw),
-            columnSpacing: colSpace,
-            dataRowMinHeight: 25,
-            dataRowMaxHeight: 40,
-            columns: _buildHeader('Dag'),
-            rows: _buildDataRows(),
+          child: Column(
+            children: [
+              DataTable(
+                headingRowHeight: 30,
+                horizontalMargin: 10,
+                headingRowColor:
+                    WidgetStateColor.resolveWith((states) => c.lonuBlauw),
+                columnSpacing: colSpace,
+                dataRowMinHeight: 25,
+                dataRowMaxHeight: 40,
+                columns: _buildHeader('Dag'),
+                rows: _buildDataRows(),
+              ),
+              _showMaxTrainingCountIfNeeded(context),
+            ],
           ),
         ),
       ),
@@ -195,6 +209,28 @@ bool _isEditable() {
   // make use the datecheck is correct
   DateTime useDate = AppData.instance.lastActiveDate.copyWith(day: 2);
   return !useDate.isAfter(tsDate);
+}
+
+///------------------------------------------------
+Widget _showMaxTrainingCountIfNeeded(BuildContext context) {
+  int maxTrainingCount =
+      AppData.instance.getTrainer().getMaxTrainingCountValue();
+  if (maxTrainingCount < 5) {
+    return Column(
+      children: [
+        Text(
+          'Max aantal trainingen/maand staat nu op : $maxTrainingCount',
+          style: const TextStyle(fontSize: 16, color: Colors.orange),
+        ),
+        Text(
+          'Je kunt dit aanpassen in Voorkeuren.',
+          style: const TextStyle(fontSize: 16, color: Colors.orange),
+        ),
+      ],
+    );
+  } else {
+    return const SizedBox.shrink();
+  }
 }
 
 ///----------------------------------------------------------------

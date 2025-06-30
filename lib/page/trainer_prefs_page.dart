@@ -211,10 +211,12 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w15,
-            child: const Text('max aantal trainingen/maand'),
+            width: c.w1,
+            child: const Text('max'),
           ),
-          wh.horSpace(10),
+          wh.horSpace(5),
+          _builInfoMaxButton(
+              onPressed: _onInfoMaxPressed, iconData: Icons.info_outline),
           _buildMaxCountSlider(),
           wh.horSpace(10),
           Text(_maxTrainingCount.toString()),
@@ -345,7 +347,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
   ///------------------------------------------------
   Widget _buildMaxCountSlider() {
     return SizedBox(
-      width: c.w15 * 2,
+      width: c.w15 * 3,
       child: Slider.adaptive(
         value: _maxTrainingCount,
         label: _maxTrainingCount.toString(),
@@ -363,5 +365,22 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         }),
       ),
     );
+  }
+
+  //----------------------------------------
+  Widget _builInfoMaxButton(
+      {required Function() onPressed, required IconData iconData}) {
+    return IconButton(
+      onPressed: () => onPressed(),
+      icon: Icon(iconData),
+    );
+  }
+
+  ///------------------------------------------------
+  void _onInfoMaxPressed() {
+    wh.showInfoDialog(context,
+        title: 'Max aantal trainingen/maand',
+        content:
+            'Hiermee kan je het maximum aantal trainingen per maand instellen.');
   }
 }
