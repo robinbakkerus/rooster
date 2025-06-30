@@ -26,17 +26,17 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   @override
   void initState() {
-    AppEvents.onTrainerDataReadyEvent(_onReady);
-    AppEvents.onTrainerPrefUpdatedEvent(_onTrainerPrefUpdatedReady);
+    AppEvents.onTrainerDataReadyEvent(_onTrainerReady);
+    AppEvents.onTrainerUpdatedEvent(_onTrainerPrefUpdatedReady);
     AppEvents.onSchemaUpdatedEvent(_onSchemaUpdated);
     super.initState();
   }
 
-  void _onReady(TrainerDataReadyEvent event) {
+  void _onTrainerReady(TrainerDataReadyEvent event) {
     _handleReadyEvent();
   }
 
-  void _onTrainerPrefUpdatedReady(TrainerPrefUpdatedEvent event) {
+  void _onTrainerPrefUpdatedReady(TrainerUpdatedEvent event) {
     _handleReadyEvent();
   }
 
