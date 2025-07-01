@@ -1,5 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'dart:convert';
+import 'dart:developer';
 
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
@@ -217,20 +218,16 @@ class AppController {
 
   ///---------------------------------------
   /// triggered via Supervisor admin page
-  Future<SpreadSheet> regenerateSpreadsheet() async {
+  Future<void> regenerateSpreadsheet() async {
     LoadingIndicatorDialog().show();
     SpreadSheet? activeSpreadsheet;
-    SpreadSheet result;
+    SpreadSheet updatedSpreadsheet;
 
     await _getAllTrainerDataForThisSpreadsheet();
 
-    SpreadSheet? spreadSheet = await _getTheActiveSpreadsheet();
-    if (spreadSheet != null) {
-      activeSpreadsheet = spreadSheet;
-      result = _generateTheSpreadsheet();
-    } else {
-      result = _generateTheSpreadsheet();
-    }
+    activeSpreadsheet = await _getTheActiveSpreadsheet();
+
+    updatedSpreadsheet = _generateTheSpreadsheet();
 
     AppData.instance.activeTrainingGroups =
         SpreadsheetGenerator.instance.generateActiveTrainingGroups();
@@ -238,16 +235,18 @@ class AppController {
     // copy training text
     if (activeSpreadsheet != null) {
       for (SheetRow row in activeSpreadsheet.rows) {
-        SheetRow? resultRow = _findCorrRow(row, result);
+        SheetRow? resultRow = _findCorrRow(row, updatedSpreadsheet);
         if (resultRow != null) {
           resultRow.trainingText = row.trainingText;
+        } else {
+          updatedSpreadsheet.rows.add(row);
         }
       }
     }
 
-    AppData.instance.setSpreadsheet(result);
+    AppData.instance.setSpreadsheet(updatedSpreadsheet);
     AppEvents.fireSpreadsheetReady();
-    return result;
+    return;
   }
 
   ///------------------------------------

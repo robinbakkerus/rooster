@@ -48,7 +48,9 @@ class _SupervisorPageState extends State<SupervisorPage> with AppMixin {
   //------------------ private -------------------------
   void _updateSpreadsheet() async {
     await AppController.instance.regenerateSpreadsheet();
-    AppEvents.fireShowPage(PageEnum.spreadSheet);
+    wh.popPage(context);
+    // AppEvents.fireShowPage(PageEnum.spreadSheet);
+    AppEvents.fireSpreadsheetReady();
   }
 
   //-----------------------------

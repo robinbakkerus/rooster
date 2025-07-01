@@ -476,6 +476,7 @@ Weet je zeker dat je wijzigingen wilt aanbrengen?
     if (mounted) {
       setState(() {
         _spreadSheet = AppData.instance.getSpreadsheet();
+        _buildBody();
 
         if (AppData.instance.getSpreadsheet().status ==
             SpreadsheetStatus.active) {
