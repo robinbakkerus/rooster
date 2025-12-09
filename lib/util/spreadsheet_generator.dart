@@ -504,8 +504,7 @@ class SpreadsheetGenerator with AppMixin {
     int count = 0;
     for (int prevRowNr = rowNr - 1; prevRowNr >= 0; prevRowNr--) {
       for (RowCell rowCell in _spreadSheet.rows[prevRowNr].rowCells) {
-        if (!_isSaturday(prevRowNr) &&
-            !_isThursdayAndPR(prevRowNr, groupName)) {
+        if (!_isThursdayAndPR(prevRowNr, groupName)) {
           Trainer schedTrainer = rowCell.getTrainer();
           if (schedTrainer == trainer) {
             count++;
