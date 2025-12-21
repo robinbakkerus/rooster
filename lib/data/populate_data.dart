@@ -167,10 +167,6 @@ MetaPlanRankValues getPlanRankValues() {
   startValues.add(PlanRankStartValue(trainerPk: 'FvH', value: 110.0));
   startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 110.0));
   List<PlanRankStartValue> zamoStartValues = [];
-  startValues.add(PlanRankStartValue(trainerPk: '*', value: 0.0));
-  startValues.add(PlanRankStartValue(trainerPk: 'HC', value: 141.0));
-  startValues.add(PlanRankStartValue(trainerPk: 'PG', value: 131.0));
-  startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 100.0));
   List<double> alreadyScheduled = [-10.0, -13.0, -12.0, -11.0];
   MetaPlanRankValues weightValues = MetaPlanRankValues(
       startValues: startValues,

@@ -431,6 +431,7 @@ class SpreadsheetGenerator with AppMixin {
   // here we make the rank higher or lower in order to make choice
   void _applyRanks(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr, required String groepName, required int groepNr}) {
+  
     if (!_isSaturday(rowNr) && !_isThursdayAndPR(rowNr, groepName)) {
       _applyOnlyIfNeeded(trainerPlanRankList,
           rowNr: rowNr, groepName: groepName);
@@ -440,10 +441,10 @@ class SpreadsheetGenerator with AppMixin {
           rowNr: rowNr, groupName: groepName);
       _applyMaxTrainingCount(trainerPlanRankList,
           rowNr: rowNr, groupName: groepName);
-    }
+  
   }
 
-  ///-- if trainer is not available future days its score goes up
+  ///-- if trainer indicated only if needed its score goes down
   void _applyOnlyIfNeeded(List<TrainerPlanningRank> trainerPlanRankList,
       {required int rowNr, required String groepName}) {
     for (TrainerPlanningRank tw in trainerPlanRankList) {
@@ -467,7 +468,7 @@ class SpreadsheetGenerator with AppMixin {
           _countDaysNotAvalaible(trainer, rowNr: rowNr, groupIndex: groepNr);
 
       if (notAvailCnt > 0) {
-        tw.rank += (notAvailCnt * 10);
+        tw.rank += (notAvailCnt * 2);
       }
     }
   }
