@@ -1,4 +1,6 @@
+
 import 'package:rooster/model/app_models.dart';
 
-RunMode appRunModus = RunMode.acc;
-String appVersion = '29-Aug-2025 buildnr: 53';
+RunMode appRunModus = RunMode.prod;
+String appVersion = '21-Dec-2025 buildnr: 55';
+

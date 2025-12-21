@@ -8,3 +8,6 @@ final String passwordPrefix = 'pwd';
 final String passwordSuffix = '!678123';
 
 En je moet ook handmatig original email aanmaken
+
+#powershell
+Set-ExecutionPolicy unrestricted
