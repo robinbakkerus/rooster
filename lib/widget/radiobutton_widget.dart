@@ -61,8 +61,6 @@ class RadioButtonWidget extends StatefulWidget {
 
 ///------------------------------------------------
 class _RadioButtonWidgetState extends State<RadioButtonWidget> with AppMixin {
-  int? selectedOption = 1;
-
   @override
   Widget build(BuildContext context) {
     return _radioButton();
@@ -71,11 +69,15 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> with AppMixin {
   Widget _radioButton() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-      child: Radio<int>(
-        activeColor: widget.color,
-        value: widget.value,
+      child: RadioGroup<int>(
         groupValue: widget.rbValue,
         onChanged: (val) => widget.isEditable ? onChangeValue(val) : null,
+        child: Column(children: <Widget>[
+          Radio<int>(
+            value: widget.value,
+            activeColor: widget.color,
+          ),
+        ]),
       ),
     );
   }
