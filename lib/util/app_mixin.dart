@@ -7,7 +7,7 @@ mixin AppMixin {
   final WidgetHelper wh = WidgetHelper.instance;
   final AppConstants c = AppConstants();
 
-  lp(String message) {
+  void lp(String message) {
     log(message);
   }
 }

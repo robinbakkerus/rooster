@@ -134,28 +134,36 @@ class _SpreadsheetTrainingColumnState extends State<SpreadsheetTrainingColumn> {
   }
 
   Widget _buildDropdown() {
-    String topVal = '... Training';
-    List<String> trainingItems = [topVal];
+    // String topVal = '... Training';
+    List<String> trainingItems = [];
     trainingItems.addAll(AppData.instance.trainerItems);
+    final valueNotifier = ValueNotifier<String?>(null);
 
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
-        value: topVal,
+        hint: Text(
+          'Kies een training of vul zelf in',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey, //Theme.of(context).hintColor,
+          ),
+        ),
         items: trainingItems.map((String item) {
-          return DropdownMenuItem(
-            value: item,
-            child: Text(item),
-          );
+          return DropdownItem<String>(
+              value: item,
+              height: 40,
+              child: Text(
+                item,
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ));
         }).toList(),
+        valueListenable: valueNotifier,
         onChanged: _onDropdownSelected,
         buttonStyleData: const ButtonStyleData(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          height: 24,
-          width: 300,
-        ),
-        menuItemStyleData: const MenuItemStyleData(
-          height: 30,
+          height: 40,
+          width: 400,
         ),
       ),
     );

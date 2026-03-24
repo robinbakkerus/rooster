@@ -294,6 +294,8 @@ class AppHelper with AppMixin {
     if (date.weekday == DateTime.saturday) {
       int dayPref = trainer.getDayPrefValue(weekday: date.weekday);
       return dayPref > 0;
+    } else if (date.weekday == DateTime.sunday) {
+      return false;
     } else {
       return true;
     }

@@ -7,7 +7,7 @@ class AuthHelper with AppMixin {
   static final AuthHelper instance = AuthHelper._();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  get user => _auth.currentUser;
+  User? get user => _auth.currentUser;
 
   //SIGN UP METHOD
   Future signUp({required String email, required String password}) async {

@@ -269,7 +269,7 @@ class _OverallAvailabilityPageState extends State<OverallAvailabilityPage>
     );
   }
 
-  _horLine() {
+  Divider _horLine() {
     return const Divider(
       color: Colors.grey,
     );

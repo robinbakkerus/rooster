@@ -13,7 +13,7 @@ class LoadingIndicatorDialog {
 
   LoadingIndicatorDialog._internal();
 
-  show({String text = 'Loading...'}) {
+  void show({String text = 'Loading...'}) {
     if (isDisplayed) {
       return;
     }
@@ -26,7 +26,7 @@ class LoadingIndicatorDialog {
         });
   }
 
-  dismiss() {
+  void dismiss() {
     if (isDisplayed) {
       Navigator.of(_context!, rootNavigator: true).pop();
       isDisplayed = false;

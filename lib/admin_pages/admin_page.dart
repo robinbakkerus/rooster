@@ -195,7 +195,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         .doc('training_items')
         .set(map)
         .then((val) {})
-        .onError((error, stackTrace) => lp(error.toString()));
+        .onError((error, stackTrace) {
+          lp(error.toString());
+        });
   }
 
   Future<void> _addTrainingGroups() async {

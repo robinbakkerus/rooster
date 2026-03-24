@@ -152,11 +152,12 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
   Widget _buildDropdown() {
     const topVal = '... Trainers';
     List<String> trainerList = [topVal];
+    final valueNotifier = ValueNotifier<String?>(null);
     trainerList.addAll(
         AppData.instance.getAllTrainers().map((e) => e.firstName()).toList());
 
     var items = trainerList.map((item) {
-      return DropdownMenuItem(
+      return DropdownItem(
         value: item,
         child: Text(item),
       );
@@ -165,16 +166,20 @@ class _SpreadsheetTrainerColumnState extends State<SpreadsheetTrainerColumn>
     return DropdownButton2(
       isExpanded: true,
       isDense: true,
-      value: topVal,
+      hint: Text(
+        'Kies trainer, of vul zelf in',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey, //Theme.of(context).hintColor,
+        ),
+      ),
+      valueListenable: valueNotifier,
       items: items,
       onChanged: _onDropdownSelected,
       buttonStyleData: const ButtonStyleData(
         padding: EdgeInsets.symmetric(horizontal: 16),
         height: 24,
-        width: 200,
-      ),
-      menuItemStyleData: const MenuItemStyleData(
-        height: 30,
+        width: 240,
       ),
     );
   }

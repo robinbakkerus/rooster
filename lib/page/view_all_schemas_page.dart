@@ -48,6 +48,7 @@ class _ViewAllSchemasPageState extends State<ViewAllSchemasPage> with AppMixin {
     );
   }
 
+  // ignore: strict_top_level_inference
   void _onTap(value) {
     if (AppData.instance.getSpreadsheet().status == SpreadsheetStatus.active &&
         value == 3) {
