@@ -53,7 +53,10 @@ Function runFirebaseScripts{
     Write-host "Run scripts ..." 
     flutter clean
     flutter build web
+    # Write-host "remove .firebase folder ..." 
     # Remove-Item '.firebase' -Force -Recurse
+    Write-host "deploying ..." 
+    Write-host "firebase deploy --only hosting:$global:modus " 
     firebase deploy --only hosting:$global:modus
 }
 
