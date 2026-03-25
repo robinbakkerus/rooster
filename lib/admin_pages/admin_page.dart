@@ -50,11 +50,15 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
                 child: const Text('Email accesscodes')),
             OutlinedButton(
                 onPressed: _signUpOrSignIn, child: const Text('SignUp')),
+            OutlinedButton(
+                onPressed: _updateFirebase,
+                child: const Text('Update Firebase')),
           ],
         ),
       ),
     );
   }
+  //------------------ private -------------------------
 
   void _addTrainers() {
     List<Trainer> trainers = _allTrainers();
@@ -196,8 +200,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         .set(map)
         .then((val) {})
         .onError((error, stackTrace) {
-          lp(error.toString());
-        });
+      lp(error.toString());
+    });
   }
 
   Future<void> _addTrainingGroups() async {
@@ -205,7 +209,22 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     Dbs.instance.saveTrainingGroups(groups);
   }
 
-  //------------------ private -------------------------
+  // hiermee kun je handmatig een rij toevoegen aan de firebase spreadsheet.
+  void _updateFirebase() async {
+    FsSpreadsheet? spreadSheet =
+        await Dbs.instance.retrieveSpreadsheet(year: 2026, month: 3);
+
+    FsSpreadsheetRow row = FsSpreadsheetRow(
+        date: DateTime(2026, 3, 31),
+        trainingText: 'Bosloop',
+        isExtraRow: false,
+        rowCells: ['Merijn', 'Fried', 'Robin', 'Paula', '']);
+
+    if (spreadSheet != null) {
+      spreadSheet.rows.add(row);
+      Dbs.instance.saveFsSpreadsheet(spreadSheet);
+    }
+  }
 
   String _accessCodeHtml(Trainer trainer) {
     String html = '<div>';

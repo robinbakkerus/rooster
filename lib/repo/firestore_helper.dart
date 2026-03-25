@@ -7,6 +7,7 @@ import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:stack_trace/stack_trace.dart';
 
+//Firestore Collections enumeration
 enum FsCol {
   logs,
   trainer,
