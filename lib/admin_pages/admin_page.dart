@@ -161,7 +161,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   Future<void> _deleteOldSchemas() async {
-     CollectionReference schemaRef =
+    CollectionReference schemaRef =
         FirestoreHelper.instance.collectionRef(FsCol.schemas);
     await schemaRef.get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
@@ -176,15 +176,15 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
   }
 
   Future<void> _deleteOldSpreadsheets() async {
-     CollectionReference spreadsheetRef =
+    CollectionReference spreadsheetRef =
         FirestoreHelper.instance.collectionRef(FsCol.spreadsheet);
     await spreadsheetRef.get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
         FsSpreadsheet spreadsheet =
             FsSpreadsheet.fromMap(doc.data() as Map<String, dynamic>);
         if (spreadsheet.year < DateTime.now().year) {
-          log('Deleting old spreadsheet: ${spreadsheet.year}');
-          // doc.reference.delete();
+          log('Deleting old spreadsheet: ${spreadsheet.year} ${spreadsheet.month}');
+          doc.reference.delete();
         }
       }
     });
