@@ -133,8 +133,8 @@ class AppData {
         .where((e) =>
             e.weekday == DateTime.tuesday ||
             e.weekday == DateTime.thursday ||
-            e.weekday == DateTime.saturday ||
-            e.weekday == DateTime.sunday)
+            e.weekday == DateTime.saturday)
+        // e.weekday == DateTime.sunday)
         .toList();
   }
 

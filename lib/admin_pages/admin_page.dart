@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rooster/data/populate_data.dart' as p;
@@ -41,6 +43,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
             OutlinedButton(
                 onPressed: _deleteOldErrors,
                 child: const Text('Delete old errors')),
+            OutlinedButton(
+                onPressed: _deleteOldSchemaAndSpreadsheet,
+                child: const Text('Delete old schema en spreadsheet')),
             OutlinedButton(
                 onPressed: _addMetaData, child: const Text('Add MetaData')),
             OutlinedButton(
@@ -146,6 +151,41 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
           doc.reference.delete();
         }
         firstOne = false;
+      }
+    });
+  }
+
+  void _deleteOldSchemaAndSpreadsheet() async {
+    await _deleteOldSchemas();
+    await _deleteOldSpreadsheets();
+  }
+
+  Future<void> _deleteOldSchemas() async {
+     CollectionReference schemaRef =
+        FirestoreHelper.instance.collectionRef(FsCol.schemas);
+    await schemaRef.get().then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        TrainerSchema schema =
+            TrainerSchema.fromMap(doc.data() as Map<String, dynamic>);
+        if (schema.year < DateTime.now().year) {
+          log('Deleting old schema: ${schema.id}');
+          doc.reference.delete();
+        }
+      }
+    });
+  }
+
+  Future<void> _deleteOldSpreadsheets() async {
+     CollectionReference spreadsheetRef =
+        FirestoreHelper.instance.collectionRef(FsCol.spreadsheet);
+    await spreadsheetRef.get().then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        FsSpreadsheet spreadsheet =
+            FsSpreadsheet.fromMap(doc.data() as Map<String, dynamic>);
+        if (spreadsheet.year < DateTime.now().year) {
+          log('Deleting old spreadsheet: ${spreadsheet.year}');
+          // doc.reference.delete();
+        }
       }
     });
   }
