@@ -49,7 +49,8 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------
-  List<AvailableData> mapFromJsonList({required List<dynamic> jsonList}) {
+  List<AvailableData> mapAvailableDataFromJsonList(
+      {required List<dynamic> jsonList}) {
     var json = jsonList[0];
     List<AvailableData> result = [];
     if (json == null || jsonList.isEmpty) {

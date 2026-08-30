@@ -380,8 +380,8 @@ class TrainerSchema {
         trainerPk: map['trainerPk'],
         year: map['year'],
         month: map['month'],
-        trainerAvailableList:
-            AppHelper.instance.mapFromJsonList(jsonList: map['availabilities']),
+        trainerAvailableList: AppHelper.instance
+            .mapAvailableDataFromJsonList(jsonList: map['availabilities']),
         isNew: map['isNew'],
         created: AppHelper.instance.parseDateTime(map['created']),
         modified: AppHelper.instance.parseDateTime(map['modified']));
@@ -516,9 +516,12 @@ class AvailableCounts {
 }
 
 ///------------------------------------------
+///this container class is used to store the available trainers for a given date, and the counts of available,
+///if needed, and not available trainers for that date.
 class Available {
   DateTime date;
-  List<AvailableCounts> counts = [];
+  List<AvailableCounts> counts =
+      []; // the number corresponds with the nummber of trainingroups
 
   Available({required this.date, required int groupCount}) {
     for (int i = 0; i < groupCount; i++) {
@@ -942,6 +945,7 @@ class FsSpreadsheet {
 //------------------------------------------------
 class FsSpreadsheetRow {
   DateTime date = DateTime.now();
+  int get day => date.day;
   String trainingText = '';
   bool isExtraRow = false;
   List<String> rowCells = [];
@@ -955,6 +959,7 @@ class FsSpreadsheetRow {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'date': date.millisecondsSinceEpoch,
+      'day': day,
       'trainingText': trainingText,
       'isExtraRow': isExtraRow,
       'rowCells': rowCells,
@@ -973,7 +978,7 @@ class FsSpreadsheetRow {
 
   @override
   String toString() =>
-      'FsSpreadsheetRow(trainingText: $trainingText, isExtraRow: $isExtraRow, rowCells: $rowCells)';
+      'FsSpreadsheetRow(day: $day, trainingText: $trainingText, isExtraRow: $isExtraRow, rowCells: $rowCells)';
 
   @override
   bool operator ==(covariant FsSpreadsheetRow other) {

@@ -252,6 +252,7 @@ class SpreadsheetGenerator with AppMixin {
   Available _genAvailableCountsForDate(DateTime date) {
     List<String> groupNames = getGroupNames(date);
     Available available = Available(date: date, groupCount: groupNames.length);
+    available.counts = [];
 
     for (String groepName in groupNames) {
       AvailableCounts availableCounts = AvailableCounts();
