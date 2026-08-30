@@ -7,6 +7,7 @@ import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/widget/animated_fab.dart';
 import 'package:rooster/widget/radiobutton_widget.dart';
+import 'package:collection/collection.dart';
 
 /*
 This page is used to edit the schema for a trainer.
@@ -20,8 +21,6 @@ class SchemaEditPage extends StatefulWidget {
 }
 
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
-  List<int> _availableList = [];
-
   _SchemaEditPageState();
 
   @override
@@ -43,7 +42,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   void _handleReadyEvent() {
     if (mounted) {
       setState(() {
-        _availableList = AppData.instance.newAvailaibleList;
+        AppData.instance.cloneAvailableDataList();
       });
     }
 
@@ -55,7 +54,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   void _onSchemaUpdated(SchemaUpdatedEvent event) {
     if (mounted) {
       setState(() {
-        _availableList = AppData.instance.newAvailaibleList;
+        AppData.instance.cloneAvailableDataList();
         if (AppData.instance.isSchemaDirty()) {
           wh.playWhooshSound();
         }
@@ -107,56 +106,81 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   List<DataRow> _buildDataRows() {
     List<DataRow> result = [];
 
-    for (int dateIndex = 0; dateIndex < _availableList.length; dateIndex++) {
-      List<DateTime> dates = AppData.instance.getActiveDates();
-      if (dateIndex > dates.length - 1) {
-        break;
-      }
-
-      DateTime date = AppData.instance.getActiveDates()[dateIndex];
+    for (AvailableData availableData in AppData.instance
+        .getTrainerData()
+        .trainerSchemas
+        .trainerAvailableList) {
+      DateTime date = DateTime(AppData.instance.getActiveYear(),
+          AppData.instance.getActiveMonth(), availableData.day);
 
       bool addRow = AppHelper.instance
           .addSchemaEditRow(date, AppData.instance.getTrainer());
 
       if (addRow) {
         result.add(DataRow(
-            cells: _buildDataCells(dateIndex),
-            color: wh.getDaySchemaRowColor(dateIndex)));
+            cells: _buildDataCells(day: availableData.day),
+            color: wh.getDaySchemaRowColor(availableData.day)));
       }
     }
 
     return result;
   }
 
-  List<DataCell> _buildDataCells(int dateIndex) {
+  List<DataCell> _buildDataCells({required int day}) {
     List<DataCell> result = [];
 
-    result.add(_buildDayDataCell(dateIndex));
-    result.add(_buildRadioButtonDataCell(dateIndex, 1, Colors.green));
-    result.add(_buildRadioButtonDataCell(dateIndex, 0, Colors.red));
-    result.add(_buildRadioButtonDataCell(dateIndex, 2, Colors.brown));
+    AvailableData availableData = _getAvailableDataForDay(day);
+    int availableValue = availableData.value;
+
+    result.add(_buildDayDataCell(day: day));
+    result.add(_buildRadioButtonDataCell(
+        day: day,
+        value: 1,
+        color: Colors.green,
+        availableValue: availableValue));
+
+    result.add(_buildRadioButtonDataCell(
+        day: day, value: 0, color: Colors.red, availableValue: availableValue));
+
+    result.add(_buildRadioButtonDataCell(
+        day: day,
+        value: 2,
+        color: Colors.brown,
+        availableValue: availableValue));
 
     return result;
   }
 
-  DataCell _buildDayDataCell(int dateIndex) {
-    DateTime datetime = AppData.instance.getActiveDates()[dateIndex];
+  DataCell _buildDayDataCell({required int day}) {
+    DateTime datetime = DateTime(AppData.instance.getActiveYear(),
+        AppData.instance.getActiveMonth(), day);
     String label = AppHelper.instance.getSimpleDayString(datetime);
     return DataCell(Center(child: Text(label)));
   }
 
-  DataCell _buildRadioButtonDataCell(int dateIndex, int value, Color color) {
-    int avail = _availableList[dateIndex];
+  DataCell _buildRadioButtonDataCell(
+      {required int day,
+      required int value,
+      required Color color,
+      required int availableValue}) {
     return DataCell(RadioButtonWidget.forAvailability(
       key: UniqueKey(),
-      dateIndex: dateIndex,
-      value: avail,
+      day: day,
+      value: availableValue,
       rbValue: value,
       color: color,
       isEditable: _isEditable(),
     ));
   }
 
+  //----------------------------------------
+  AvailableData _getAvailableDataForDay(int day) {
+    AvailableData? availableData = AppData.instance.newAvailaibleDataList
+        .firstWhereOrNull((e) => e.day == day);
+    return availableData ?? AvailableData(day: day, value: -1);
+  }
+
+  //----------------------------------------
   Widget? _buildFab() {
     if (AppData.instance.isSchemaDirty() && _isEditable()) {
       return FloatingActionButton(
@@ -170,7 +194,8 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   }
 
   void _onSaveSchema() async {
-    bool result = await AppController.instance.updateTrainerSchemas();
+    bool result = await AppController.instance.updateTrainerSchema(
+        updatedAvailableDataList: AppData.instance.newAvailaibleDataList);
     if (result) {
       wh.showSnackbar('Met succes wijzigingen opgeslagen!',
           color: Colors.lightGreen);

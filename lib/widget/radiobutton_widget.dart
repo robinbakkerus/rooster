@@ -5,7 +5,7 @@ import 'package:rooster/util/app_mixin.dart';
 
 class RadioButtonWidget extends StatefulWidget {
   final String paramName;
-  final int dateIndex;
+  final int day;
   final int value;
   final int rbValue;
   final Color color;
@@ -17,7 +17,7 @@ class RadioButtonWidget extends StatefulWidget {
     required this.rbValue,
     required this.color,
     required this.isEditable,
-    this.dateIndex = -1,
+    this.day = -1,
     this.paramName = '',
     this.value = 0,
   }) : super(key: key);
@@ -26,7 +26,7 @@ class RadioButtonWidget extends StatefulWidget {
     required Key key,
     required int rbValue,
     required Color color,
-    required int dateIndex,
+    required int day,
     required int value,
     required bool isEditable,
   }) {
@@ -34,7 +34,7 @@ class RadioButtonWidget extends StatefulWidget {
       key: key,
       rbValue: rbValue,
       color: color,
-      dateIndex: dateIndex,
+      day: day,
       value: value,
       isEditable: isEditable,
     );
@@ -85,8 +85,8 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> with AppMixin {
   void onChangeValue(int? value) {
     setState(() {
       if (widget.paramName.isEmpty) {
-        AppData.instance.updateAvailability(
-            dateIndex: widget.dateIndex, newValue: widget.rbValue);
+        AppData.instance
+            .updateAvailability(day: widget.day, newValue: widget.rbValue);
         AppEvents.fireSchemaUpdated();
       } else {
         AppEvents.fireTrainerPrefUpdated(widget.paramName, widget.rbValue);

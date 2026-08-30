@@ -147,11 +147,17 @@ TrainerSchema _buildTrainerSchema(Trainer trainer) {
 
   for (DateTime date in AppData.instance.getActiveDates()) {
     if (date.weekday == DateTime.tuesday) {
-      result.availableList.add(availTuesday);
+      AvailableData availableData =
+          AvailableData(day: date.day, value: availTuesday);
+      result.trainerAvailableList.add(availableData);
     } else if (date.weekday == DateTime.thursday) {
-      result.availableList.add(availThursday);
+      AvailableData availableData =
+          AvailableData(day: date.day, value: availThursday);
+      result.trainerAvailableList.add(availableData);
     } else if (date.weekday == DateTime.saturday) {
-      result.availableList.add(availSaturday);
+      AvailableData availableData =
+          AvailableData(day: date.day, value: availSaturday);
+      result.trainerAvailableList.add(availableData);
     }
   }
 

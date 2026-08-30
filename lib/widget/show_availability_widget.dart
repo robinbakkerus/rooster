@@ -81,32 +81,33 @@ class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
       bool addRow = AppHelper.instance
           .addSchemaEditRow(date, AppData.instance.getTrainer());
       if (addRow) {
-        result.add(DataRow(cells: _buildDataCells(dateIndex)));
+        result.add(DataRow(cells: _buildDataCells(day: date.day)));
       }
     }
 
     return result;
   }
 
-  List<DataCell> _buildDataCells(int dateIndex) {
+  List<DataCell> _buildDataCells({required int day}) {
     List<DataCell> result = [];
 
-    result.add(_buildDateDataCell(dateIndex));
-    result.add(_buildAvailableDataCell(dateIndex));
+    result.add(_buildDateDataCell(day: day));
+    result.add(_buildAvailableDataCell(day: day));
 
     return result;
   }
 
-  DataCell _buildDateDataCell(int dateIndex) {
-    DateTime dateTime = AppData.instance.getActiveDates()[dateIndex];
+  DataCell _buildDateDataCell({required int day}) {
+    DateTime dateTime = DateTime(AppData.instance.getActiveYear(),
+        AppData.instance.getActiveMonth(), day);
     String label = AppHelper.instance.getSimpleDayString(dateTime);
     return DataCell(Text(label));
   }
 
-  DataCell _buildAvailableDataCell(int dateIndex) {
+  DataCell _buildAvailableDataCell({required int day}) {
     int avail = 0;
     if (_isSchemaEntered()) {
-      avail = _getTrainerData().trainerSchemas.availableList[dateIndex];
+      avail = AppHelper.instance.getAvailability(widget.trainer, day);
     } else {
       avail = 1;
     }

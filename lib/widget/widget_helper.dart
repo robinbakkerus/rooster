@@ -67,11 +67,12 @@ class WidgetHelper {
   }
 
   ///-----------------------------
-  WidgetStateColor getDaySchemaRowColor(int dateIndex) {
+  WidgetStateColor getDaySchemaRowColor(int day) {
     WidgetStateColor col =
         WidgetStateColor.resolveWith((states) => Colors.white);
 
-    DateTime date = AppData.instance.getActiveDates()[dateIndex];
+    DateTime date = DateTime(AppData.instance.getActiveYear(),
+        AppData.instance.getActiveMonth(), day);
 
     if (date.weekday == DateTime.tuesday) {
       col = WidgetStateColor.resolveWith((states) => c.lonuDinsDag);

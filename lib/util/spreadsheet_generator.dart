@@ -50,7 +50,7 @@ class SpreadsheetGenerator with AppMixin {
 
     for (int i = 0; i < AppData.instance.getActiveDates().length; i++) {
       DateTime date = AppData.instance.getActiveDates()[i];
-      result.add(_genAvailableCountsForDate(i, date));
+      result.add(_genAvailableCountsForDate(date));
     }
 
     return result;
@@ -249,7 +249,7 @@ class SpreadsheetGenerator with AppMixin {
   }
 
   //--- here we fill which trainers are (not) available.
-  Available _genAvailableCountsForDate(int dateIndex, DateTime date) {
+  Available _genAvailableCountsForDate(DateTime date) {
     List<String> groupNames = getGroupNames(date);
     Available available = Available(date: date, groupCount: groupNames.length);
 
@@ -266,7 +266,7 @@ class SpreadsheetGenerator with AppMixin {
           _genCountsEmptySchema(groupPref, dayPref, availableCounts, trainer);
         } else {
           _genCountsForEnteredSchema(
-              trainerSchema, dateIndex, availableCounts, trainer, groupPref);
+              trainerSchema, date.day, availableCounts, trainer, groupPref);
         }
       }
 
@@ -287,21 +287,23 @@ class SpreadsheetGenerator with AppMixin {
     }
   }
 
-  void _genCountsForEnteredSchema(TrainerSchema trainerSchema, int dateIndex,
+  void _genCountsForEnteredSchema(TrainerSchema trainerSchema, int day,
       AvailableCounts availableCounts, Trainer trainer, int groupPref) {
-    if (trainerSchema.availableList.length > dateIndex &&
-        trainerSchema.availableList[dateIndex] == 0) {
-      availableCounts.notAvailable.add(trainer);
-    } else if (trainerSchema.availableList.length > dateIndex &&
-        trainerSchema.availableList[dateIndex] == 1) {
-      if (groupPref == 2) {
+    AvailableData? availableData = trainerSchema.trainerAvailableList
+        .firstWhereOrNull((e) => e.day == day);
+
+    if (availableData != null) {
+      if (availableData.value == 0) {
+        availableCounts.notAvailable.add(trainer);
+      } else if (availableData.value == 1) {
+        if (groupPref == 2) {
+          availableCounts.ifNeeded.add(trainer);
+        } else {
+          availableCounts.available.add(trainer);
+        }
+      } else if (availableData.value == 2) {
         availableCounts.ifNeeded.add(trainer);
-      } else {
-        availableCounts.available.add(trainer);
       }
-    } else if (trainerSchema.availableList.length > dateIndex &&
-        trainerSchema.availableList[dateIndex] == 2) {
-      availableCounts.ifNeeded.add(trainer);
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/authentication.dart';
 import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/service/dbs.dart';
+// import 'package:rooster/util/admin_helper.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,6 +59,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
             OutlinedButton(
                 onPressed: _updateFirebase,
                 child: const Text('Update Firebase')),
+            OutlinedButton(
+                onPressed: _updateTrainerSchemas,
+                child: const Text('Update Trainer schema in Firebase')),
           ],
         ),
       ),
@@ -279,4 +283,42 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     html += 'Gr Robin <br>';
     return '$html</div>';
   }
+
+  void _updateTrainerSchemas() async {
+    List<Trainer> trainers = await Dbs.instance.getAllTrainers();
+    for (Trainer trainer in trainers) {
+      for (int m = 8; m <= 12; m++) {
+        String trainerSchemaId = '${trainer.pk}_2026_$m';
+
+        TrainerSchema schema =
+            await Dbs.instance.getTrainerSchema(trainerSchemaId);
+        if (schema.id.isNotEmpty) {
+          log('Updating schema: $trainerSchemaId');
+          Dbs.instance.createOrUpdateTrainerSchemas(schema, updateSchema: true);
+          // await _updateTheTrainerSchema(schema);
+        }
+      }
+    }
+  }
+
+  // Future<void> _updateTheTrainerSchema(TrainerSchema schema) async {
+  //   log('schema: ${schema.id} ${schema.year} ${schema.month}');
+  //   log('schema is empty');
+  //   List<int> tueThuDays =
+  //       AdminHelper.instance.getTueThuDays(schema.year, schema.month);
+  //   List<int> tueThuSatDays =
+  //       AdminHelper.instance.getTueThuSatDays(schema.year, schema.month);
+
+  //   if (schema.availableList.length > tueThuSatDays.length) {
+  //     log('tueThuSatDays: $tueThuSatDays');
+  //     AdminHelper.instance.updateAvailabeList(schema, tueThuSatDays);
+  //   } else if (schema.availableList.length > 1) {
+  //     log('tueAndThursDays: $tueThuDays');
+  //     AdminHelper.instance.updateAvailabeList(schema, tueThuSatDays);
+  //   } else {
+  //     log('availableList length does not match tueThuDays or tueThuSatDays');
+  //   }
+
+  //   Dbs.instance.createOrUpdateTrainerSchemas(schema, updateSchema: true);
+  // }
 }

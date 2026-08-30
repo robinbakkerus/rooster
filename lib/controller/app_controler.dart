@@ -136,12 +136,14 @@ class AppController {
   }
 
   /// update all modified DaySchema's
-  Future<bool> updateTrainerSchemas() async {
-    TrainerSchema trainerSchemas =
+  Future<bool> updateTrainerSchema(
+      {required List<AvailableData> updatedAvailableDataList}) async {
+    TrainerSchema trainerSchema =
         AppData.instance.getTrainerData().trainerSchemas;
-    trainerSchemas.availableList = AppData.instance.newAvailaibleList;
+    trainerSchema.trainerAvailableList.clear();
+    trainerSchema.trainerAvailableList.addAll(updatedAvailableDataList);
     bool result = await Dbs.instance
-        .createOrUpdateTrainerSchemas(trainerSchemas, updateSchema: true);
+        .createOrUpdateTrainerSchemas(trainerSchema, updateSchema: true);
     getTrainerData(trainer: AppData.instance.getTrainer());
     return result;
   }

@@ -49,6 +49,21 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------
+  List<AvailableData> mapFromJsonList(List<dynamic> jsonList) {
+    var json = jsonList[0];
+    if (json == null) {
+      return [];
+    }
+    List<AvailableData> result = [];
+    for (var item in jsonList) {
+      if (item is Map<String, dynamic>) {
+        result.add(AvailableData.fromMap(item));
+      }
+    }
+    return result;
+  }
+
+  ///----------------------------------------
   String buildTrainerSchemaIdFromMap(Map<String, dynamic> map) {
     String result = "";
     result += map["trainerPk"];
@@ -61,9 +76,13 @@ class AppHelper with AppMixin {
   TrainerSchema buildNewSchemaForTrainer(Trainer trainer) {
     TrainerSchema result = TrainerSchema.ofTrainer(trainer: trainer);
 
-    for (DateTime dateTime in AppData.instance.getActiveDates()) {
+    List<DateTime> activeDates = AppData.instance.getActiveDates();
+
+    for (DateTime dateTime in activeDates) {
       int avail = trainer.getDayPrefValue(weekday: dateTime.weekday);
-      result.availableList.add(avail);
+      AvailableData availableData =
+          AvailableData(day: dateTime.day, value: avail);
+      result.trainerAvailableList.add(availableData);
     }
     return result;
   }
@@ -72,7 +91,7 @@ class AppHelper with AppMixin {
   List<DateTime> getDaysInBetween(DateTime startDate) {
     DateTime endDate = DateTime(startDate.year, startDate.month + 1, 1);
     List<DateTime> days = [];
-    for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+    for (int i = 0; i < endDate.difference(startDate).inDays; i++) {
       days.add(startDate.add(Duration(days: i)));
     }
     return days;
@@ -82,6 +101,16 @@ class AppHelper with AppMixin {
   DateTime getLastDayOfMonth(DateTime startDate) {
     List<DateTime> days = getDaysInBetween(startDate);
     return days[days.length - 1];
+  }
+
+  ///----------------------------------------
+  AvailableData getTrainerAvailableDataForDay(int day) {
+    AvailableData? availableData = AppData.instance
+        .getTrainerData()
+        .trainerSchemas
+        .trainerAvailableList
+        .firstWhereOrNull((e) => e.day == day);
+    return availableData ?? AvailableData(day: day, value: -1);
   }
 
   ///----------------------------------------//------------------
@@ -246,15 +275,19 @@ class AppHelper with AppMixin {
   }
 
   ///--------------------
-  int getAvailability(Trainer trainer, int rowIndex) {
+  int getAvailability(Trainer trainer, int day) {
     TrainerData? trainerData = AppData.instance
         .getAllTrainerData()
         .firstWhereOrNull((e) => e.trainer == trainer);
 
     if (trainerData != null && !trainerData.trainerSchemas.isEmpty()) {
-      return trainerData.trainerSchemas.availableList[rowIndex];
+      AvailableData? availableData = trainerData
+          .trainerSchemas.trainerAvailableList
+          .firstWhereOrNull((e) => e.day == day);
+      return availableData?.value ?? 0;
+    } else {
+      return 0;
     }
-    return 0;
   }
 
   ///---------------------------------------------

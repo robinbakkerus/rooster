@@ -318,8 +318,7 @@ class Trainer {
       }
     }
 
-    prefValues.add(TrainerPref(
-        paramName: AppConstants().maxTrainingCountPref, value: value));
+    prefValues.add(TrainerPref(paramName: paramName, value: value));
   }
 
   /// Returns the maximum training count value from preferences.
@@ -342,7 +341,7 @@ class TrainerSchema {
   final String trainerPk;
   final int year;
   final int month;
-  List<int> availableList = [];
+  List<AvailableData> trainerAvailableList = [];
   bool? isNew = true;
   DateTime? created;
   DateTime? modified;
@@ -356,7 +355,7 @@ class TrainerSchema {
     required this.trainerPk,
     required this.year,
     required this.month,
-    required this.availableList,
+    required this.trainerAvailableList,
     this.isNew,
     this.created,
     this.modified,
@@ -368,7 +367,7 @@ class TrainerSchema {
       'trainerPk': trainerPk,
       'year': year,
       'month': month,
-      'availabilities': availableList,
+      'availabilities': trainerAvailableList.map((x) => x.toMap()).toList(),
       'isNew': isNew,
       'created': created?.millisecondsSinceEpoch,
       'modified': modified?.millisecondsSinceEpoch,
@@ -381,7 +380,8 @@ class TrainerSchema {
         trainerPk: map['trainerPk'],
         year: map['year'],
         month: map['month'],
-        availableList: List<int>.from(map['availabilities']),
+        trainerAvailableList:
+            AppHelper.instance.mapFromJsonList(map['availabilities']),
         isNew: map['isNew'],
         created: AppHelper.instance.parseDateTime(map['created']),
         modified: AppHelper.instance.parseDateTime(map['modified']));
@@ -405,7 +405,7 @@ class TrainerSchema {
         trainerPk: '',
         year: 2025,
         month: 1,
-        availableList: [],
+        trainerAvailableList: [],
         isNew: true,
         modified: null);
   }
@@ -417,7 +417,7 @@ class TrainerSchema {
         trainerPk: trainer.pk,
         year: AppData.instance.getActiveYear(),
         month: AppData.instance.getActiveMonth(),
-        availableList: [],
+        trainerAvailableList: [],
         isNew: true,
         modified: null,
         created: DateTime.now());
@@ -431,6 +431,46 @@ class TrainerSchema {
   String toJson() => json.encode(toMap());
   factory TrainerSchema.fromJson(String source) =>
       TrainerSchema.fromMap(json.decode(source));
+}
+
+///-------------
+class AvailableData {
+  final int day;
+  int value = 0;
+
+  AvailableData({required this.day, this.value = 0});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'day': day,
+      'value': value,
+    };
+  }
+
+  AvailableData clone({
+    int? day,
+    int? value,
+  }) {
+    return AvailableData(
+      day: day ?? this.day,
+      value: value ?? this.value,
+    );
+  }
+
+  factory AvailableData.fromMap(Map<String, dynamic> map) {
+    return AvailableData(
+      day: map['day'],
+      value: map['value'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory AvailableData.fromJson(String source) =>
+      AvailableData.fromMap(json.decode(source));
+
+  @override
+  String toString() => 'AvailableData(day: $day, value: $value)';
 }
 
 ///----------
@@ -482,7 +522,6 @@ class Available {
 
   Available({required this.date, required int groupCount}) {
     for (int i = 0; i < groupCount; i++) {
-      List<AvailableCounts> counts = [];
       counts.add(AvailableCounts());
     }
   }
@@ -1053,7 +1092,7 @@ class TrainingGroup {
 
   @override
   String toString() {
-    return 'TrainingGroup(name: $name, description: $description, startDate: $getStartDate(), endDate: $getEndDate(), type: $type, trainingDays: $trainingDays,  defaultTrainingText: $defaultTrainingText)';
+    return 'TrainingGroup(name: $name, description: $description, startDate: ${getStartDate()}, endDate: ${getEndDate()}, type: $type, trainingDays: $trainingDays, defaultTrainingText: $defaultTrainingText)';
   }
 
   @override

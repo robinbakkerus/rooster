@@ -83,8 +83,8 @@ class FirestoreHelper with AppMixin implements Dbs {
   /// receive all data used for editSchema view
   @override
   Future<TrainerSchema> getTrainerSchema(String trainerSchemaId) async {
-    TrainerSchema schemas = await _getTheTrainerSchema(trainerSchemaId);
-    return schemas;
+    TrainerSchema trainerSchema = await _getTheTrainerSchema(trainerSchemaId);
+    return trainerSchema;
   }
 
   /// update the available value of the given DaySchema
