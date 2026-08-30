@@ -381,7 +381,7 @@ class TrainerSchema {
         year: map['year'],
         month: map['month'],
         trainerAvailableList:
-            AppHelper.instance.mapFromJsonList(map['availabilities']),
+            AppHelper.instance.mapFromJsonList(jsonList: map['availabilities']),
         isNew: map['isNew'],
         created: AppHelper.instance.parseDateTime(map['created']),
         modified: AppHelper.instance.parseDateTime(map['modified']));

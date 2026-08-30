@@ -284,6 +284,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     return '$html</div>';
   }
 
+  //----------------------------------------
   void _updateTrainerSchemas() async {
     List<Trainer> trainers = await Dbs.instance.getAllTrainers();
     for (Trainer trainer in trainers) {
@@ -295,30 +296,8 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         if (schema.id.isNotEmpty) {
           log('Updating schema: $trainerSchemaId');
           Dbs.instance.createOrUpdateTrainerSchemas(schema, updateSchema: true);
-          // await _updateTheTrainerSchema(schema);
         }
       }
     }
   }
-
-  // Future<void> _updateTheTrainerSchema(TrainerSchema schema) async {
-  //   log('schema: ${schema.id} ${schema.year} ${schema.month}');
-  //   log('schema is empty');
-  //   List<int> tueThuDays =
-  //       AdminHelper.instance.getTueThuDays(schema.year, schema.month);
-  //   List<int> tueThuSatDays =
-  //       AdminHelper.instance.getTueThuSatDays(schema.year, schema.month);
-
-  //   if (schema.availableList.length > tueThuSatDays.length) {
-  //     log('tueThuSatDays: $tueThuSatDays');
-  //     AdminHelper.instance.updateAvailabeList(schema, tueThuSatDays);
-  //   } else if (schema.availableList.length > 1) {
-  //     log('tueAndThursDays: $tueThuDays');
-  //     AdminHelper.instance.updateAvailabeList(schema, tueThuSatDays);
-  //   } else {
-  //     log('availableList length does not match tueThuDays or tueThuSatDays');
-  //   }
-
-  //   Dbs.instance.createOrUpdateTrainerSchemas(schema, updateSchema: true);
-  // }
 }

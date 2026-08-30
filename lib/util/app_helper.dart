@@ -49,15 +49,25 @@ class AppHelper with AppMixin {
   }
 
   ///----------------------------------------
-  List<AvailableData> mapFromJsonList(List<dynamic> jsonList) {
+  List<AvailableData> mapFromJsonList({required List<dynamic> jsonList}) {
     var json = jsonList[0];
-    if (json == null) {
-      return [];
-    }
     List<AvailableData> result = [];
-    for (var item in jsonList) {
-      if (item is Map<String, dynamic>) {
-        result.add(AvailableData.fromMap(item));
+    if (json == null || jsonList.isEmpty) {
+      return result;
+    }
+
+    if (json is Map<String, dynamic>) {
+      for (var item in jsonList) {
+        if (item is Map<String, dynamic>) {
+          result.add(AvailableData.fromMap(item));
+        }
+      }
+    } else {
+      List<DateTime> activeDates = AppData.instance.getActiveDates();
+      for (int i = 0; i < activeDates.length; i++) {
+        int day = activeDates[i].day;
+        int value = jsonList[i];
+        result.add(AvailableData(day: day, value: value));
       }
     }
     return result;
