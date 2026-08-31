@@ -2,6 +2,7 @@ import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:rooster/widget/accesscode_widget.dart';
 import 'package:rooster/widget/send_accesscode_widget.dart';
 
 class AskAccessCodePage extends StatefulWidget {
@@ -12,32 +13,11 @@ class AskAccessCodePage extends StatefulWidget {
 }
 
 class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
-  final List<TextEditingController> _textCtrls = [];
-  final List<FocusNode> _focusNodes = [];
-
   bool _findTriggered = false;
 
   @override
   void initState() {
     super.initState();
-    _setup();
-  }
-
-  void _setup() {
-    for (int i = 0; i < 4; i++) {
-      _textCtrls.add(TextEditingController());
-      _textCtrls[i].addListener(_onTextFieldChanged);
-      _focusNodes.add(FocusNode());
-    }
-  }
-
-  @override
-  void dispose() {
-    for (int i = 0; i < 4; i++) {
-      _textCtrls[i].dispose();
-      _focusNodes[i].dispose();
-    }
-    super.dispose();
   }
 
   @override
@@ -62,18 +42,15 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                 Container(
                   height: 20,
                 ),
-                SizedBox(
-                  width: 500,
-                  height: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTextField(0),
-                      _buildTextField(1),
-                      _buildTextField(2),
-                      _buildTextField(3),
-                    ],
-                  ),
+                AccessCodeWidget(
+                  length: 4,
+                  boxSize: 70,
+                  spacing: 10,
+                  onChanged: (value) {
+                    if (value.length == 4 && !_findTriggered) {
+                      _findTrainer(value);
+                    }
+                  },
                 ),
                 wh.verSpace(10),
                 TextButton(
@@ -82,6 +59,7 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
                       'Toegangscode vergeten ?',
                       style: TextStyle(color: Colors.red),
                     )),
+                wh.verSpace(20),
               ],
             ),
           ),
@@ -90,48 +68,48 @@ class _AskAccessCodePageState extends State<AskAccessCodePage> with AppMixin {
     );
   }
 
-  Widget _buildTextField(int index) {
-    bool autoFocus = index == 0;
-    TextEditingController ctrl = _textCtrls[index];
-    return SizedBox(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: TextField(
-          autofocus: autoFocus,
-          textAlign: TextAlign.center,
-          textAlignVertical: TextAlignVertical.top,
-          focusNode: _focusNodes[index],
-          controller: _textCtrls[index],
-          textCapitalization: TextCapitalization.characters,
-          onChanged: (value) {
-            if (ctrl.text != value.toUpperCase()) {
-              ctrl.value = ctrl.value.copyWith(text: value.toUpperCase());
-            }
+  // Widget _buildTextField(int index) {
+  //   bool autoFocus = index == 0;
+  //   TextEditingController ctrl = _textCtrls[index];
+  //   return SizedBox(
+  //     width: 60,
+  //     height: 60,
+  //     child: Center(
+  //       child: TextField(
+  //         autofocus: autoFocus,
+  //         textAlign: TextAlign.center,
+  //         textAlignVertical: TextAlignVertical.top,
+  //         focusNode: _focusNodes[index],
+  //         controller: _textCtrls[index],
+  //         textCapitalization: TextCapitalization.characters,
+  //         onChanged: (value) {
+  //           if (ctrl.text != value.toUpperCase()) {
+  //             ctrl.value = ctrl.value.copyWith(text: value.toUpperCase());
+  //           }
 
-            if (index < 3 && ctrl.text.isNotEmpty) {
-              _focusNodes[index + 1].requestFocus();
-            }
-          },
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
-    );
-  }
+  //           if (index < 3 && ctrl.text.isNotEmpty) {
+  //             _focusNodes[index + 1].requestFocus();
+  //           }
+  //         },
+  //         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 45),
+  //         decoration: const InputDecoration(
+  //           border: OutlineInputBorder(),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  void _onTextFieldChanged() async {
-    String text = '';
-    for (int i = 0; i < 4; i++) {
-      text += _textCtrls[i].text;
-    }
-    if (text.length == 4 && !_findTriggered) {
-      String accessCode = text.toUpperCase();
-      await _findTrainer(accessCode);
-    }
-  }
+  // void _onTextFieldChanged() async {
+  //   String text = '';
+  //   for (int i = 0; i < 4; i++) {
+  //     text += _textCtrls[i].text;
+  //   }
+  //   if (text.length == 4 && !_findTriggered) {
+  //     String accessCode = text.toUpperCase();
+  //     await _findTrainer(accessCode);
+  //   }
+  // }
 
   Future<void> _findTrainer(String accesscode) async {
     _findTriggered = true;
