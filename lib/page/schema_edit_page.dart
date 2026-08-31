@@ -23,6 +23,10 @@ class SchemaEditPage extends StatefulWidget {
 class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   _SchemaEditPageState();
 
+// hier worden de nieuwe beschikbaarheden van de trainer opgeslagen, todat deze worden geSAVEd
+  // daarna wordt de nieuwe lijst gekopieerd naar de _trainerData.trainerSchemas.availableDataList
+  List<AvailableData> _updatedAvailableDataList = [];
+
   @override
   void initState() {
     AppEvents.onTrainerDataReadyEvent(_onTrainerReady);
@@ -42,7 +46,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
   void _handleReadyEvent() {
     if (mounted) {
       setState(() {
-        AppData.instance.cloneAvailableDataList();
+        _updatedAvailableDataList = AppData.instance.cloneAvailableDataList();
       });
     }
 
@@ -55,7 +59,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     if (mounted) {
       setState(() {
         AppData.instance.cloneAvailableDataList();
-        if (AppData.instance.isSchemaDirty()) {
+        if (_isSchemaDirty()) {
           wh.playWhooshSound();
         }
       });
@@ -165,24 +169,22 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
       required int availableValue}) {
     return DataCell(RadioButtonWidget.forAvailability(
       key: UniqueKey(),
-      day: day,
-      value: availableValue,
-      rbValue: value,
-      color: color,
+      availableData: _getAvailableDataForDay(day),
+      buttomValue: value,
       isEditable: _isEditable(),
     ));
   }
 
   //----------------------------------------
   AvailableData _getAvailableDataForDay(int day) {
-    AvailableData? availableData = AppData.instance.newAvailaibleDataList
-        .firstWhereOrNull((e) => e.day == day);
+    AvailableData? availableData =
+        _updatedAvailableDataList.firstWhereOrNull((e) => e.day == day);
     return availableData ?? AvailableData(day: day, value: -1);
   }
 
   //----------------------------------------
   Widget? _buildFab() {
-    if (AppData.instance.isSchemaDirty() && _isEditable()) {
+    if (_isSchemaDirty() && _isEditable()) {
       return FloatingActionButton(
         onPressed: _onSaveSchema,
         hoverColor: Colors.greenAccent,
@@ -195,7 +197,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
 
   void _onSaveSchema() async {
     bool result = await AppController.instance.updateTrainerSchema(
-        updatedAvailableDataList: AppData.instance.newAvailaibleDataList);
+        updatedAvailableDataList: _updatedAvailableDataList);
     if (result) {
       wh.showSnackbar('Met succes wijzigingen opgeslagen!',
           color: Colors.lightGreen);
@@ -224,6 +226,20 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     }
 
     wh.showSnackbar(msg, color: col, seconds: seconds);
+  }
+
+  ///-----------------------------------
+  bool _isSchemaDirty() {
+    for (int i = 0; i < _updatedAvailableDataList.length; i++) {
+      AvailableData newAvailableData = _updatedAvailableDataList[i];
+      AvailableData oldAvailableData = AppHelper.instance
+          .getTrainerAvailableDataForDay(newAvailableData.day);
+
+      if (oldAvailableData.value != newAvailableData.value) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

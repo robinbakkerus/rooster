@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:rooster/data/app_version.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/util/app_helper.dart';
@@ -82,9 +80,6 @@ class AppData {
   }
 
   TrainerData _trainerData = TrainerData.empty();
-  // hier worden de nieuwe beschikbaarheden van de trainer opgeslagen, todat deze worden geSAVEd
-  // daarna wordt de nieuwe lijst gekopieerd naar de _trainerData.trainerSchemas.availableDataList
-  List<AvailableData> newAvailaibleDataList = [];
   List<TrainerData> _allTrainerData = [];
 
   TrainerData getTrainerData() {
@@ -163,39 +158,11 @@ class AppData {
     return maanden[getActiveMonth() - 1];
   }
 
-  ///--- update the avavailability in the newAvailabilities list
-  void updateAvailability({required int day, required int newValue}) {
-    AvailableData availableData = newAvailaibleDataList.firstWhere(
-        (e) => e.day == day,
-        orElse: () => AvailableData(day: day, value: 0));
-    availableData.value = newValue;
-    log('updated');
-
-    AvailableData oldAvailableData =
-        AppHelper.instance.getTrainerAvailableDataForDay(day);
-    log(oldAvailableData.toString());
-  }
-
   //--- update the trainer preference value
   void updateTrainerPref(String paramName, int newValue) {
     Map<String, dynamic> map = _trainerData.trainer.toMap();
     map[paramName] = newValue;
     _trainerData.trainer = Trainer.fromMap(map);
-  }
-
-  ///-----------------------------------
-  bool isSchemaDirty() {
-    for (int i = 0; i < AppData.instance.newAvailaibleDataList.length; i++) {
-      AvailableData newAvailableData =
-          AppData.instance.newAvailaibleDataList[i];
-      AvailableData oldAvailableData = AppHelper.instance
-          .getTrainerAvailableDataForDay(newAvailableData.day);
-
-      if (oldAvailableData.value != newAvailableData.value) {
-        return true;
-      }
-    }
-    return false;
   }
 
   bool isTrainerForGroup(Trainer trainer, String groupName) {
@@ -205,6 +172,10 @@ class AppData {
   // return the ExcludePeriod for this year
   SpecialPeriod getSummerPeriod() {
     return specialDays.summerPeriod;
+  }
+
+  void _setTrainerData(TrainerData trainerData) {
+    _trainerData = trainerData;
   }
 
   //----------------------------------------------
@@ -235,10 +206,4 @@ class AppData {
   ];
 
   //---------- private --------------
-
-  void _setTrainerData(TrainerData trainerData) {
-    _trainerData = trainerData;
-
-    newAvailaibleDataList = cloneAvailableDataList();
-  }
 }
