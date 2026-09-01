@@ -67,7 +67,7 @@ class AppHelper with AppMixin {
       List<DateTime> activeDates = AppData.instance.getActiveDates();
       for (int i = 0; i < activeDates.length; i++) {
         int day = activeDates[i].day;
-        int value = jsonList[i];
+        int value = i < jsonList.length ? jsonList[i] : 0;
         result.add(AvailableData(day: day, value: value));
       }
     }

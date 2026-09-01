@@ -134,14 +134,19 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         FirestoreHelper.instance.collectionRef(FsCol.logs);
     bool firstOne =
         true; // dont remove all logs becauce then de whole table is gone
-    await logRef.get().then((querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (!firstOne) {
-          doc.reference.delete();
+    try {
+      await logRef.get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          if (!firstOne) {
+            doc.reference.delete();
+          }
+          firstOne = false;
         }
-        firstOne = false;
-      }
-    });
+      });
+    } catch (e, stackTrace) {
+      log('Error deleting old logs: $e');
+      log(stackTrace.toString());
+    }
   }
 
   void _deleteOldErrors() async {
@@ -149,34 +154,51 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         FirestoreHelper.instance.collectionRef(FsCol.error);
     bool firstOne =
         true; // dont remove all logs becauce then de whole table is gone
-    await logRef.get().then((querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (!firstOne) {
-          doc.reference.delete();
+    try {
+      await logRef.get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          if (!firstOne) {
+            doc.reference.delete();
+          }
+          firstOne = false;
         }
-        firstOne = false;
-      }
-    });
+      });
+    } catch (e, stackTrace) {
+      log('Error deleting old errors: $e');
+      log(stackTrace.toString());
+    }
   }
 
   void _deleteOldSchemaAndSpreadsheet() async {
-    await _deleteOldSchemas();
-    await _deleteOldSpreadsheets();
+    try {
+      await _deleteOldSchemas();
+      await _deleteOldSpreadsheets();
+    } catch (e, stackTrace) {
+      log('Error deleting old schemas and spreadsheets: $e');
+      log(stackTrace.toString());
+    }
   }
 
   Future<void> _deleteOldSchemas() async {
     CollectionReference schemaRef =
         FirestoreHelper.instance.collectionRef(FsCol.schemas);
-    await schemaRef.get().then((querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        TrainerSchema schema =
-            TrainerSchema.fromMap(doc.data() as Map<String, dynamic>);
-        if (schema.year < DateTime.now().year) {
-          log('Deleting old schema: ${schema.id}');
-          doc.reference.delete();
+    try {
+      await schemaRef.get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          TrainerSchema schema =
+              TrainerSchema.fromMap(doc.data() as Map<String, dynamic>);
+          if (schema.year < DateTime.now().year ||
+              (schema.year == DateTime.now().year &&
+                  schema.month < DateTime.now().month - 4)) {
+            log('Deleting old schema: ${schema.id}');
+            doc.reference.delete();
+          }
         }
-      }
-    });
+      });
+    } catch (e, stackTrace) {
+      log('Error deleting old schemas: $e');
+      log(stackTrace.toString());
+    }
   }
 
   Future<void> _deleteOldSpreadsheets() async {
@@ -186,7 +208,9 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       for (var doc in querySnapshot.docs) {
         FsSpreadsheet spreadsheet =
             FsSpreadsheet.fromMap(doc.data() as Map<String, dynamic>);
-        if (spreadsheet.year < DateTime.now().year) {
+        if (spreadsheet.year < DateTime.now().year ||
+            (spreadsheet.year == DateTime.now().year &&
+                spreadsheet.month < DateTime.now().month - 4)) {
           log('Deleting old spreadsheet: ${spreadsheet.year} ${spreadsheet.month}');
           doc.reference.delete();
         }
