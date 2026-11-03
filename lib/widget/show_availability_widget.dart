@@ -24,48 +24,57 @@ class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.trainer.firstName(),
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-          ),
-          _buildWhenEntered(),
-          wh.verSpace(10),
-          _buildGrid(),
+          Row(children: [
+            Text(
+              widget.trainer.firstName(),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+            ),
+            wh.horSpace(10),
+            _buildWhenEntered(),
+          ]),
+          wh.verSpace(5),
+          _buildDayAvailableGrid(),
+          wh.verSpace(5),
+          _buildTrainerPrefGrid(groupNames, _buildGroupPrefs()),
+          wh.verSpace(5),
+          _buildTrainerPrefGrid(dayNames, _buildDayPrefs()),
+          wh.verSpace(5),
+          _buildMaxPref(),
         ],
       ),
     );
   }
 
-  Widget _buildGrid() {
+  //-------------------------
+  Widget _buildDayAvailableGrid() {
     double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        headingRowHeight: 30,
+        headingRowHeight: 20,
         horizontalMargin: 10,
         headingRowColor: WidgetStateColor.resolveWith((states) => c.lightblue),
         columnSpacing: colSpace,
         dataRowMinHeight: 15,
-        dataRowMaxHeight: 30,
-        columns: _buildHeader(),
+        dataRowMaxHeight: 25,
+        columns: _buildGridHeader(['Dag', 'Beschikbaar']),
         rows: _buildDataRows(),
       ),
     );
   }
 
   //-------------------------
-  List<DataColumn> _buildHeader() {
+  List<DataColumn> _buildGridHeader(List<String> headerLabels) {
     List<DataColumn> result = [];
 
-    var headerLabels = ['Dag', 'Beschikbaar'];
-
     for (int i = 0; i < headerLabels.length; i++) {
+      String label = headerLabels[i].toLowerCase();
+      label = label.length > 3 ? label.substring(0, 3) : label;
       result.add(DataColumn(
           label: Container(
         color: c.lightblue,
-        child: Text(headerLabels[i],
-            style: const TextStyle(fontStyle: FontStyle.italic)),
+        child: Text(label, style: const TextStyle(fontStyle: FontStyle.italic)),
       )));
     }
     return result;
@@ -112,18 +121,22 @@ class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
       avail = 1;
     }
 
+    Icon icon = _buildIcon(avail);
+
+    return DataCell(Center(child: icon));
+  }
+
+  Icon _buildIcon(int value) {
     Icon icon = const Icon(Icons.done, color: Colors.green);
-    if (avail == 0) {
+    if (value == 0) {
       icon = const Icon(Icons.block, color: Colors.red);
-    } else if (avail == 2) {
+    } else if (value == 2) {
       icon = const Icon(
         Icons.change_history,
         color: Colors.brown,
-        // weight: 5,
       );
     }
-
-    return DataCell(Center(child: icon));
+    return icon;
   }
 
   TrainerData _getTrainerData() {
@@ -146,4 +159,56 @@ class _ShowAvailabilityWidgetState extends State<ShowAvailabilityWidget>
       return const Text('Nog niet ingevuld');
     }
   }
+
+  //-------------------------
+  Widget _buildTrainerPrefGrid(List<String> headerLabels, List<DataRow> rows) {
+    double colSpace = AppHelper.instance.isWindows() ? 30 : 15;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        headingRowHeight: 20,
+        horizontalMargin: 10,
+        headingRowColor: WidgetStateColor.resolveWith((states) => c.lightblue),
+        columnSpacing: colSpace,
+        dataRowMinHeight: 15,
+        dataRowMaxHeight: 25,
+        columns: _buildGridHeader(headerLabels),
+        rows: rows,
+      ),
+    );
+  }
+
+  List<DataRow> _buildGroupPrefs() {
+    List<DataCell> rowCells = [];
+    for (String groupName in groupNames) {
+      int prefValue = widget.trainer.getPrefValue(paramName: groupName);
+      rowCells.add(DataCell(_buildIcon(prefValue)));
+    }
+
+    List<DataRow> result = [];
+    result.add(DataRow(cells: rowCells));
+    return result;
+  }
+
+  List<DataRow> _buildDayPrefs() {
+    List<DataCell> rowCells = [];
+    for (String day in dayNames) {
+      int prefValue = widget.trainer.getPrefValue(paramName: day);
+      rowCells.add(DataCell(_buildIcon(prefValue)));
+    }
+
+    List<DataRow> result = [];
+    result.add(DataRow(cells: rowCells));
+    return result;
+  }
+
+  Widget _buildMaxPref() {
+    int maxPref = widget.trainer.getPrefValue(paramName: 'max');
+    String text = maxPref > 0 ? 'Max = $maxPref' : 'Max = -1 (niet ingevuld)';
+    return Text(text);
+  }
+
+  //-------------------------
+  final dayNames = ['dinsdag', 'donderdag', 'zaterdag', 'sg'];
+  final groupNames = ['pr', 'r1', 'r2', 'r3'];
 }

@@ -296,7 +296,7 @@ class AppController {
         if (available.counts.length > c) {
           cell.availableCounts = available.counts[c];
         } else {
-          cell.availableCounts = AvailableCounts();
+          cell.availableCounts = AvailableCounts(date: row.date);
         }
         row.rowCells.add(cell);
       }

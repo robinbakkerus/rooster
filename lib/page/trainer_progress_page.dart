@@ -15,6 +15,7 @@ class TrainerProgressPage extends StatefulWidget {
   State<TrainerProgressPage> createState() => _TrainerProgressPageState();
 }
 
+//-----------------------------------
 class _TrainerProgressPageState extends State<TrainerProgressPage>
     with AppMixin {
   // varbs

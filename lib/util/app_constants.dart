@@ -47,4 +47,9 @@ Het kan nog volledig worden gewijzigd!
 
   final String maxTrainingCountPref = 'max';
   final int maxTrainingCountDefault = 10;
+
+  //-- values to add to the rank of a trainer when he/she is scheduled for a training on a day that is not his/her preferred day.
+  final int applyOnlyIfNeeded = -10;
+  final int applyAlreadyScheduled = -2;
+  final int applyAlreadyScheduledThisWeek = -5;
 }

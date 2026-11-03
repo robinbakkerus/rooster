@@ -17,6 +17,7 @@ class SpreadsheetTopButtons extends StatelessWidget {
           _buildButton('Schema', PageEnum.spreadSheet, 0),
           _buildButton('Voortgang', PageEnum.progess, 1),
           _buildButton('Beschikbaarheid', PageEnum.availability, 2),
+          _buildButton('Aantal trainingen', PageEnum.scheduledCount, 3),
         ],
       ),
     );

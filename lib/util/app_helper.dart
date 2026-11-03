@@ -146,7 +146,7 @@ class AppHelper with AppMixin {
       FirestoreHelper.instance.handleError(ex, stackTrace);
     }
 
-    return AvailableCounts();
+    return AvailableCounts(date: dateTime);
   }
 
   ///-----------------

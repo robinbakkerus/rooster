@@ -16,6 +16,7 @@ import 'package:rooster/page/spreadsheet_page.dart';
 import 'package:rooster/admin_pages/supervisor_page.dart';
 import 'package:rooster/page/trainer_prefs_page.dart';
 import 'package:rooster/page/trainer_progress_page.dart';
+import 'package:rooster/page/trainer_scheduled_count.dart';
 import 'package:rooster/util/app_constants.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/spreadsheet_status_help.dart' as status_help;
@@ -82,6 +83,7 @@ class _StartPageState extends State<StartPage> {
           const SpreadsheetPage(), //4
           const TrainerProgressPage(), //5
           const OverallAvailabilityPage(), //6
+          const TrainerScheduledCount(), //7
           const AppErrorPage(), //8
         ],
       ),

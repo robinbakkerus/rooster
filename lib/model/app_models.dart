@@ -18,6 +18,7 @@ enum LogAction {
   modifyTrainerField;
 }
 
+/// Note see the build() command in StartPage, where the index of the page is used to show the correct page!
 enum PageEnum {
   splashPage(0),
   askAccessCode(1),
@@ -26,10 +27,11 @@ enum PageEnum {
   spreadSheet(4),
   progess(5),
   availability(6),
-  helpPage(7),
-  adminPage(8),
-  errorPage(9),
-  supervisorPage(10);
+  scheduledCount(7),
+  helpPage(8),
+  adminPage(9),
+  errorPage(10),
+  supervisorPage(11);
 
   const PageEnum(this.code);
   final int code;
@@ -493,6 +495,17 @@ class TrainerData {
 ///---------------------------
 
 class AvailableCounts {
+  final DateTime date;
+
+  AvailableCounts({required this.date}) {
+    available = [];
+    availableBnye = [];
+    ifNeeded = [];
+    ifNeededBnye = [];
+    notAvailable = [];
+    notAvailableBnye = [];
+  }
+
   List<Trainer> available = [];
   List<Trainer> availableBnye = []; //but not yet entered
   List<Trainer> ifNeeded = [];
@@ -511,7 +524,20 @@ class AvailableCounts {
 
   @override
   String toString() {
-    return 'AvailableCounts(available: $available, availableBnye: $availableBnye, ifNeeded: $ifNeeded, ifNeededBnye: $ifNeededBnye, notAvailable: $notAvailable, notAvailableBnye: $notAvailableBnye)';
+    String s = 'AvailableCounts: day = ${date.day} '
+        'a = ${_listToString(available, availableBnye)} ifn = ${_listToString(ifNeeded, ifNeededBnye)} na = ${_listToString(notAvailable, notAvailableBnye)}';
+    return s;
+  }
+
+  String _listToString(List<Trainer> trainers, List<Trainer> trainersBnye) {
+    String result = '';
+    for (Trainer trainer in trainers) {
+      result += '${trainer.firstName()}, ';
+    }
+    for (Trainer trainer in trainersBnye) {
+      result += '${trainer.firstName()}, ';
+    }
+    return result;
   }
 }
 
@@ -525,13 +551,13 @@ class Available {
 
   Available({required this.date, required int groupCount}) {
     for (int i = 0; i < groupCount; i++) {
-      counts.add(AvailableCounts());
+      counts.add(AvailableCounts(date: date));
     }
   }
 
   @override
   String toString() {
-    return 'Available(date: $date ';
+    return 'Available(date: $date, counts: $counts)';
   }
 
   @override
@@ -552,23 +578,16 @@ class Available {
 class MetaPlanRankValues {
   List<PlanRankStartValue> startValues = [];
   List<PlanRankStartValue> zamoStartValues = [];
-  double onlyIfNeeded = -15;
-  // the first [0] value is the default value, the [1] value means 1 training day before etc (see Firestore dbs )
-  List<double> alreadyScheduled = [];
 
   MetaPlanRankValues({
     required this.startValues,
     required this.zamoStartValues,
-    required this.onlyIfNeeded,
-    required this.alreadyScheduled,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'startValues': startValues.map((x) => x.toMap()).toList(),
       'zamoStartValues': zamoStartValues.map((x) => x.toMap()).toList(),
-      'onlyIfNeeded': onlyIfNeeded,
-      'alreadyScheduled': alreadyScheduled,
     };
   }
 
@@ -578,14 +597,12 @@ class MetaPlanRankValues {
           map['startValues']?.map((x) => PlanRankStartValue.fromMap(x))),
       zamoStartValues: List<PlanRankStartValue>.from(
           map['zamoStartValues']?.map((x) => PlanRankStartValue.fromMap(x))),
-      onlyIfNeeded: map['onlyIfNeeded'],
-      alreadyScheduled: List<double>.from(map['alreadyScheduled']),
     );
   }
 
   @override
   String toString() {
-    return 'PlanRankValues(startValues: $startValues, zamoStartValues: $zamoStartValues, onlyIfNeeded: $onlyIfNeeded, alreadyScheduled: $alreadyScheduled)';
+    return 'PlanRankValues(startValues: $startValues, zamoStartValues: $zamoStartValues)';
   }
 
   @override
@@ -594,38 +611,30 @@ class MetaPlanRankValues {
 
     return other is MetaPlanRankValues &&
         listEquals(other.startValues, startValues) &&
-        listEquals(other.zamoStartValues, zamoStartValues) &&
-        other.onlyIfNeeded == onlyIfNeeded &&
-        listEquals(other.alreadyScheduled, alreadyScheduled);
+        listEquals(other.zamoStartValues, zamoStartValues);
   }
 
   @override
   int get hashCode {
-    return startValues.hashCode ^
-        zamoStartValues.hashCode ^
-        onlyIfNeeded.hashCode ^
-        alreadyScheduled.hashCode;
+    return startValues.hashCode ^ zamoStartValues.hashCode;
   }
 
   MetaPlanRankValues copyWith({
     List<PlanRankStartValue>? startValues,
     List<PlanRankStartValue>? zamoStartValues,
-    double? onlyIfNeeded,
-    List<double>? alreadyScheduled,
+    int? onlyIfNeeded,
+    List<int>? alreadyScheduled,
   }) {
     return MetaPlanRankValues(
-      startValues: startValues ?? this.startValues,
-      zamoStartValues: zamoStartValues ?? this.zamoStartValues,
-      onlyIfNeeded: onlyIfNeeded ?? this.onlyIfNeeded,
-      alreadyScheduled: alreadyScheduled ?? this.alreadyScheduled,
-    );
+        startValues: startValues ?? this.startValues,
+        zamoStartValues: zamoStartValues ?? this.zamoStartValues);
   }
 }
 
 ///------------ PlanRankStartValue
 class PlanRankStartValue {
   final String trainerPk;
-  final double value;
+  final int value;
 
   PlanRankStartValue({
     required this.trainerPk,
@@ -771,7 +780,7 @@ class SheetRow {
 class RowCell {
   final int rowIndex;
   final int colIndex;
-  AvailableCounts availableCounts = AvailableCounts();
+  AvailableCounts availableCounts = AvailableCounts(date: DateTime.now());
   List<TrainerPlanningRank> trainerRanks = [];
   Trainer _trainer = Trainer.empty();
   String text = '';
@@ -789,8 +798,7 @@ class RowCell {
     RowCell result = RowCell(rowIndex: rowIndex, colIndex: colIndex);
     result.setTrainer(getTrainer());
     result.text = text;
-    result.availableCounts =
-        availableCounts; // we dont need to clone these onea
+    result.availableCounts = availableCounts; // we dont need to clone these one
     result.trainerRanks = trainerRanks; // and this one
     return result;
   }
@@ -874,7 +882,7 @@ class LastRosterFinal {
 
 class TrainerPlanningRank {
   final Trainer trainer;
-  double rank = 100.0;
+  int rank = 100;
   TrainerPlanningRank({
     required this.trainer,
     required this.rank,
