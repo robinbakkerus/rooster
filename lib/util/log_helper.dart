@@ -6,7 +6,7 @@ class LogHelper {
   static final LogHelper _instance = LogHelper._internal();
 
   factory LogHelper() => _instance;
-  final bool isDebug = false;
+  final bool isDebug = false; // Set to true to enable logging, false to disable
 
   LogHelper._internal();
 

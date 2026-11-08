@@ -292,9 +292,15 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   //----------------------------
   Widget _buildActionButtonsNewSpreadsheet() {
     if (_isSupervisor()) {
-      return OutlinedButton(
-          onPressed: _onConfirmFinalizeSpreadsheet,
-          child: const Text('Maak schema definitief'));
+      return Row(
+        children: [
+          OutlinedButton(
+              onPressed: _saveNewSpreadsheet, child: const Text('Sla op')),
+          OutlinedButton(
+              onPressed: _onConfirmFinalizeSpreadsheet,
+              child: const Text('Maak schema definitief ')),
+        ],
+      );
     } else {
       return Container();
     }
@@ -316,7 +322,7 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
   }
 
   void _onConfirmFinalizeSpreadsheet() {
-    _buildDialogConfirm(context, _areProgramFieldSet());
+    _makeSpreadFinalAfterConfirm(context, _areProgramFieldSet());
   }
 
   void _saveSpreadsheetMutations() async {
@@ -426,7 +432,8 @@ Weet je zeker dat je wijzigingen wilt aanbrengen?
     return counts;
   }
 
-  void _buildDialogConfirm(BuildContext context, bool allProgramFieldSet) {
+  void _makeSpreadFinalAfterConfirm(
+      BuildContext context, bool allProgramFieldSet) {
     String msg = allProgramFieldSet
         ? "Weet je zeker dat je het schema van ${AppData.instance.getActiveMonthAsString()} definitief wilt maken"
         : "Eerst moeten alle trainingen gevuld zijn!";
@@ -462,6 +469,15 @@ Weet je zeker dat je wijzigingen wilt aanbrengen?
         return alert;
       },
     );
+  }
+
+  void _saveNewSpreadsheet() async {
+    await AppController.instance.updateSpreadsheet(_spreadSheet);
+    AppData.instance.getSpreadsheet().status =
+        AppData.instance.getOriginalpreadsheet().status;
+    wh.showSnackbar('Rooster is opgeslagen, maar nog niet definitief',
+        color: Colors.lightGreen);
+    AppEvents.fireSpreadsheetReady();
   }
 
   bool _areProgramFieldSet() {

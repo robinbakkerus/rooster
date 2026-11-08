@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rooster/service/navigation_service.dart';
+import 'package:rooster/widget/show_progress_widget.dart';
 
 class LoadingIndicatorDialog {
   static final LoadingIndicatorDialog _singleton =
@@ -13,7 +14,7 @@ class LoadingIndicatorDialog {
 
   LoadingIndicatorDialog._internal();
 
-  void show({String text = 'Loading...'}) {
+  void show({required String title}) {
     if (isDisplayed) {
       return;
     }
@@ -22,7 +23,8 @@ class LoadingIndicatorDialog {
         context: _context!,
         builder: (BuildContext context) {
           isDisplayed = true;
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+              child: ShowProgressWidget(title: title, value: 0, maxvalue: 10));
         });
   }
 

@@ -69,11 +69,16 @@ class ErrorEvent {
   );
 }
 
+class ProgressEvent {
+  final int value;
+  ProgressEvent(this.value);
+}
+
 /*
 	Static class that contains all onXxx and fireXxx methods.
 */
 class AppEvents {
-  static final EventBus _sEventBus = EventBus();
+  static final EventBus _sEventBus = EventBus(sync: true);
 
   // Only needed if clients want all EventBus functionality.
   static EventBus ebus() => _sEventBus;
@@ -114,6 +119,9 @@ class AppEvents {
   static void fireErrorEvent(String errMsg) =>
       _sEventBus.fire(ErrorEvent(errMsg));
 
+  static void fireProgressEvent(int currentStep) =>
+      _sEventBus.fire(ProgressEvent(currentStep));
+
   ///----- static onXxx methods --------
   static void onShowPage(OnShowPageFunc func) =>
       _sEventBus.on<ShowPageEvent>().listen((event) => func(event));
@@ -153,6 +161,9 @@ class AppEvents {
 
   static void onErrorEvent(OnErrorEventFunc func) =>
       _sEventBus.on<ErrorEvent>().listen((event) => func(event));
+
+  static void onProgressEvent(OnProgressEventFunc func) =>
+      _sEventBus.on<ProgressEvent>().listen((event) => func(event));
 }
 
 /// ----- typedef's -----------
@@ -182,3 +193,5 @@ typedef OnTrainerPrefUpdatedEventFunc = void Function(
     TrainerPrefUpdatedEvent event);
 
 typedef OnErrorEventFunc = void Function(ErrorEvent event);
+
+typedef OnProgressEventFunc = void Function(ProgressEvent event);
