@@ -577,17 +577,14 @@ class Available {
 
 class MetaPlanRankValues {
   List<PlanRankStartValue> startValues = [];
-  List<PlanRankStartValue> zamoStartValues = [];
 
   MetaPlanRankValues({
     required this.startValues,
-    required this.zamoStartValues,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'startValues': startValues.map((x) => x.toMap()).toList(),
-      'zamoStartValues': zamoStartValues.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -595,14 +592,12 @@ class MetaPlanRankValues {
     return MetaPlanRankValues(
       startValues: List<PlanRankStartValue>.from(
           map['startValues']?.map((x) => PlanRankStartValue.fromMap(x))),
-      zamoStartValues: List<PlanRankStartValue>.from(
-          map['zamoStartValues']?.map((x) => PlanRankStartValue.fromMap(x))),
     );
   }
 
   @override
   String toString() {
-    return 'PlanRankValues(startValues: $startValues, zamoStartValues: $zamoStartValues)';
+    return 'PlanRankValues(startValues: $startValues)';
   }
 
   @override
@@ -610,24 +605,20 @@ class MetaPlanRankValues {
     if (identical(this, other)) return true;
 
     return other is MetaPlanRankValues &&
-        listEquals(other.startValues, startValues) &&
-        listEquals(other.zamoStartValues, zamoStartValues);
+        listEquals(other.startValues, startValues);
   }
 
   @override
   int get hashCode {
-    return startValues.hashCode ^ zamoStartValues.hashCode;
+    return startValues.hashCode;
   }
 
   MetaPlanRankValues copyWith({
     List<PlanRankStartValue>? startValues,
-    List<PlanRankStartValue>? zamoStartValues,
-    int? onlyIfNeeded,
-    List<int>? alreadyScheduled,
   }) {
     return MetaPlanRankValues(
-        startValues: startValues ?? this.startValues,
-        zamoStartValues: zamoStartValues ?? this.zamoStartValues);
+      startValues: startValues ?? this.startValues,
+    );
   }
 }
 

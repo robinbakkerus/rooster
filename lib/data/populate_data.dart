@@ -172,9 +172,8 @@ MetaPlanRankValues getPlanRankValues() {
   startValues.add(PlanRankStartValue(trainerPk: 'OB', value: 110));
   startValues.add(PlanRankStartValue(trainerPk: 'FvH', value: 110));
   startValues.add(PlanRankStartValue(trainerPk: 'RV', value: 110));
-  List<PlanRankStartValue> zamoStartValues = [];
-  MetaPlanRankValues weightValues = MetaPlanRankValues(
-      startValues: startValues, zamoStartValues: zamoStartValues);
+  MetaPlanRankValues weightValues =
+      MetaPlanRankValues(startValues: startValues);
   return weightValues;
 }
 
