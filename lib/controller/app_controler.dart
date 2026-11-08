@@ -200,7 +200,11 @@ class AppController {
   Future<SpreadSheet> generateOrRetrieveSpreadsheet() async {
     SpreadSheet? spreadSheet = await _getTheActiveSpreadsheet();
     if (spreadSheet == null) {
-      LoadingIndicatorDialog().show(title: 'Rooster genereren..');
+      LoadingIndicatorDialog()
+          .show(title: 'Rooster genereren..', showSpinner: true);
+    } else {
+      LoadingIndicatorDialog()
+          .show(title: 'Rooster wordt opgehaald...', showSpinner: false);
     }
 
     SpreadSheet result;
@@ -223,7 +227,8 @@ class AppController {
   ///---------------------------------------
   /// triggered via Supervisor admin page
   Future<void> regenerateSpreadsheet() async {
-    LoadingIndicatorDialog().show(title: 'Rooster opnieuw genereren..');
+    LoadingIndicatorDialog()
+        .show(title: 'Rooster opnieuw genereren..', showSpinner: true);
     SpreadSheet? activeSpreadsheet;
     SpreadSheet updatedSpreadsheet;
 

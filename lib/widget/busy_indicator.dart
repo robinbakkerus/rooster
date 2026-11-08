@@ -14,7 +14,7 @@ class LoadingIndicatorDialog {
 
   LoadingIndicatorDialog._internal();
 
-  void show({required String title}) {
+  void show({required String title, required bool showSpinner}) {
     if (isDisplayed) {
       return;
     }
@@ -24,7 +24,8 @@ class LoadingIndicatorDialog {
         builder: (BuildContext context) {
           isDisplayed = true;
           return Center(
-              child: ShowProgressWidget(title: title, value: 0, maxvalue: 10));
+              child:
+                  ShowProgressWidget(title: title, showSpinner: showSpinner));
         });
   }
 

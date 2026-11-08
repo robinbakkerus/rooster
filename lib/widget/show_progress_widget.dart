@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ShowProgressWidget extends StatefulWidget {
-  const ShowProgressWidget({
-    super.key,
-    required this.value,
-    required this.maxvalue,
-    required this.title,
-  });
+  const ShowProgressWidget(
+      {super.key, required this.title, required this.showSpinner});
 
-  /// A value from 0.0 to 1.0, or null for an indeterminate indicator.
-  final int value;
-  final int maxvalue;
+  final bool showSpinner;
   final String title;
   final Color color = Colors.blue;
   final Color backgroundColor = Colors.grey;
@@ -65,7 +59,7 @@ class _ShowProgressWidgetState extends State<ShowProgressWidget> {
   }
 
   Widget _buildProgress() {
-    if (widget.title.isNotEmpty) {
+    if (widget.showSpinner) {
       return Center(
         child: CircularProgressIndicator(
           // value: _progressValue,
