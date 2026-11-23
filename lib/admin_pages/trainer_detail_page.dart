@@ -1,6 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';

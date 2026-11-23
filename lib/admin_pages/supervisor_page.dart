@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/admin_pages/manage_trainers.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';

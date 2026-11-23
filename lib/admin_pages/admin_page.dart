@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/repo/authentication.dart';

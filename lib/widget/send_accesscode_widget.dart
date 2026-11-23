@@ -1,6 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/model/app_models.dart';
 import 'package:rooster/service/dbs.dart';
 import 'package:rooster/util/app_mixin.dart';

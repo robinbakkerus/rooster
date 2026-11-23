@@ -5,7 +5,7 @@ import 'package:rooster/widget/show_availability_widget.dart';
 import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:rooster/util/spreadsheet_generator.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/widget/spreadsheet_top_buttons.dart';
 
 class TrainerProgressPage extends StatefulWidget {

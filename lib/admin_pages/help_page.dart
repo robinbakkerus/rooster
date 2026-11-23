@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/data/app_version.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -10,7 +10,7 @@ import 'package:rooster/widget/spreadsheet_extra_day_field.dart';
 import 'package:rooster/widget/spreadsheet_top_buttons.dart';
 import 'package:rooster/widget/spreadsheet_trainer_field.dart';
 import 'package:rooster/widget/spreadsheet_training_field.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 
@@ -275,8 +275,31 @@ class _SpreadsheetPageState extends State<SpreadsheetPage> with AppMixin {
             _buildActionButton(context),
           ],
         ),
+        _buildFooter(),
       ],
     );
+  }
+
+  Widget _buildFooter() {
+    if (_spreadSheet.status == SpreadsheetStatus.opened) {
+      return Row(
+        children: [
+          wh.horSpace(40),
+          Text('Schema is geopend voor wijziging(en)',
+              style: const TextStyle(fontSize: 20, color: Colors.orange)),
+        ],
+      );
+    } else if (_spreadSheet.status == SpreadsheetStatus.dirty) {
+      return Row(
+        children: [
+          wh.horSpace(40),
+          Text('Schema is aangepast, vergeet niet op te slaan!',
+              style: const TextStyle(fontSize: 20, color: Colors.orange)),
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
 
   //----------------------------

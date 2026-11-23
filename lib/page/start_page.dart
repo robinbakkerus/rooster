@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -198,7 +198,7 @@ class _StartPageState extends State<StartPage> {
       result = 'onderhanden';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.opened) {
-      result = 'geopend';
+      result = 'geopend voor wijzigingen';
     } else if (AppData.instance.getSpreadsheet().status ==
         SpreadsheetStatus.dirty) {
       result = 'aangepast';

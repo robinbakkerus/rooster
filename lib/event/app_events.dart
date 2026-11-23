@@ -78,7 +78,7 @@ class ProgressEvent {
 	Static class that contains all onXxx and fireXxx methods.
 */
 class AppEvents {
-  static final EventBus _sEventBus = EventBus(sync: true);
+  static final EventBus _sEventBus = EventBus();
 
   // Only needed if clients want all EventBus functionality.
   static EventBus ebus() => _sEventBus;

@@ -1,6 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -80,9 +80,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
 
   List<Widget> _readOnlyValues() {
     List<Widget> list = [];
-    list.add(_readOnlyRow('PK', 'pk'));
-    list.add(_readOnlyRow('Naam', 'fullname'));
-    list.add(_readOnlyRow('Rollen', 'roles'));
+    list.add(_readOnlyRowValues());
     list.add(wh.verSpace(10));
     list.add(_accesscodeRow());
     list.add(wh.verSpace(10));
@@ -94,24 +92,31 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
     return list;
   }
 
-  Widget _readOnlyRow(String label, String mapElem) {
+  Widget _readOnlyRowValues() {
+    return Row(
+      children: [
+        _readOnlyValue('Naam', 'fullname'),
+        wh.horSpace(10),
+        _readOnlyValue('Primary key:', 'pk'),
+        wh.horSpace(10),
+        _readOnlyValue('Rollen:', 'roles'),
+      ],
+    );
+  }
+
+  Widget _readOnlyValue(String label, String mapElem) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 2, 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(
-            width: c.w40,
-            child: Text(label),
-          ),
+          Text(label),
           wh.horSpace(10),
-          SizedBox(
-              width: c.w25 * 2,
-              child: Text(
-                _getStringValue(mapElem),
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.grey),
-              )),
+          Text(
+            _getStringValue(mapElem),
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.grey),
+          ),
         ],
       ),
     );
@@ -124,7 +129,7 @@ class _TrainerPrefsPageState extends State<TrainerPrefsPage> with AppMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: c.w40,
+            width: c.w1,
             child: const Text('toegangscode'),
           ),
           wh.horSpace(10),

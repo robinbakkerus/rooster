@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 // import 'package:flutter/services.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/model/app_models.dart';
@@ -248,8 +248,8 @@ class WidgetHelper {
             headingRowColor:
                 WidgetStateColor.resolveWith((states) => c.lightblue),
             columnSpacing: colSpace,
-            dataRowMinHeight: 20,
-            dataRowMaxHeight: 30,
+            dataRowMinHeight: 30,
+            dataRowMaxHeight: 40,
             columns: buildYesNoIfNeededHeader('Dag'),
             rows:
                 _buildDataRowsForPrefDays(trainer: trainer, viewOnly: viewOnly),
@@ -274,8 +274,8 @@ class WidgetHelper {
             headingRowColor:
                 WidgetStateColor.resolveWith((states) => c.lightblue),
             columnSpacing: colSpace,
-            dataRowMinHeight: 20,
-            dataRowMaxHeight: 30,
+            dataRowMinHeight: 30,
+            dataRowMaxHeight: 40,
             columns: buildYesNoIfNeededHeader('Groep'),
             rows: _buildDataRowsForPrefGroups(
                 trainer: trainer, viewOnly: viewOnly),

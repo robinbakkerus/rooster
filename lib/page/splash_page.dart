@@ -2,7 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/data/app_version.dart';
 import 'package:rooster/util/app_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SplashPage extends StatefulWidget {
   SplashPage({super.key});

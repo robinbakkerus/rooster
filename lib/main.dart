@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/page/start_page.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rooster/service/navigation_service.dart';
 import 'package:rooster/util/app_helper.dart';

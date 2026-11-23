@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rooster/controller/app_controler.dart';
 import 'package:rooster/data/app_data.dart';
 import 'package:rooster/event/app_events.dart';
@@ -95,6 +95,7 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
                 rows: _buildDataRows(),
               ),
               _showMaxTrainingCountIfNeeded(context),
+              _showIsUpdatedMsg(context),
             ],
           ),
         ),
@@ -228,6 +229,16 @@ class _SchemaEditPageState extends State<SchemaEditPage> with AppMixin {
     wh.showSnackbar(msg, color: col, seconds: seconds);
   }
 
+  Widget _showIsUpdatedMsg(BuildContext context) {
+    if (_isSchemaDirty()) {
+      return const Text(
+        'Schema gewijzigd, vergeet niet op te slaan.',
+        style: TextStyle(fontSize: 18, color: Colors.orange),
+      );
+    }
+    return Container();
+  }
+
   ///-----------------------------------
   bool _isSchemaDirty() {
     for (int i = 0; i < _updatedAvailableDataList.length; i++) {
@@ -261,11 +272,11 @@ Widget _showMaxTrainingCountIfNeeded(BuildContext context) {
       children: [
         Text(
           'Max aantal trainingen/maand staat nu op : $maxTrainingCount',
-          style: const TextStyle(fontSize: 16, color: Colors.orange),
+          style: const TextStyle(fontSize: 16, color: Colors.blue),
         ),
         Text(
           'Je kunt dit aanpassen in Voorkeuren.',
-          style: const TextStyle(fontSize: 16, color: Colors.orange),
+          style: const TextStyle(fontSize: 16, color: Colors.blue),
         ),
       ],
     );
