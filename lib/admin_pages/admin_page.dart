@@ -4,11 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:rooster/data/populate_data.dart' as p;
 import 'package:rooster/model/app_models.dart';
-import 'package:rooster/repo/authentication.dart';
 import 'package:rooster/repo/firestore_helper.dart';
 import 'package:rooster/service/dbs.dart';
 // import 'package:rooster/util/admin_helper.dart';
-import 'package:rooster/util/app_helper.dart';
 import 'package:rooster/util/app_mixin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,20 +46,23 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
                 onPressed: _deleteOldSchemaAndSpreadsheet,
                 child: const Text('Delete old schema en spreadsheet')),
             OutlinedButton(
+                onPressed: _deleteOldMails,
+                child: const Text('Delete old mails')),
+            OutlinedButton(
                 onPressed: _addMetaData, child: const Text('Add MetaData')),
             OutlinedButton(
                 onPressed: _sendEmail, child: const Text('Send email')),
-            OutlinedButton(
-                onPressed: _sendAccessCodes,
-                child: const Text('Email accesscodes')),
-            OutlinedButton(
-                onPressed: _signUpOrSignIn, child: const Text('SignUp')),
-            OutlinedButton(
-                onPressed: _updateFirebase,
-                child: const Text('Update Firebase')),
-            OutlinedButton(
-                onPressed: _updateTrainerSchemas,
-                child: const Text('Update Trainer schema in Firebase')),
+            // OutlinedButton(
+            //     onPressed: _sendAccessCodes,
+            //     child: const Text('Email accesscodes')),
+            // OutlinedButton(
+            //     onPressed: _signUpOrSignIn, child: const Text('SignUp')),
+            // OutlinedButton(
+            //     onPressed: _updateFirebase,
+            //     child: const Text('Update Firebase')),
+            // OutlinedButton(
+            //     onPressed: _updateTrainerSchemas,
+            //     child: const Text('Update Trainer schema in Firebase')),
           ],
         ),
       ),
@@ -169,6 +170,28 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     }
   }
 
+  void _deleteOldMails() async {
+    int count = 0;
+    CollectionReference mailRef =
+        FirestoreHelper.instance.collectionRef(FsCol.mail);
+    bool firstOne = true;
+    try {
+      final querySnapshot = await mailRef.get();
+      for (final doc in querySnapshot.docs) {
+        if (firstOne) {
+          firstOne = false;
+        } else {
+          await doc.reference.delete();
+          count++;
+        }
+      }
+    } catch (e, stackTrace) {
+      log('Error deleting old mails: $e');
+      log(stackTrace.toString());
+    }
+    log('Deleted $count old mails');
+  }
+
   void _deleteOldSchemaAndSpreadsheet() async {
     try {
       await _deleteOldSchemas();
@@ -225,23 +248,6 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
         toList: toTrainers, ccList: [], subject: 'subject', html: html);
   }
 
-  void _sendAccessCodes() async {
-    // for (Trainer trainer in _allTrainers()) {
-    for (Trainer trainer in p.allTrainers) {
-      String html = _accessCodeHtml(trainer);
-      Dbs.instance.sendEmail(
-          toList: [trainer], ccList: [], subject: 'Toegangscode', html: html);
-    }
-  }
-
-  void _signUpOrSignIn() async {
-    for (Trainer trainer in _allTrainers()) {
-      AuthHelper.instance.signUp(
-          email: trainer.email,
-          password: AppHelper.instance.getAuthPassword(trainer));
-    }
-  }
-
   void _addMetaData() async {
     await _addPlanRankValues();
     await _addTrainingItems();
@@ -277,6 +283,23 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
     Dbs.instance.saveTrainingGroups(groups);
   }
 
+  /*****************************************************  
+  
+  String _accessCodeHtml(Trainer trainer) {
+    String html = '<div>';
+    html += 'Hallo ${trainer.firstName()}<br><br>';
+    html +=
+        'Je kunt vanaf nu verhindering doorgeven via deze url: <b>https://lonutrainingschema.web.app</b> <br>';
+    html += 'Je toegangscode is: <b>${trainer.accessCode}</b> <br><br>';
+    html += 'Een korte uitleg vind je hier: <br>';
+    html +=
+        '<b>https://drive.google.com/file/d/1P1VRW5GXnh7jFimqcddL_0VJlvLq3Qrs/view?usp=sharing</b> <br><br>';
+
+    html += 'Gr Robin <br>';
+    return '$html</div>';
+  }
+
+
   // hiermee kun je handmatig een rij toevoegen aan de firebase spreadsheet.
   void _updateFirebase() async {
     FsSpreadsheet? spreadSheet =
@@ -293,22 +316,7 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       Dbs.instance.saveFsSpreadsheet(spreadSheet);
     }
   }
-
-  String _accessCodeHtml(Trainer trainer) {
-    String html = '<div>';
-    html += 'Hallo ${trainer.firstName()}<br><br>';
-    html +=
-        'Je kunt vanaf nu verhindering doorgeven via deze url: <b>https://lonutrainingschema.web.app</b> <br>';
-    html += 'Je toegangscode is: <b>${trainer.accessCode}</b> <br><br>';
-    html += 'Een korte uitleg vind je hier: <br>';
-    html +=
-        '<b>https://drive.google.com/file/d/1P1VRW5GXnh7jFimqcddL_0VJlvLq3Qrs/view?usp=sharing</b> <br><br>';
-
-    html += 'Gr Robin <br>';
-    return '$html</div>';
-  }
-
-  //----------------------------------------
+ 
   void _updateTrainerSchemas() async {
     List<Trainer> trainers = await Dbs.instance.getAllTrainers();
     for (Trainer trainer in trainers) {
@@ -324,4 +332,24 @@ class _AdminPageState extends State<AdminPage> with AppMixin {
       }
     }
   }
+
+
+  void _sendAccessCodes() async {
+    // for (Trainer trainer in _allTrainers()) {
+    for (Trainer trainer in p.allTrainers) {
+      String html = _accessCodeHtml(trainer);
+      Dbs.instance.sendEmail(
+          toList: [trainer], ccList: [], subject: 'Toegangscode', html: html);
+    }
+  }
+
+  void _signUpOrSignIn() async {
+    for (Trainer trainer in _allTrainers()) {
+      AuthHelper.instance.signUp(
+          email: trainer.email,
+          password: AppHelper.instance.getAuthPassword(trainer));
+    }
+  }
+
+  *******************************************************************/
 }
